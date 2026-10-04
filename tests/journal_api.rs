@@ -213,6 +213,7 @@ fn allocated_mutations_replay_conflict_and_restart_with_bounded_journal() {
                 architecture: "amd64".into(),
                 variant: None,
             },
+            pin: None,
         },
     );
     let corrupt_id = corrupt.operation_id.clone();

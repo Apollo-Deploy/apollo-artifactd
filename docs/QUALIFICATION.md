@@ -180,4 +180,12 @@ same-digest admission under a fresh token, conflicting pin ownership, GC,
 restart/replay, retained pin protection after restart, and release/collection.
 The controlled old effect fails because GC collects content after admission.
 This closes the artifactd import-to-pin gap; actual buildd publication and
-registry-pull protection still require integration and qualification.
+caller registry-pull lifecycle integration still requires qualification.
+
+## Registry pulls with atomic GC protection
+
+[Pull pin qualification](PULL_PIN.md) covers optional pin admission through
+both authenticated HTTPS transfer and verified local-cache reuse. The public
+daemon test checks a new cache-hit pin independently by releasing the original
+pin and collecting before preparation. Full registry fault/concurrency and
+caller lifecycle cutover gates remain open.

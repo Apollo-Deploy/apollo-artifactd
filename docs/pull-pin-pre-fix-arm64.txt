@@ -1,0 +1,32 @@
+   Compiling artifactd-protocol v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004/crates/artifactd-protocol)
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+warning: unused variable: `pin`
+  --> src/registry/pull.rs:44:9
+   |
+44 |         pin: Option<&str>,
+   |         ^^^ help: if this is intentional, prefix it with an underscore: `_pin`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `apollo-artifactd` (lib) generated 1 warning (run `cargo fix --lib -p apollo-artifactd` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.20s
+
+running 1 test
+     Running tests/registry_api.rs (target/debug/deps/registry_api-4fdf6c5f6d6ef05f)
+
+thread 'registry_api_fd_credentials_journal_and_prepared_facts' (135711) panicked at tests/registry_api.rs:132:5:
+assertion `left == right` failed
+  left: Null
+ right: String("registry-api-pull")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test registry_api_fd_credentials_journal_and_prepared_facts ... FAILED
+
+failures:
+
+failures:
+    registry_api_fd_credentials_journal_and_prepared_facts
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.76s
+
+CONTROLLED_UNPINNED_PULL_EXIT 101
+error: test failed, to rerun pass `--test registry_api`

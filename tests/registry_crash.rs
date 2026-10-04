@@ -165,6 +165,7 @@ fn sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_
         Action::Pull {
             reference: pinned.clone(),
             platform: platform(),
+            pin: None,
         },
     );
     let worker_request = pull.clone();
@@ -268,6 +269,7 @@ fn sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_
         Action::Pull {
             reference: pinned,
             platform: platform(),
+            pin: None,
         },
     );
     let response = client::call(

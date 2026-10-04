@@ -164,6 +164,8 @@ pub enum Action {
     Pull {
         reference: String,
         platform: Platform,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pin: Option<PinId>,
     },
     Push {
         digest: ArtifactDigest,

@@ -13,7 +13,8 @@ admission. A committed pin survives uncertain operation completion; restart
 reconciliation does not discard pins. Callers must keep their chosen PinId in
 their own durable lifecycle state and release it only when no longer needed.
 Omitting the pin preserves the generic unprotected import contract. Registry
-pull admission does not yet accept this optional pin and requires further work.
+pull admission also accepts this optional pin; see `PULL_PIN.md` for its
+separate network/cache qualification.
 
 The test-audit owner is the real Unix-socket daemon test `admission_pin`: an
 FD archive import, fresh-token direct admission with the same pin, conflict

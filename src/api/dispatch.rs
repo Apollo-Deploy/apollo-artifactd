@@ -177,16 +177,18 @@ fn dispatch(
         Action::Pull {
             reference,
             platform,
+            pin,
         } => {
             let registry = REGISTRY
                 .as_ref()
                 .map_err(|_| anyhow::anyhow!("registry runtime unavailable"))?;
-            registry.pull(
-                store,
-                reference,
-                platform,
-                crate::registry::Credentials::read(input)?,
-            )?
+            let credentials = crate::registry::Credentials::read(input)?;
+            match pin {
+                Some(pin) => {
+                    registry.pull_pinned(store, reference, platform, credentials, pin.as_str())?
+                }
+                None => registry.pull(store, reference, platform, credentials)?,
+            }
         }
         Action::Push { digest, reference } => {
             let registry = REGISTRY
