@@ -55,10 +55,15 @@ pub fn serve(store: &Path, path: &Path) -> Result<()> {
     filesystem::sync(&dir)?;
     loop {
         let socket = net::accept_with(&listener, SocketFlags::CLOEXEC)?;
-        if net::sockopt::socket_peercred(&socket)?.uid != geteuid() {
+        let peer = net::sockopt::socket_peercred(&socket)?;
+        if peer.uid != geteuid() {
             continue;
         }
-        if let Err(_error) = handle(&mut store, &socket) {
+        let caller = crate::state::PeerIdentity {
+            uid: peer.uid.as_raw(),
+            gid: peer.gid.as_raw(),
+        };
+        if let Err(_error) = handle(&mut store, &socket, &caller) {
             // Do not log customer input, credentials or registry diagnostics.
             eprintln!("artifactd request rejected");
         }
@@ -69,12 +74,12 @@ pub fn serve(store: &Path, path: &Path) -> Result<()> {
     }
 }
 
-fn handle(store: &mut Store, socket: &OwnedFd) -> Result<()> {
+fn handle(store: &mut Store, socket: &OwnedFd, caller: &crate::state::PeerIdentity) -> Result<()> {
     wire::wait(socket, false)?;
     let (bytes, fd) = wire::receive(socket)?;
     let request: Request = serde_json::from_slice(&bytes)?;
     ensure!(request.version == VERSION, "unsupported API version");
-    let (result, output) = dispatch::execute(store, &request, fd);
+    let (result, output) = dispatch::execute(store, &request, fd, caller);
     let response = Response {
         version: VERSION,
         operation_id: request.operation_id,

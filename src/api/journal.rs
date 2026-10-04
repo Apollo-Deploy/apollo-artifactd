@@ -1,7 +1,7 @@
 //! Bounded replay with daemon-issued identities and a durable retirement floor.
 use crate::{
     Store,
-    state::{Operation, StateTx},
+    state::{Operation, PeerIdentity, StateTx},
 };
 use anyhow::{Result, ensure};
 use artifactd_protocol::OperationId;
@@ -76,7 +76,7 @@ fn get(tx: &mut StateTx, id: &OperationId, sequence: u64) -> Result<Operation> {
     Ok(record)
 }
 
-pub(super) fn allocate(store: &Store) -> Result<OperationId> {
+pub(super) fn allocate(store: &Store, caller: &PeerIdentity) -> Result<OperationId> {
     // Requests execute serially. Any remaining intent between calls has an
     // unknown outcome, rather than a concurrently running owner. Resolve it
     // explicitly before retirement so a failed completion commit cannot wedge
@@ -134,6 +134,7 @@ pub(super) fn allocate(store: &Store) -> Result<OperationId> {
                 phase: "allocated".to_owned(),
                 result: None,
                 sequence: journal.next_sequence,
+                owner: Some(caller.clone()),
             },
         )?;
         journal.next_sequence = journal
@@ -151,11 +152,16 @@ pub(super) fn begin(
     id: &OperationId,
     payload: &str,
     registry: bool,
+    caller: &PeerIdentity,
 ) -> Result<Option<Result<Value, String>>> {
     store.db.transaction(|tx| {
         let journal = load(tx)?;
         let sequence = validate(&journal, id)?;
         let mut record = get(tx, id, sequence)?;
+        ensure!(
+            record.owner.as_ref() == Some(caller),
+            "operation owner mismatch"
+        );
         match record.phase.as_str() {
             "allocated" => {
                 ensure!(
@@ -207,11 +213,16 @@ pub(super) fn complete(
     payload: &str,
     outcome: &Result<&Value, String>,
     registry: bool,
+    caller: &PeerIdentity,
 ) -> Result<()> {
     store.db.transaction(|tx| {
         let journal = load(tx)?;
         let sequence = validate(&journal, id)?;
         let mut record = get(tx, id, sequence)?;
+        ensure!(
+            record.owner.as_ref() == Some(caller),
+            "operation owner mismatch"
+        );
         ensure!(
             record.phase == "intent" && record.request == payload,
             "operation completion lost its intent"

@@ -1,0 +1,25 @@
+COMMAND: /home/apollo-admin/.cargo/bin/cargo test --locked --test operation_owner ownerless_persisted_operation_fails_closed_and_is_preserved -- --exact
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.97s
+     Running tests/operation_owner.rs (target/debug/deps/operation_owner-4a203eaad6f55f90)
+
+running 1 test
+test ownerless_persisted_operation_fails_closed_and_is_preserved ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.08s
+
+COMMAND: /home/apollo-admin/.cargo/bin/cargo test --locked --test operation_owner_peer --no-run
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.27s
+  Executable tests/operation_owner_peer.rs (target/debug/deps/operation_owner_peer-fdb2e5dd78ba5520)
+COMMAND: sudo -n /home/apollo-admin/artifactd-qualification-20261004/target/debug/deps/operation_owner_peer-fdb2e5dd78ba5520 --ignored --exact kernel_peer_gid_binds_operation_owner_across_restart --nocapture
+
+running 1 test
+test kernel_peer_gid_binds_operation_owner_across_restart ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+COMMAND: /home/apollo-admin/.cargo/bin/cargo clippy --locked --workspace --all-targets -- -D warnings
+    Checking apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.98s
+FOCUSED_QUALIFICATION_EXIT=0

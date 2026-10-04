@@ -17,7 +17,7 @@ mod codec;
 mod integrity;
 mod records;
 use codec::{decode, encode, validate_key, validate_mutation, validate_table};
-pub use records::{Blob, Garbage, Imported, Operation, Prepared, Reference, Root};
+pub use records::{Blob, Garbage, Imported, Operation, PeerIdentity, Prepared, Reference, Root};
 pub const CURRENT_SCHEMA: u32 = 3;
 pub const MAX_RECORD: usize = 64 * 1024;
 const MAX_SCAN: usize = 4096;

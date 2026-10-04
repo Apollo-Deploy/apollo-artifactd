@@ -1,0 +1,29 @@
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+warning: unused import: `VERSION`
+ --> tests/operation_owner_peer.rs:3:44
+  |
+3 | use artifactd_protocol::{Action, Response, VERSION};
+  |                                            ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `apollo-artifactd` (test "operation_owner_peer") generated 1 warning (run `cargo fix --test "operation_owner_peer" -p apollo-artifactd` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.47s
+  Executable tests/operation_owner_peer.rs (target/debug/deps/operation_owner_peer-fdb2e5dd78ba5520)
+
+running 1 test
+
+thread 'kernel_peer_gid_binds_operation_owner_across_restart' (170390) panicked at tests/operation_owner_peer.rs:147:9:
+assertion failed: !foreign.status.success()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test kernel_peer_gid_binds_operation_owner_across_restart ... FAILED
+
+failures:
+
+failures:
+    kernel_peer_gid_binds_operation_owner_across_restart
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+
+CONTROL_EXIT=101

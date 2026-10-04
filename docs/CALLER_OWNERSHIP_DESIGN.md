@@ -1,12 +1,12 @@
 # Caller ownership design
 
-This is an implementation map for admitting trusted service peers with different UIDs. It preserves the existing v2 operation token format and replay semantics while making every durable capability owner-bound. It is a design document only; no production files are changed by this investigation.
+This is an implementation map for admitting trusted service peers with different UIDs. It preserves the existing v2 operation token format and replay semantics while making every durable capability owner-bound. The operation-token portion is implemented and qualified in [OPERATION_OWNERSHIP.md](OPERATION_OWNERSHIP.md). Reference ownership, role admission, quotas, and delegated consumer lifetime below remain implementation requirements.
 
 ## Current boundary and threat
 
 `src/api/mod.rs::serve` currently accepts a connection only when `rustix::net::sockopt::socket_peercred(&socket)?.uid == geteuid()`. The returned Linux `UCred` contains `pid`, `uid`, and `gid`. Once producer and sandbox consumer UIDs are admitted, UID equality can no longer be the authorization policy. The socket must map `(uid,gid)` to a configured role and reject unknown peers before decoding or journaling a request.
 
-The operation journal in `src/api/journal.rs` binds an ID to the current epoch, sequence, and serialized action. It does not bind the ID to the peer. A token copied from a producer to another admitted peer can therefore be replayed, and `OperationAllocate` can be used by any admitted peer to consume the global 4096-record window. Pins and leases in `src/state/records.rs::Reference` contain only a digest; `Store::unpin`, `Store::release`, `Store::leased`, and `Store::open_prepared` currently authorize by opaque ID alone. A peer that learns another peer's lease can open its graph or release it; a peer that learns a pin ID can revoke GC protection.
+The operation journal in `src/api/journal.rs` binds an ID to the current epoch, sequence, and serialized action. It now binds allocation, execution, and replay to the kernel peer UID/GID. `OperationAllocate` can still be used by any admitted peer to consume the global 4096-record window; per-principal quotas remain required. Pins and leases in `src/state/records.rs::Reference` contain only a digest; `Store::unpin`, `Store::release`, `Store::leased`, and `Store::open_prepared` currently authorize by opaque ID alone. A peer that learns another peer's lease can open its graph or release it; a peer that learns a pin ID can revoke GC protection.
 
 ## Durable records and schema
 

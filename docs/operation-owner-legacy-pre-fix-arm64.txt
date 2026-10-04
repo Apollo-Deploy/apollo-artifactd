@@ -1,0 +1,21 @@
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.53s
+     Running tests/operation_owner.rs (target/debug/deps/operation_owner-4a203eaad6f55f90)
+
+running 1 test
+
+thread 'ownerless_persisted_operation_fails_closed_and_is_preserved' (170977) panicked at tests/operation_owner.rs:75:13:
+daemon served ownerless journal
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ownerless_persisted_operation_fails_closed_and_is_preserved ... FAILED
+
+failures:
+
+failures:
+    ownerless_persisted_operation_fails_closed_and_is_preserved
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.10s
+
+error: test failed, to rerun pass `--test operation_owner`
+
+CONTROL_EXIT=101

@@ -189,3 +189,9 @@ both authenticated HTTPS transfer and verified local-cache reuse. The public
 daemon test checks a new cache-hit pin independently by releasing the original
 pin and collecting before preparation. Full registry fault/concurrency and
 caller lifecycle cutover gates remain open.
+
+[Durable operation ownership](OPERATION_OWNERSHIP.md) records exact kernel
+UID/GID token binding, ownerless startup refusal, controlled negative cases,
+and final native ordinary-suite/Clippy/release qualification on both hosts.
+This does not implement pin/lease ownership, delegated consumer lifetime,
+per-principal quotas, or server admission for distinct service UIDs.

@@ -41,9 +41,19 @@ pub struct Prepared {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct PeerIdentity {
+    pub uid: u32,
+    pub gid: u32,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Operation {
     pub request: String,
     pub phase: String,
     pub result: Option<String>,
     pub sequence: u64,
+    /// Missing on legacy records; never adopt these on first use.
+    #[serde(default)]
+    pub owner: Option<PeerIdentity>,
 }

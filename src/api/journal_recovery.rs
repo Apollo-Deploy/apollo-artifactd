@@ -25,6 +25,10 @@ pub(super) fn audit(store: &Store, recover: bool) -> Result<Value> {
                 break;
             }
             for (key, mut record) in page {
+                ensure!(
+                    record.owner.is_some(),
+                    "legacy operation ownership requires explicit migration"
+                );
                 let expected =
                     OperationId::token(&journal.epoch, sequence).map_err(anyhow::Error::msg)?;
                 ensure!(

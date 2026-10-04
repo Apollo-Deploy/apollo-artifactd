@@ -1,4 +1,4 @@
-use crate::Store;
+use crate::{Store, state::PeerIdentity};
 use anyhow::{Result, ensure};
 use artifactd_protocol::{Action, Request, VERSION};
 use rustix::fd::OwnedFd;
@@ -10,8 +10,9 @@ pub(super) fn execute(
     store: &mut Store,
     request: &Request,
     fd: Option<OwnedFd>,
+    caller: &PeerIdentity,
 ) -> (Result<Value, String>, Option<OwnedFd>) {
-    match recorded(store, request, fd) {
+    match recorded(store, request, fd, caller) {
         Ok((value, fd)) => (Ok(value), fd),
         Err(e) => (Err(e.to_string()), None),
     }
@@ -20,6 +21,7 @@ fn recorded(
     store: &mut Store,
     request: &Request,
     fd: Option<OwnedFd>,
+    caller: &PeerIdentity,
 ) -> Result<(Value, Option<OwnedFd>)> {
     let input_required = matches!(
         request.action,
@@ -57,13 +59,15 @@ fn recorded(
     }
     // Observations must reflect current integrity and liveness, including replay.
     if !request.action.is_mutation() {
-        return dispatch(store, &request.action, input);
+        return dispatch(store, &request.action, input, caller);
     }
     let payload = serde_json::to_string(&request.action)?;
-    if let Some(result) = super::journal::begin(store, &request.operation_id, &payload, registry)? {
+    if let Some(result) =
+        super::journal::begin(store, &request.operation_id, &payload, registry, caller)?
+    {
         return result.map(|v| (v, None)).map_err(anyhow::Error::msg);
     }
-    let outcome = dispatch(store, &request.action, input);
+    let outcome = dispatch(store, &request.action, input, caller);
     let saved: Result<&Value, String> = outcome.as_ref().map(|(v, _)| v).map_err(|e| e.to_string());
     // A page check can repair roots or fail partway through. Its owning
     // state is quarantined: never overwrite the uncertain journal afterward.
@@ -71,13 +75,21 @@ fn recorded(
         store.db.is_healthy(),
         "database quarantined; operation outcome uncertain; restart required"
     );
-    super::journal::complete(store, &request.operation_id, &payload, &saved, registry)?;
+    super::journal::complete(
+        store,
+        &request.operation_id,
+        &payload,
+        &saved,
+        registry,
+        caller,
+    )?;
     outcome
 }
 fn dispatch(
     store: &mut Store,
     action: &Action,
     input: Option<std::fs::File>,
+    caller: &PeerIdentity,
 ) -> Result<(Value, Option<OwnedFd>)> {
     let mut fd = None;
     let value = match action {
@@ -162,7 +174,7 @@ fn dispatch(
             json!({"recovered":store.reconcile(*max_operations)?})
         }
         Action::OperationAllocate => {
-            let id = super::journal::allocate(store)?;
+            let id = super::journal::allocate(store, caller)?;
             json!({"operation_id":id,"retention_window":super::journal::WINDOW})
         }
         Action::Status => store.status()?,

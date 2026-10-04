@@ -1,0 +1,21 @@
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.20s
+     Running tests/operation_owner.rs (target/debug/deps/operation_owner-4a203eaad6f55f90)
+
+running 1 test
+
+thread 'persisted_operation_owner_mismatch_blocks_effect_and_replay' (179199) panicked at tests/operation_owner.rs:140:10:
+called `Result::unwrap_err()` on an `Ok` value: Object {"artifact_digest": String("sha256:2626e8ce08937a4302bb2ee4575b8e6fe5e0705e6ef0ec2aea232353f0763605"), "size": Number(14)}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test persisted_operation_owner_mismatch_blocks_effect_and_replay ... FAILED
+
+failures:
+
+failures:
+    persisted_operation_owner_mismatch_blocks_effect_and_replay
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.10s
+
+error: test failed, to rerun pass `--test operation_owner`
+
+CONTROL_EXIT=101

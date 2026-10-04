@@ -1,0 +1,25 @@
+COMMAND: cargo test --locked --test operation_owner ownerless_persisted_operation_fails_closed_and_is_preserved -- --exact
+   Compiling apollo-artifactd v0.1.0 (/home/tihan/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.40s
+     Running tests/operation_owner.rs (target/debug/deps/operation_owner-29643be6cea60f98)
+
+running 1 test
+test ownerless_persisted_operation_fails_closed_and_is_preserved ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.06s
+
+COMMAND: cargo test --locked --test operation_owner_peer --no-run
+   Compiling apollo-artifactd v0.1.0 (/home/tihan/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.50s
+  Executable tests/operation_owner_peer.rs (target/debug/deps/operation_owner_peer-514fdd5a70bc0b66)
+COMMAND: sudo -n /home/tihan/artifactd-qualification-20261004/target/debug/deps/operation_owner_peer-514fdd5a70bc0b66 --ignored --exact kernel_peer_gid_binds_operation_owner_across_restart --nocapture
+
+running 1 test
+test kernel_peer_gid_binds_operation_owner_across_restart ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+COMMAND: cargo clippy --locked --workspace --all-targets -- -D warnings
+    Checking apollo-artifactd v0.1.0 (/home/tihan/artifactd-qualification-20261004)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.98s
+FOCUSED_QUALIFICATION_EXIT=0
