@@ -62,6 +62,10 @@ pub fn serve(store: &Path, path: &Path) -> Result<()> {
             // Do not log customer input, credentials or registry diagnostics.
             eprintln!("artifactd request rejected");
         }
+        ensure!(
+            store.db.is_healthy(),
+            "database quarantined; restart and reconciliation required"
+        );
     }
 }
 

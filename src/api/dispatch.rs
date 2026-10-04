@@ -65,6 +65,12 @@ fn recorded(
     }
     let outcome = dispatch(store, &request.action, input);
     let saved: Result<&Value, String> = outcome.as_ref().map(|(v, _)| v).map_err(|e| e.to_string());
+    // A page check can repair roots or fail partway through. Its owning
+    // state is quarantined: never overwrite the uncertain journal afterward.
+    ensure!(
+        store.db.is_healthy(),
+        "database quarantined; operation outcome uncertain; restart required"
+    );
     super::journal::complete(store, &request.operation_id, &payload, &saved, registry)?;
     outcome
 }

@@ -99,6 +99,25 @@ qualification files from that earlier repair. They precede incremental marking.
 
 [Incremental GC evidence](GC_INCREMENTAL.md) records the subsequent durable mark phases, reference epochs, bounded root scans and native mutation/recovery checks. These replace global GC reachability scans but do not prove the entire churn, latency or fault gate.
 
+At commit `29f069f`, both native hosts completed a fresh 100,000-blob and
+20,000-zero-layer-OCI churn run with incremental marking enabled. Logs are
+`gc-churn-current-{arm64,x86_64}.txt`. Each ended with zero blobs/bytes,
+11 FDs and one thread. Sampled process peak RSS was 6528 kB on ARM and
+7432 kB on x86. The external time command includes compilation and must not
+be interpreted as service-only peak memory or CPU. These runs precede the
+Doctor integrity and two-phase commit changes; they do not qualify those
+changes or the entire required state-growth/performance matrix.
+
+[Doctor integrity policy](DOCTOR_INTEGRITY.md) records page checking,
+quarantine, historical maintenance receipts and two-phase Immediate commits.
+[Independent Doctor review](RED_TEAM_DOCTOR.md) found no remaining material
+defect in that implementation, while retaining the broader fault campaign
+and global release gates. `doctor-native-{arm64,x86_64}.txt` records passing
+final exact daemon corruption checks, normal workspace suites, warning-free
+clippy and real SIGKILL import/prepared-GC recovery. Both debug snapshots
+match 79 current source/qualification files. These checks precede the new
+two-phase-commit churn measurement and remain separate from earlier churn.
+
 The package must not replace the existing Artifact implementation yet. Registry, secure credentials, all caller cutovers, old Zig removal, bounded global GC/concurrency, durable replay guarantees and the remaining qualification campaigns are mandatory work in this request. They are not deferred to a future version. `RED_TEAM_RELEASE_APPROVED` and `APOLLO_ARTIFACTD_PRODUCTION_COMPLETE` have not been earned.
 
 Retained command logs may have trailing whitespace normalized; test results and diagnostics are preserved.

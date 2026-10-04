@@ -13,8 +13,10 @@ use redb::{
 use rustix::fs::{Mode, OFlags};
 use serde::{Serialize, de::DeserializeOwned};
 use std::{fs::File, ops::Bound};
-
+mod codec;
+mod integrity;
 mod records;
+use codec::{decode, encode, validate_key, validate_mutation, validate_table};
 pub use records::{Blob, Garbage, Imported, Operation, Prepared, Reference, Root};
 pub const CURRENT_SCHEMA: u32 = 3;
 pub const MAX_RECORD: usize = 64 * 1024;
@@ -41,41 +43,12 @@ type Table = TableDefinition<'static, &'static str, &'static [u8]>;
 fn table(name: &'static str) -> Table {
     TableDefinition::new(name)
 }
-fn validate_table(name: &'static str) -> Result<()> {
-    ensure!(TABLES.contains(&name), "unknown state table: {name}");
-    Ok(())
-}
-
-fn validate_key(key: &str) -> Result<()> {
-    ensure!(!key.is_empty() && key.len() <= 4096, "invalid state key");
-    ensure!(!key.as_bytes().contains(&0), "state key contains NUL");
-    Ok(())
-}
-fn validate_mutation(name: &'static str, key: &str) -> Result<()> {
-    validate_table(name)?;
-    validate_key(key)?;
-    ensure!(
-        !(name == METADATA && matches!(key, "schema_version" | GC_REFERENCE_EPOCH)),
-        "schema version is immutable"
-    );
-    Ok(())
-}
-
-fn encode<T: Serialize>(value: &T) -> Result<Vec<u8>> {
-    let bytes = serde_json::to_vec(value).context("encode state record")?;
-    ensure!(bytes.len() <= MAX_RECORD, "state record exceeds 64 KiB");
-    Ok(bytes)
-}
-
-fn decode<T: DeserializeOwned>(bytes: &[u8]) -> Result<T> {
-    ensure!(bytes.len() <= MAX_RECORD, "state record exceeds 64 KiB");
-    serde_json::from_slice(bytes).context("decode state record")
-}
 /// A single owning redb database. The parent capability is retained so every
 /// committed mutation can sync the directory entry without reopening a path.
 pub struct State {
     db: Database,
     root: Dir,
+    healthy: bool,
 }
 
 impl State {
@@ -92,10 +65,15 @@ impl State {
             .set_cache_size(8 * 1024 * 1024)
             .create_file(File::from(fd))
             .context("open redb state")?;
-        let state = Self {
+        let mut state = Self {
             db,
             root: root.try_clone()?,
+            healthy: true,
         };
+        ensure!(
+            state.check_integrity()?,
+            "database repaired during open; reconciliation requires operator review"
+        );
         state.initialize_schema()?;
         Ok(state)
     }
@@ -141,12 +119,14 @@ impl State {
                 metadata.insert(GC_REFERENCE_EPOCH, encode(&0u64)?.as_slice())?;
             }
         }
+        write.set_two_phase_commit(true);
         write.set_durability(Durability::Immediate)?;
         write.commit()?;
         filesystem::sync(&self.root)
     }
 
     pub fn get<T: DeserializeOwned>(&self, name: &'static str, key: &str) -> Result<Option<T>> {
+        self.require_healthy()?;
         validate_table(name)?;
         validate_key(key)?;
         let read = self.db.begin_read()?;
@@ -158,6 +138,7 @@ impl State {
     }
 
     pub fn count(&self, name: &'static str) -> Result<u64> {
+        self.require_healthy()?;
         validate_table(name)?;
         let read = self.db.begin_read()?;
         Ok(read.open_table(table(name))?.len()?)
@@ -169,6 +150,7 @@ impl State {
         after: Option<&str>,
         limit: usize,
     ) -> Result<Vec<(String, T)>> {
+        self.require_healthy()?;
         let read = self.db.begin_read()?;
         scan_table(&read.open_table(table_checked(name)?)?, after, limit)
     }
@@ -182,6 +164,7 @@ impl State {
     }
 
     pub fn transaction<R>(&self, operation: impl FnOnce(&mut StateTx) -> Result<R>) -> Result<R> {
+        self.require_healthy()?;
         let write = self.db.begin_write()?;
         let mut tx = StateTx {
             write,
@@ -189,10 +172,23 @@ impl State {
         };
         let result = operation(&mut tx)?;
         tx.commit_epoch_if_dirty()?;
+        tx.write.set_two_phase_commit(true);
         tx.write.set_durability(Durability::Immediate)?;
         tx.write.commit()?;
         filesystem::sync(&self.root)?;
         Ok(result)
+    }
+
+    pub fn is_healthy(&self) -> bool {
+        self.healthy
+    }
+
+    fn require_healthy(&self) -> Result<()> {
+        ensure!(
+            self.healthy,
+            "state database is quarantined; restart required"
+        );
+        Ok(())
     }
 }
 

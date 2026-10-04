@@ -190,7 +190,6 @@ impl Action {
                 | Self::OpenBlob { .. }
                 | Self::OpenPrepared { .. }
                 | Self::Status
-                | Self::Doctor
                 | Self::Capabilities
         )
     }

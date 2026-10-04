@@ -150,10 +150,15 @@ impl Store {
     }
 
     pub fn doctor(&mut self) -> Result<serde_json::Value> {
+        let database_clean = self.db.check_integrity()?;
+        anyhow::ensure!(
+            database_clean,
+            "database integrity repair quarantined state; restart required"
+        );
         self.verify_live_graphs()?;
         filesystem::sync(&self.root)?;
         Ok(
-            serde_json::json!({"database": "open", "database_integrity_checked": false, "live_graphs_verified":true, "engine": "redb", "durability": "Immediate", "exclusive_owner": true}),
+            serde_json::json!({"database": "open", "inspection_scope": "operation_execution", "database_integrity_checked": true, "database_integrity_clean": true, "database_repaired": false, "live_graphs_verified":true, "engine": "redb", "durability": "Immediate", "exclusive_owner": true}),
         )
     }
 }

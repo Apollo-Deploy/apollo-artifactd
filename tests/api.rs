@@ -137,11 +137,16 @@ fn daemon_fd_contract_idempotency_and_replay() {
     rustix::net::connect(&raw, &rustix::net::SocketAddrUnix::new(&socket).unwrap()).unwrap();
     wire::send(&raw, b"{", None).unwrap();
     drop(raw);
-    assert!(
-        call(&socket, &request("doctor", Action::Doctor), None)
-            .unwrap()
-            .0
-            .result
-            .is_ok()
+    let doctor = mutation(Action::Doctor);
+    let facts = call(&socket, &doctor, None).unwrap().0.result.unwrap();
+    assert_eq!(facts["inspection_scope"], "operation_execution");
+    assert_eq!(facts["database_integrity_checked"], true);
+    assert_eq!(facts["database_integrity_clean"], true);
+    assert_eq!(facts["database_repaired"], false);
+    assert_eq!(facts["live_graphs_verified"], true);
+    // Retrying maintenance returns the recorded outcome, not a second repair.
+    assert_eq!(
+        call(&socket, &doctor, None).unwrap().0.result.unwrap(),
+        facts
     );
 }

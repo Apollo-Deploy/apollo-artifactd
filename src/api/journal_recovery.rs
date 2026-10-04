@@ -99,7 +99,9 @@ pub(super) fn audit(store: &Store, recover: bool) -> Result<Value> {
         }
         Ok(
             json!({"verified":true,"retained":sequence-journal.retired_through-1,
-            "retired_through":journal.retired_through,"interrupted":interrupted}),
+            "retired_through":journal.retired_through,
+            "interrupted":if recover { interrupted } else { 0 },
+            "pending_intents":if recover { 0 } else { interrupted }}),
         )
     })
 }

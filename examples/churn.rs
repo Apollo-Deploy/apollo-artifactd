@@ -3,14 +3,18 @@ use anyhow::{Result, ensure};
 use apollo_artifactd::{Limits, Store};
 use artifactd_protocol::{ArtifactDigest, Platform};
 use sha2::{Digest, Sha256};
-use std::{io::Cursor, path::PathBuf, time::Instant};
+use std::{
+    io::Cursor,
+    path::{Path, PathBuf},
+    time::Instant,
+};
 
 fn import(store: &mut Store, bytes: &[u8]) -> Result<ArtifactDigest> {
     let digest = format!("sha256:{}", hex::encode(Sha256::digest(bytes))).parse()?;
     store.import_blob(&mut Cursor::new(bytes), &digest, bytes.len() as u64)?;
     Ok(digest)
 }
-fn resources() -> serde_json::Value {
+fn resources(path: &Path) -> serde_json::Value {
     #[cfg(target_os = "linux")]
     {
         let status = std::fs::read_to_string("/proc/self/status").unwrap_or_default();
@@ -25,11 +29,11 @@ fn resources() -> serde_json::Value {
         let fds = std::fs::read_dir("/proc/self/fd")
             .map(|it| it.count())
             .unwrap_or(0);
-        serde_json::json!({"status":selected,"fds":fds})
+        serde_json::json!({"status":selected,"fds":fds,"database_bytes":std::fs::metadata(path.join("state.redb")).map(|m|m.len()).unwrap_or(0)})
     }
     #[cfg(not(target_os = "linux"))]
     {
-        serde_json::json!({"native_linux":false})
+        serde_json::json!({"native_linux":false,"store":path})
     }
 }
 fn distribution(mut samples: Vec<u128>) -> serde_json::Value {
@@ -48,7 +52,7 @@ fn main() -> Result<()> {
         .ok_or_else(|| anyhow::anyhow!("private store path required"))?
         .into();
     let mut store = Store::open(&path, Limits::default())?;
-    let baseline = resources();
+    let baseline = resources(&path);
     let start = Instant::now();
     let mut latency = Vec::with_capacity(100_000);
     for i in 0u64..100_000 {
@@ -61,7 +65,7 @@ fn main() -> Result<()> {
         if i % 10_000 == 0 {
             println!(
                 "{}",
-                serde_json::json!({"blob_iteration":i,"resources":resources()})
+                serde_json::json!({"blob_iteration":i,"resources":resources(&path)})
             );
         }
     }
@@ -92,13 +96,49 @@ fn main() -> Result<()> {
         if i % 2000 == 0 {
             println!(
                 "{}",
-                serde_json::json!({"oci_iteration":i,"resources":resources()})
+                serde_json::json!({"oci_iteration":i,"resources":resources(&path)})
             );
         }
     }
+    let oci_elapsed = start.elapsed();
+    let final_state = store.status()?;
+    let final_resources = resources(&path);
+    ensure!(
+        final_state["blobs"] == 0 && final_state["bytes"] == 0,
+        "churn retained blobs"
+    );
+    drop(store);
+    let mut restarted = Store::open(&path, Limits::default())?;
+    ensure!(
+        restarted.status()?["blobs"] == 0,
+        "restart resurrected blobs"
+    );
+    let restart_doctor = restarted.doctor()?;
+    drop(restarted);
+    let dir = cap_std::fs::Dir::open_ambient_dir(&path, cap_std::ambient_authority())?;
+    let state = apollo_artifactd::state::State::open(&dir)?;
+    let mut inventory = serde_json::Map::new();
+    for table in [
+        "blobs",
+        "imports",
+        "roots",
+        "edges",
+        "pins",
+        "leases",
+        "prepared",
+        "gc",
+        "gc_marks",
+        "operations",
+        "registry",
+    ] {
+        let count = state.count(table)?;
+        ensure!(count == 0, "churn retained {count} {table} records");
+        inventory.insert(table.to_owned(), count.into());
+    }
+    inventory.insert("metadata".into(), state.count("metadata")?.into());
     println!(
         "{}",
-        serde_json::json!({"blob_operations":100000,"oci_lifecycles":20000,"blob_elapsed_seconds":blobs_elapsed.as_secs_f64(),"oci_elapsed_seconds":start.elapsed().as_secs_f64(),"blob_latency":distribution(latency),"oci_latency":distribution(oci_latency),"baseline":baseline,"final_resources":resources(),"final_state":store.status()?})
+        serde_json::json!({"blob_operations":100000,"oci_lifecycles":20000,"blob_elapsed_seconds":blobs_elapsed.as_secs_f64(),"oci_elapsed_seconds":oci_elapsed.as_secs_f64(),"blob_latency":distribution(latency),"oci_latency":distribution(oci_latency),"baseline":baseline,"final_resources":final_resources,"final_state":final_state,"final_inventory":inventory,"restart_doctor":restart_doctor})
     );
     Ok(())
 }
