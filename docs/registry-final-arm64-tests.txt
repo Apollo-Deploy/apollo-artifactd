@@ -1,0 +1,71 @@
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+warning: struct `Daemon` is never constructed
+ --> tests/support/daemon.rs:7:12
+  |
+7 | pub struct Daemon(pub Child);
+  |            ^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: associated function `spawn` is never used
+  --> tests/support/daemon.rs:10:12
+   |
+ 9 | impl Daemon {
+   | ----------- associated function in this implementation
+10 |     pub fn spawn(store: &Path, runtime: &Path) -> (Self, PathBuf) {
+   |            ^^^^^
+
+warning: constant `MANIFEST` is never used
+ --> tests/support/mod.rs:7:11
+  |
+7 | pub const MANIFEST: &str = "application/vnd.oci.image.manifest.v1+json";
+  |           ^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `digest` is never used
+ --> tests/support/mod.rs:9:8
+  |
+9 | pub fn digest(bytes: &[u8]) -> ArtifactDigest {
+  |        ^^^^^^
+
+warning: function `import` is never used
+  --> tests/support/mod.rs:14:8
+   |
+14 | pub fn import(store: &mut Store, bytes: &[u8]) -> ArtifactDigest {
+   |        ^^^^^^
+
+warning: function `platform` is never used
+  --> tests/support/mod.rs:21:8
+   |
+21 | pub fn platform(arch: &str) -> Platform {
+   |        ^^^^^^^^
+
+warning: function `layer` is never used
+  --> tests/support/mod.rs:28:8
+   |
+28 | pub fn layer(entries: &[(&str, &[u8])]) -> Vec<u8> {
+   |        ^^^^^
+
+warning: function `image` is never used
+  --> tests/support/mod.rs:40:8
+   |
+40 | pub fn image(
+   |        ^^^^^
+
+warning: `apollo-artifactd` (test "registry_api") generated 6 warnings
+warning: `apollo-artifactd` (test "registry") generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.14s
+     Running tests/registry.rs (target/debug/deps/registry-2136830c64677dbe)
+
+running 1 test
+test https_registry_push_pull_verifies_graph_and_retries ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.35s
+
+     Running tests/registry_api.rs (target/debug/deps/registry_api-4a1a6625661f272c)
+
+running 1 test
+test registry_api_fd_credentials_journal_and_prepared_facts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.64s

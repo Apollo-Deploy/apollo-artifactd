@@ -1,0 +1,13 @@
+Command (isolated copy with the old first-page recovery scan):
+
+cargo test --offline --test recovery prepared_recovery_cursor -- --nocapture
+
+Result: FAIL. The valid fixture retained the later pending record:
+
+assertion `left == right` failed
+left: 4097
+right: 4096
+
+The fixture contained 4096 complete records backed by real read-only prepared
+directories, followed by a later intent record. This is an actual isolated
+source-copy run with the cursor implementation replaced by the old scan.

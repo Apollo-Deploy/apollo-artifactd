@@ -1,18 +1,11 @@
 #![cfg(target_os = "linux")]
 use apollo_artifactd::api::call;
 use artifactd_protocol::{Action, Request, VERSION, wire};
+use daemon::Daemon;
 use sha2::{Digest, Sha256};
-use std::{
-    os::unix::fs::PermissionsExt,
-    process::{Child, Command, Stdio},
-};
-struct Daemon(Child);
-impl Drop for Daemon {
-    fn drop(&mut self) {
-        let _ = self.0.kill();
-        let _ = self.0.wait();
-    }
-}
+use std::os::unix::fs::PermissionsExt;
+#[path = "support/daemon.rs"]
+mod daemon;
 
 #[test]
 fn daemon_fd_contract_idempotency_and_replay() {
@@ -21,31 +14,7 @@ fn daemon_fd_contract_idempotency_and_replay() {
     for dir in [root.path(), runtime.path()] {
         std::fs::set_permissions(dir, std::fs::Permissions::from_mode(0o700)).unwrap();
     }
-    let socket = runtime.path().join("artifactd.sock");
-    let mut daemon = Daemon(
-        Command::new(env!("CARGO_BIN_EXE_apollo-artifactd"))
-            .env_clear()
-            .args([
-                "--store",
-                root.path().to_str().unwrap(),
-                "--socket",
-                socket.to_str().unwrap(),
-            ])
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()
-            .unwrap(),
-    );
-    for _ in 0..100 {
-        if socket.exists() {
-            break;
-        }
-        assert!(
-            daemon.0.try_wait().unwrap().is_none(),
-            "daemon exited before ready"
-        );
-        std::thread::sleep(std::time::Duration::from_millis(10));
-    }
+    let (_daemon, socket) = Daemon::spawn(root.path(), runtime.path());
     let request = |id: &str, action| Request {
         version: VERSION,
         operation_id: id.to_owned().try_into().unwrap(),
@@ -60,7 +29,7 @@ fn daemon_fd_contract_idempotency_and_replay() {
     let import = request(
         "import",
         Action::ImportBlob {
-            digest: d.clone(),
+            digest: Some(d.clone()),
             size: 5,
         },
     );
@@ -88,7 +57,10 @@ fn daemon_fd_contract_idempotency_and_replay() {
                 let file = std::fs::File::open(path).unwrap();
                 let action = request(
                     &format!("duplicate-{i}"),
-                    Action::ImportBlob { digest, size: 5 },
+                    Action::ImportBlob {
+                        digest: Some(digest),
+                        size: 5,
+                    },
                 );
                 assert!(call(socket, &action, Some(&file)).unwrap().0.result.is_ok());
             }));
@@ -97,6 +69,21 @@ fn daemon_fd_contract_idempotency_and_replay() {
             task.join().unwrap();
         }
     });
+    let calculated = request(
+        "calculate",
+        Action::ImportBlob {
+            digest: None,
+            size: 5,
+        },
+    );
+    let fresh_input = std::fs::File::open(input.path()).unwrap();
+    let result = call(&socket, &calculated, Some(&fresh_input))
+        .unwrap()
+        .0
+        .result
+        .unwrap();
+    assert_eq!(result["artifact_digest"], d.as_str());
+    assert_eq!(result["size"], 5);
     let conflict = request("import", Action::Gc { max_entries: 1 });
     assert!(call(&socket, &conflict, None).unwrap().0.result.is_err());
     let lease: artifactd_protocol::LeaseId = "consumer".to_owned().try_into().unwrap();

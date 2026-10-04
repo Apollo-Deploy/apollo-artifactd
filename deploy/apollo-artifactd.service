@@ -1,6 +1,6 @@
 [Unit]
 Description=Apollo artifact daemon (qualification build)
-After=local-fs.target
+After=local-fs.target network.target
 
 [Service]
 Type=simple
@@ -19,7 +19,7 @@ ProtectHome=true
 PrivateTmp=true
 PrivateDevices=true
 RestrictSUIDSGID=true
-RestrictAddressFamilies=AF_UNIX
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
 CapabilityBoundingSet=
 ReadWritePaths=/var/lib/apollo-artifactd /run/apollo-artifactd
 MemoryMax=1G

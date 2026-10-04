@@ -1,9 +1,10 @@
 use crate::Store;
-use anyhow::{Result, bail, ensure};
+use anyhow::{Result, ensure};
 use artifactd_protocol::{Action, Request, VERSION};
-use rusqlite::OptionalExtension;
 use rustix::fd::OwnedFd;
 use serde_json::{Value, json};
+static REGISTRY: std::sync::LazyLock<Result<crate::registry::Registry>> =
+    std::sync::LazyLock::new(crate::registry::Registry::new);
 
 pub(super) fn execute(
     store: &mut Store,
@@ -24,10 +25,26 @@ fn recorded(
         request.action,
         Action::ImportBlob { .. } | Action::ImportOciArchive { .. }
     );
+    let registry = matches!(request.action, Action::Pull { .. } | Action::Push { .. });
     ensure!(
-        fd.is_some() == input_required,
+        registry || fd.is_some() == input_required,
         "unexpected/missing input descriptor"
     );
+    // Validate references before serializing operation intent: credentials may
+    // only enter through a descriptor, never through a URL or query string.
+    match &request.action {
+        Action::Pull { reference, .. } => {
+            crate::registry::validate_reference(reference, true)?;
+        }
+        Action::Push { digest, reference } => {
+            let target = crate::registry::validate_reference(reference, false)?;
+            ensure!(
+                target.digest().is_none_or(|v| v == digest.as_str()),
+                "push destination digest mismatch"
+            );
+        }
+        _ => {}
+    }
     let input = fd.map(std::fs::File::from);
     if let Some(file) = &input {
         let stat = rustix::fs::fstat(file)?;
@@ -54,56 +71,70 @@ fn recorded(
         return dispatch(store, &request.action, input);
     }
     let payload = serde_json::to_string(&request.action)?;
-    let prior: Option<(String, String, Option<String>)> = store
+    let prior = store
         .db
-        .query_row(
-            "SELECT request,phase,result FROM operations WHERE id=?1",
-            [request.operation_id.as_str()],
-            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
-        )
-        .optional()?;
+        .get::<crate::state::Operation>("operations", request.operation_id.as_str())?;
     let open = matches!(
         request.action,
         Action::OpenBlob { .. } | Action::OpenPrepared { .. }
     );
-    if let Some((old, phase, result)) = prior {
-        ensure!(old == payload, "operation identity conflict");
-        if phase == "complete" && !open {
+    if let Some(record) = prior {
+        ensure!(record.request == payload, "operation identity conflict");
+        if record.phase == "complete" && !open {
             let result: Result<Value, String> = serde_json::from_str(
-                &result.ok_or_else(|| anyhow::anyhow!("missing operation result"))?,
+                &record
+                    .result
+                    .ok_or_else(|| anyhow::anyhow!("missing operation result"))?,
             )?;
             return result.map(|v| (v, None)).map_err(anyhow::Error::msg);
         }
     } else {
-        let pending: u32 = store.db.query_row(
-            "SELECT count(*) FROM operations WHERE phase='intent'",
-            [],
-            |r| r.get(0),
-        )?;
-        ensure!(pending < 4096, "unfinished operation limit");
-        store.db.execute(
-            "INSERT INTO operations(id,request,phase) VALUES (?1,?2,'intent')",
-            rusqlite::params![request.operation_id.as_str(), payload],
+        ensure!(
+            store.db.count("operations")? < 4096,
+            "operation journal capacity exhausted"
+        );
+        record(
+            store,
+            request.operation_id.as_str(),
+            &crate::state::Operation {
+                request: payload.clone(),
+                phase: "intent".to_owned(),
+                result: None,
+                sequence: 0,
+            },
+            registry,
         )?;
     }
     let outcome = dispatch(store, &request.action, input);
     let saved: Result<&Value, String> = outcome.as_ref().map(|(v, _)| v).map_err(|e| e.to_string());
-    store.db.execute(
-        "UPDATE operations SET phase=?3,result=?2 WHERE id=?1",
-        rusqlite::params![
-            request.operation_id.as_str(),
-            serde_json::to_string(&saved)?,
-            if outcome.is_ok() {
+    record(
+        store,
+        request.operation_id.as_str(),
+        &crate::state::Operation {
+            request: payload,
+            phase: if outcome.is_ok() {
                 "complete"
             } else {
                 "failed"
             }
-        ],
+            .to_owned(),
+            result: Some(serde_json::to_string(&saved)?),
+            sequence: 0,
+        },
+        registry,
     )?;
-    // Bound history without pruning unfinished mutation intents. Each effect is
-    // independently idempotent; IDs older than this window may be re-executed.
-    store.db.execute("DELETE FROM operations WHERE phase IN ('complete','failed') AND seq < (SELECT coalesce(max(seq),0)-4096 FROM operations)", [])?;
+    // Preserve retry identities. Capacity exhaustion rejects new operations;
+    // it never discards a result and silently re-executes an old operation ID.
     outcome
+}
+fn record(store: &Store, id: &str, value: &crate::state::Operation, registry: bool) -> Result<()> {
+    store.db.transaction(|tx| {
+        tx.put("operations", id, value)?;
+        if registry {
+            tx.put("registry", id, value)?;
+        }
+        Ok(())
+    })
 }
 fn dispatch(
     store: &mut Store,
@@ -114,8 +145,13 @@ fn dispatch(
     let value = match action {
         Action::ImportBlob { digest, size } => {
             let mut file = input.ok_or_else(|| anyhow::anyhow!("missing blob FD"))?;
-            store.import_blob(&mut file, digest, *size)?;
-            json!({"artifact_digest":digest,"size":size})
+            let actual = if let Some(expected) = digest {
+                store.import_blob(&mut file, expected, *size)?;
+                expected.clone()
+            } else {
+                store.import_calculated(&mut file, *size)?
+            };
+            json!({"artifact_digest":actual,"size":size})
         }
         Action::ImportOci { digest, platform } => store.admit_oci(digest, platform)?,
         Action::ImportOciArchive { platform } => store.import_oci_archive(
@@ -128,7 +164,7 @@ fn dispatch(
             json!({"artifact_digest":digest,"size":file.metadata()?.len(),"verified":true})
         }
         Action::Resolve { digest, platform } => {
-            crate::oci::facts(&store.resolve(digest, platform)?, platform)
+            crate::oci::facts(digest, &store.resolve(digest, platform)?, platform)
         }
         Action::Pin { id, digest } => {
             store.pin(id.as_str(), digest)?;
@@ -147,7 +183,19 @@ fn dispatch(
             json!({"lease_id":id})
         }
         Action::Prepare { digest, platform } => {
-            json!({"prepared_artifact_id":store.prepare(digest,platform)?})
+            let id = store.prepare(digest, platform)?;
+            let prepared = store
+                .db
+                .get::<crate::state::Prepared>("prepared", id.as_str())?
+                .ok_or_else(|| anyhow::anyhow!("missing prepared receipt"))?;
+            let tree_digest = prepared
+                .tree_digest
+                .ok_or_else(|| anyhow::anyhow!("missing prepared digest"))?;
+            let prepared_digest: artifactd_protocol::PreparedDigest =
+                format!("sha256:{tree_digest}").parse()?;
+            json!({"prepared_artifact_id":id,"prepared_digest":prepared_digest,
+                "manifest_digest":prepared.manifest,"platform":prepared.platform,"size":prepared.size,
+                "format":"artifactd-rootfs-v1"})
         }
         Action::OpenBlob { digest, lease } => {
             ensure!(
@@ -168,10 +216,32 @@ fn dispatch(
         Action::Status => store.status()?,
         Action::Doctor => store.doctor()?,
         Action::Capabilities => {
-            json!({"version":VERSION,"fd_transport":"SCM_RIGHTS","credentials":"SO_PEERCRED","platforms":["linux/amd64","linux/arm64"],"registry":false,"production_qualified":false})
+            json!({"version":VERSION,"fd_transport":"SCM_RIGHTS","credentials":"SO_PEERCRED","registry_credentials":"PRIVATE_FD","platforms":["linux/amd64","linux/arm64"],"registry":true,"production_qualified":false})
         }
-        Action::Pull { .. } | Action::Push { .. } => {
-            bail!("registry operations unavailable: production qualification incomplete")
+        Action::Pull {
+            reference,
+            platform,
+        } => {
+            let registry = REGISTRY
+                .as_ref()
+                .map_err(|_| anyhow::anyhow!("registry runtime unavailable"))?;
+            registry.pull(
+                store,
+                reference,
+                platform,
+                crate::registry::Credentials::read(input)?,
+            )?
+        }
+        Action::Push { digest, reference } => {
+            let registry = REGISTRY
+                .as_ref()
+                .map_err(|_| anyhow::anyhow!("registry runtime unavailable"))?;
+            registry.push(
+                store,
+                digest,
+                reference,
+                crate::registry::Credentials::read(input)?,
+            )?
         }
     };
     Ok((value, fd))

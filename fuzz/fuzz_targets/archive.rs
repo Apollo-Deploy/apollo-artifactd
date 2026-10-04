@@ -16,7 +16,7 @@ fuzz_target!(|bytes: &[u8]| {
         let _ = store.prepare(&manifest, &p);
     }
     drop(store);
-    if let Ok(store) = Store::open(root.path(), limits) {
+    if let Ok(mut store) = Store::open(root.path(), limits) {
         assert!(store.doctor().is_ok());
     }
 });

@@ -30,7 +30,7 @@ This evidence covers the new standalone package. It does not qualify the existin
 
 The churn example runs direct core calls, including verification and durable filesystem/database effects. Each host uses a fresh private store. Blob cycles use small unique contents; OCI cycles use valid zero-layer manifests/configs. These results establish that these fixtures finish at the requested counts; they do not establish daemon or registry load behavior. JSONL samples and `/usr/bin/time -v` output are retained. Final state inventories record empty tables/directories and SQLite size, but do not prove long-term journal replay semantics.
 
-Measurements are generated from the retained native JSON/JSONL logs below. Cross-host throughput differences are not a controlled architecture comparison. Import and preparation use a 256 MiB uncompressed layer, with verification and fsync enabled. Registry pull/push throughput has no measurement because the operations are unavailable.
+Measurements are generated from the retained native JSON/JSONL logs below. Cross-host throughput differences are not a controlled architecture comparison. Import and preparation use a 256 MiB uncompressed layer, with verification and fsync enabled. Registry pull/push throughput was not measured in this baseline campaign.
 
 | Measurement | arm64 (`apollo-node-01`) | x86_64 (`tihan-apollo`) |
 |---|---:|---:|
@@ -47,7 +47,7 @@ Measurements are generated from the retained native JSON/JSONL logs below. Cross
 | Verified import MiB/s | 182.68 | 74.0 |
 | Verified prepare MiB/s | 65.63 | 20.01 |
 
-These are the final native reruns after the latest state/OCI guards. Each host passed the full current test suite (18 test entries, including the child-worker helper), release all-targets build, and core churn. The source/Cargo hashes in `native-{architecture}-snapshot.json` match the local production source bytes. Binary hashes, host uname and read-only final store inventories are retained; both inventories have zero rows and data-directory entries, `quick_check=ok`, an 86,016-byte main database and a zero-length WAL. The read-only inventory connection may create SQLite shared-memory sidecars. This is not the full required fault or daemon-journal campaign.
+These are the final native reruns after the latest state/OCI guards. Each host passed the full current test suite (18 test entries, including the child-worker helper), release all-targets build, and core churn. The source/Cargo hashes in `native-{architecture}-snapshot.json` matched the production source bytes at baseline commit `3a42141`; subsequent feature evidence is recorded separately. Binary hashes, host uname and read-only final store inventories are retained; both inventories have zero rows and data-directory entries, `quick_check=ok`, an 86,016-byte main database and a zero-length WAL. The read-only inventory connection may create SQLite shared-memory sidecars. This is not the full required fault or daemon-journal campaign.
 
 ## Fuzz and dependency commands
 
@@ -55,6 +55,18 @@ The separate `fuzz/` workspace pins its own dependencies. Local Darwin sanitizer
 
 `cargo audit --json` was run for both production and fuzz lockfiles; both reports contain zero vulnerabilities and no warnings. `cargo deny check` passed advisories, bans, licenses and sources, with duplicate-version warnings. `cargo tree --locked` and a metadata-derived CycloneDX 1.5 SBOM are retained. `sbom-validation.txt` confirms official schema validation, unique component references and complete dependency-edge references for all 167 components. `cargo clippy --locked --workspace --all-targets -- -D warnings` passes. No dependency-audit exception was added to suppress an advisory.
 
+## Subsequent implementation progress
+
+[Producer-calculated imports](PRODUCER_IMPORT.md) add optional digest handling, durable unresolved/resolved intents and real SIGKILL recovery coverage after the baseline snapshot. Their native checks are separate from the baseline churn/performance logs. Registry-library hardening and capability-FD redb state conversion are implemented but are not release-qualified.
+
+Current authenticated HTTPS integration tests passed on both native Linux architectures (`registry-redb-{arm64,x86_64}-tests.txt`): layered image push/pull, duplicate transfers, descriptor integrity, preparation, wrong references and authentication failures. The native workspace suites and warning-free clippy checks also passed (`redb-native-{arm64,x86_64}-tests.txt`, `redb-{arm64,x86_64}-clippy.txt`). These runs precede the subsequent prepared/blob GC cursor repairs and final upload-Location patch; those changes need their own native rerun. They do not qualify all registry fault/security/performance requirements.
+
+`cargo-audit-redb-registry.json` and `cargo-audit-fuzz-redb-registry.json` record current lockfile vulnerability checks. `cargo-deny-redb-registry.txt` passes all checks after review of the certificate-data license retained in `licenses/`. The current 293-component SBOM includes the vendored OCI fork and redb; `sbom-validation-redb-registry.txt` validates its official schema, dependency references and lockfile hash. The 167-component baseline inventory is preserved as `sbom-baseline-3a42141.cdx.json`.
+
+Latest integration checks are recorded in `registry-final-{arm64,x86_64}-tests.txt`: both the core HTTPS transfer test and the real daemon Unix-FD registry test pass. The API test verifies protected credential FD delivery, secret-free errors/journal records, pre-journal reference rejection and canonical `PreparedDigest` facts. It does not establish all registry response/fault cases. [Cursor recovery evidence](CURSOR_RECOVERY.md) records the subsequent bounded-page progress regressions and both native reruns. Current source/debug binary snapshots are separate from the baseline release binaries and performance logs.
+
 ## Release decision
 
 The package must not replace the existing Artifact implementation yet. Registry, secure credentials, all caller cutovers, old Zig removal, bounded global GC/concurrency, durable replay guarantees and the remaining qualification campaigns are mandatory work in this request. They are not deferred to a future version. `RED_TEAM_RELEASE_APPROVED` and `APOLLO_ARTIFACTD_PRODUCTION_COMPLETE` have not been earned.
+
+Retained command logs may have trailing whitespace normalized; test results and diagnostics are preserved.

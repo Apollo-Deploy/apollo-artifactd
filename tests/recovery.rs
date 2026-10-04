@@ -1,5 +1,8 @@
 mod support;
-use apollo_artifactd::{Limits, Store};
+use apollo_artifactd::{
+    Limits, Store,
+    state::{Garbage, Imported, Prepared, State},
+};
 use std::{
     io::{Cursor, Read},
     os::unix::fs::PermissionsExt,
@@ -26,10 +29,17 @@ fn publication_and_gc_intents_reconcile_idempotently() {
     std::fs::write(&path, data).unwrap();
     std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o400)).unwrap();
     std::fs::hard_link(&path, root.path().join("blobs").join(digest.hex())).unwrap();
-    let db = rusqlite::Connection::open(root.path().join("state.sqlite")).unwrap();
-    db.execute(
-        "INSERT INTO imports(id,temp,digest,size) VALUES (?1,?2,?3,?4)",
-        rusqlite::params![id, temp, digest.as_str(), data.len() as i64],
+    let dir =
+        cap_std::fs::Dir::open_ambient_dir(root.path(), cap_std::ambient_authority()).unwrap();
+    let db = State::open(&dir).unwrap();
+    db.put(
+        "imports",
+        &id,
+        &Imported {
+            temp: temp.clone(),
+            digest: Some(digest.clone()),
+            size: data.len() as u64,
+        },
     )
     .unwrap();
     drop(db);
@@ -38,10 +48,13 @@ fn publication_and_gc_intents_reconcile_idempotently() {
     assert!(!path.exists());
     assert_eq!(store.reconcile(10).unwrap(), 0);
     drop(store);
-    let db = rusqlite::Connection::open(root.path().join("state.sqlite")).unwrap();
-    db.execute(
-        "INSERT INTO gc(digest,size) VALUES (?1,?2)",
-        rusqlite::params![digest.as_str(), data.len() as i64],
+    let db = State::open(&dir).unwrap();
+    db.put(
+        "gc",
+        digest.as_str(),
+        &Garbage {
+            size: data.len() as u64,
+        },
     )
     .unwrap();
     std::fs::remove_file(root.path().join("blobs").join(digest.hex())).unwrap();
@@ -63,17 +76,96 @@ fn prepared_publication_reconciles_before_reuse() {
     );
     let prepared = store.prepare(&manifest, &platform("amd64")).unwrap();
     drop(store);
-    let db = rusqlite::Connection::open(root.path().join("state.sqlite")).unwrap();
-    db.execute(
-        "UPDATE prepared SET phase='intent' WHERE id=?1",
-        [prepared.as_str()],
-    )
-    .unwrap();
+    let dir =
+        cap_std::fs::Dir::open_ambient_dir(root.path(), cap_std::ambient_authority()).unwrap();
+    let db = State::open(&dir).unwrap();
+    let mut record = db
+        .get::<Prepared>("prepared", prepared.as_str())
+        .unwrap()
+        .unwrap();
+    record.phase = "intent".to_owned();
+    db.put("prepared", prepared.as_str(), &record).unwrap();
     drop(db);
     let mut store = Store::open(root.path(), Limits::default()).unwrap();
     assert_eq!(
         store.prepare(&manifest, &platform("amd64")).unwrap(),
         prepared
+    );
+}
+
+#[test]
+fn prepared_recovery_cursor_reaches_late_intent_after_many_complete_records() {
+    let root = root();
+    drop(Store::open(root.path(), Limits::default()).unwrap());
+    let dir =
+        cap_std::fs::Dir::open_ambient_dir(root.path(), cap_std::ambient_authority()).unwrap();
+    let db = State::open(&dir).unwrap();
+    let manifest = digest(b"recovery-manifest");
+    std::fs::write(
+        root.path().join("blobs").join(manifest.hex()),
+        b"recovery-manifest",
+    )
+    .unwrap();
+    std::fs::set_permissions(
+        root.path().join("blobs").join(manifest.hex()),
+        std::fs::Permissions::from_mode(0o400),
+    )
+    .unwrap();
+    for n in 0..4096u32 {
+        let id = format!("{n:064x}");
+        std::fs::create_dir(root.path().join("prepared").join(&id)).unwrap();
+        std::fs::set_permissions(
+            root.path().join("prepared").join(&id),
+            std::fs::Permissions::from_mode(0o500),
+        )
+        .unwrap();
+    }
+    db.transaction(|tx| {
+        tx.put(
+            "blobs",
+            manifest.as_str(),
+            &apollo_artifactd::state::Blob { size: 17 },
+        )?;
+        for n in 0..4096u32 {
+            let id = format!("{n:064x}");
+            tx.put(
+                "prepared",
+                &id,
+                &Prepared {
+                    manifest: manifest.clone(),
+                    platform: platform("amd64"),
+                    phase: "complete".into(),
+                    tree_digest: Some(digest(b"").hex().to_string()),
+                    staging: format!("{}.staging", uuid::Uuid::new_v4()),
+                    size: 0,
+                },
+            )?;
+        }
+        tx.put(
+            "prepared",
+            &format!("{:064x}", 4096u32),
+            &Prepared {
+                manifest,
+                platform: platform("amd64"),
+                phase: "intent".into(),
+                tree_digest: None,
+                staging: format!("{}.staging", uuid::Uuid::new_v4()),
+                size: 0,
+            },
+        )
+    })
+    .unwrap();
+    drop(db);
+
+    let mut store = Store::open(root.path(), Limits::default()).unwrap();
+    store.reconcile(4096).unwrap();
+    drop(store);
+    let db = State::open(&dir).unwrap();
+    assert_eq!(db.count("prepared").unwrap(), 4096);
+    assert!(
+        db.get::<Prepared>("prepared", &format!("{:064x}", 4096u32))
+            .unwrap()
+            .is_none()
     );
 }
 
@@ -98,21 +190,39 @@ fn crash_import_worker() {
         return;
     };
     let mut store = Store::open(std::path::Path::new(&path), Limits::default()).unwrap();
-    store
-        .import_blob(&mut PausedInput { first: true }, &digest(b"complete"), 8)
-        .unwrap();
+    if std::env::var_os("ARTIFACTD_TEST_CALCULATED_IMPORT").is_some() {
+        store
+            .import_calculated(&mut PausedInput { first: true }, 8)
+            .unwrap();
+    } else {
+        store
+            .import_blob(&mut PausedInput { first: true }, &digest(b"complete"), 8)
+            .unwrap();
+    }
 }
 
 #[test]
 fn sigkill_during_import_never_resolves_partial_content() {
+    kill_import(false);
+}
+
+#[test]
+fn sigkill_during_calculated_import_discards_unresolved_intent() {
+    kill_import(true);
+}
+
+fn kill_import(calculated: bool) {
     let root = root();
-    let mut child = Command::new(std::env::current_exe().unwrap())
+    let mut command = Command::new(std::env::current_exe().unwrap());
+    command
         .args(["--exact", "crash_import_worker", "--nocapture"])
         .env("ARTIFACTD_TEST_CRASH_STORE", root.path())
         .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .unwrap();
+        .stderr(Stdio::null());
+    if calculated {
+        command.env("ARTIFACTD_TEST_CALCULATED_IMPORT", "1");
+    }
+    let mut child = command.spawn().unwrap();
     let deadline = Instant::now() + Duration::from_secs(10);
     let partial = loop {
         let files = std::fs::read_dir(root.path().join("temp"));

@@ -1,5 +1,5 @@
 mod support;
-use apollo_artifactd::{Limits, Store};
+use apollo_artifactd::{Limits, Store, state::State};
 use std::{
     io::{Cursor, Read},
     os::unix::fs::PermissionsExt,
@@ -120,14 +120,22 @@ fn corrupt_reachability_cannot_authorize_gc() {
         false,
     );
     store.pin("keep", &manifest).unwrap();
-    let db = rusqlite::Connection::open(root.path().join("state.sqlite")).unwrap();
-    db.execute("DELETE FROM edges WHERE parent=?1", [manifest.as_str()])
-        .unwrap();
-    assert!(store.gc(100).is_err());
-    assert_eq!(store.status().unwrap()["blobs"], 3);
-    db.execute("DELETE FROM roots", []).unwrap();
-    assert!(store.gc(100).is_err());
-    assert_eq!(store.status().unwrap()["blobs"], 3);
+    drop(store);
+    let dir =
+        cap_std::fs::Dir::open_ambient_dir(root.path(), cap_std::ambient_authority()).unwrap();
+    let db = State::open(&dir).unwrap();
+    db.remove("edges", manifest.as_str()).unwrap();
+    drop(db);
+    assert!(Store::open(root.path(), Limits::default()).is_err());
+    let db = State::open(&dir).unwrap();
+    for (key, _) in db
+        .scan::<apollo_artifactd::state::Root>("roots", None, 4096)
+        .unwrap()
+    {
+        db.remove("roots", &key).unwrap();
+    }
+    drop(db);
+    assert!(Store::open(root.path(), Limits::default()).is_err());
 }
 
 #[test]

@@ -1,6 +1,6 @@
 //! Versioned generic artifact contract. Files cross the boundary as SCM_RIGHTS.
 mod digest;
-pub use digest::{ArtifactDigest, BlobDigest, ConfigDigest, ManifestDigest};
+pub use digest::{ArtifactDigest, BlobDigest, ConfigDigest, ManifestDigest, PreparedDigest};
 use serde::{Deserialize, Serialize};
 
 pub const VERSION: u32 = 1;
@@ -77,7 +77,8 @@ pub struct Request {
 )]
 pub enum Action {
     ImportBlob {
-        digest: BlobDigest,
+        #[serde(default)]
+        digest: Option<BlobDigest>,
         size: u64,
     },
     ImportOci {

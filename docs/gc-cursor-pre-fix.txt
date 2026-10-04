@@ -1,0 +1,24 @@
+   Compiling apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.72s
+     Running tests/cas.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/cas-3fddcb867d6c92cd)
+
+running 1 test
+test incremental_gc_progresses_past_pinned_prefix_after_restart ... FAILED
+
+failures:
+
+---- incremental_gc_progresses_past_pinned_prefix_after_restart stdout ----
+
+thread 'incremental_gc_progresses_past_pinned_prefix_after_restart' (1892457) panicked at tests/cas.rs:62:5:
+assertion `left == right` failed
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    incremental_gc_progresses_past_pinned_prefix_after_restart
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.24s
+
+error: test failed, to rerun pass `--test cas`

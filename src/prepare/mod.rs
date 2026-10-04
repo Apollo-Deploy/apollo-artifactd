@@ -5,7 +5,6 @@ mod tree;
 use crate::{Store, filesystem};
 use anyhow::{Result, ensure};
 use artifactd_protocol::{ArtifactDigest, Platform, PreparedArtifactId};
-use rusqlite::OptionalExtension;
 use sha2::{Digest, Sha256};
 
 const FORMAT: &str = "artifactd-rootfs-v1";
@@ -24,19 +23,14 @@ impl Store {
         let p = serde_json::to_string(platform)?;
         let identity = format!("{FORMAT}\n{source}\n{p}\n");
         let id = hex::encode(Sha256::digest(identity.as_bytes()));
-        let phase: Option<String> = self
-            .db
-            .query_row("SELECT phase FROM prepared WHERE id=?1", [&id], |r| {
-                r.get(0)
-            })
-            .optional()?;
+        let existing = self.db.get::<crate::state::Prepared>("prepared", &id)?;
+        let phase = existing.as_ref().map(|record| record.phase.clone());
         if phase.as_deref() == Some("complete") {
             let dir = self.prepared.open_dir(&id)?;
-            let expected: String =
-                self.db
-                    .query_row("SELECT tree_digest FROM prepared WHERE id=?1", [&id], |r| {
-                        r.get(0)
-                    })?;
+            let expected = existing
+                .as_ref()
+                .and_then(|record| record.tree_digest.clone())
+                .ok_or_else(|| anyhow::anyhow!("missing prepared tree digest"))?;
             ensure!(
                 tree::verify(&dir)? == expected,
                 "prepared integrity mismatch"
@@ -44,11 +38,36 @@ impl Store {
             return PreparedArtifactId::try_from(id).map_err(anyhow::Error::msg);
         }
         if phase.is_some() {
-            self.recover_prepared(4096)?;
-            return self.prepare(source, platform);
+            self.recover_prepared_id(&id)?;
+            if let Some(record) = self.db.get::<crate::state::Prepared>("prepared", &id)? {
+                ensure!(
+                    record.phase == "complete",
+                    "prepared recovery left incomplete intent"
+                );
+                let expected = record
+                    .tree_digest
+                    .ok_or_else(|| anyhow::anyhow!("missing prepared tree digest"))?;
+                let dir = self.prepared.open_dir(&id)?;
+                ensure!(
+                    tree::verify(&dir)? == expected,
+                    "prepared integrity mismatch"
+                );
+                return PreparedArtifactId::try_from(id).map_err(anyhow::Error::msg);
+            }
         }
         let staging_name = format!("{}.staging", uuid::Uuid::new_v4());
-        self.db.execute("INSERT INTO prepared(id,manifest,platform,phase,staging) VALUES (?1,?2,?3,'intent',?4)", rusqlite::params![id,source.as_str(),p,staging_name])?;
+        self.db.put(
+            "prepared",
+            &id,
+            &crate::state::Prepared {
+                manifest: source.clone(),
+                platform: platform.clone(),
+                phase: "intent".to_owned(),
+                tree_digest: None,
+                staging: staging_name.clone(),
+                size: 0,
+            },
+        )?;
         rustix::fs::mkdirat(
             &self.prepared,
             &staging_name,
@@ -58,36 +77,50 @@ impl Store {
         let staging = filesystem::directory(&self.prepared, &staging_name)?;
         let size = self.extract_layers(&image, &staging)?;
         let tree_digest = tree::freeze(&staging)?;
-        self.db.execute(
-            "UPDATE prepared SET tree_digest=?2,size=?3 WHERE id=?1",
-            rusqlite::params![id, tree_digest, i64::try_from(size)?],
+        self.db.put(
+            "prepared",
+            &id,
+            &crate::state::Prepared {
+                manifest: source.clone(),
+                platform: platform.clone(),
+                phase: "intent".to_owned(),
+                tree_digest: Some(tree_digest.clone()),
+                staging: staging_name.clone(),
+                size,
+            },
         )?;
         filesystem::sync(&staging)?;
         self.prepared.rename(&staging_name, &self.prepared, &id)?;
         filesystem::sync(&self.prepared)?;
-        self.db
-            .execute("UPDATE prepared SET phase='complete' WHERE id=?1", [&id])?;
+        let mut record = self
+            .db
+            .get::<crate::state::Prepared>("prepared", &id)?
+            .ok_or_else(|| anyhow::anyhow!("prepared intent disappeared"))?;
+        record.phase = "complete".to_owned();
+        self.db.put("prepared", &id, &record)?;
         PreparedArtifactId::try_from(id).map_err(anyhow::Error::msg)
     }
 
     pub fn open_prepared(&self, id: &PreparedArtifactId, lease: &str) -> Result<std::fs::File> {
-        let manifest: String = self.db.query_row(
-            "SELECT manifest FROM prepared WHERE id=?1 AND phase='complete'",
-            [id.as_str()],
-            |r| r.get(0),
-        )?;
+        let record = self
+            .db
+            .get::<crate::state::Prepared>("prepared", id.as_str())?
+            .ok_or_else(|| anyhow::anyhow!("prepared artifact not found"))?;
+        ensure!(
+            record.phase == "complete",
+            "prepared artifact is incomplete"
+        );
+        let manifest = record.manifest.to_string();
         ensure!(
             self.leased(lease, &manifest.parse()?)?,
             "prepared artifact requires a covering lease"
         );
         let dir = self.prepared.open_dir(id.as_str())?;
-        let expected: String = self.db.query_row(
-            "SELECT tree_digest FROM prepared WHERE id=?1",
-            [id.as_str()],
-            |r| r.get(0),
-        )?;
+        let expected = record
+            .tree_digest
+            .ok_or_else(|| anyhow::anyhow!("missing prepared tree digest"))?;
         ensure!(
-            tree::verify(&dir)? == expected,
+            tree::verify(&dir)? == expected.as_str(),
             "prepared integrity mismatch"
         );
         let fd = rustix::fs::openat(

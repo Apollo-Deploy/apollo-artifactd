@@ -2,6 +2,7 @@ use super::tree;
 use crate::{Store, filesystem, oci::Image};
 use anyhow::{Result, bail, ensure};
 use cap_std::fs::Dir;
+use serde::de::DeserializeOwned;
 use sha2::{Digest, Sha256};
 use std::{
     io::{Read, Write},
@@ -46,7 +47,21 @@ impl Store {
     }
 
     pub(crate) fn extract_layers(&self, image: &Image, root: &Dir) -> Result<u64> {
-        let used: u64 = self.db.query_row("SELECT (SELECT coalesce(sum(size),0) FROM blobs)+(SELECT coalesce(sum(size),0) FROM prepared)",[],|r| crate::state::unsigned(r,0))?;
+        let blob_bytes = sum_sizes(
+            &self.db,
+            "blobs",
+            |item: &crate::state::Blob| item.size,
+            "blob",
+        )?;
+        let prepared_bytes = sum_sizes(
+            &self.db,
+            "prepared",
+            |item: &crate::state::Prepared| item.size,
+            "prepared",
+        )?;
+        let used = blob_bytes
+            .checked_add(prepared_bytes)
+            .ok_or_else(|| anyhow::anyhow!("store usage overflow"))?;
         let available = self
             .limits
             .max_store
@@ -180,6 +195,28 @@ impl Store {
             }
         }
         Ok(output)
+    }
+}
+
+fn sum_sizes<T: DeserializeOwned>(
+    db: &crate::state::State,
+    table: &'static str,
+    size: impl Fn(&T) -> u64,
+    label: &str,
+) -> Result<u64> {
+    let mut total = 0u64;
+    let mut after = None;
+    loop {
+        let page = db.scan::<T>(table, after.as_deref(), 4096)?;
+        if page.is_empty() {
+            return Ok(total);
+        }
+        for (_, item) in &page {
+            total = total
+                .checked_add(size(item))
+                .ok_or_else(|| anyhow::anyhow!("{label} bytes overflow"))?;
+        }
+        after = page.last().map(|(key, _)| key.clone());
     }
 }
 

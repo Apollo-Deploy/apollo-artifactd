@@ -1,0 +1,15 @@
+   Compiling apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.34s
+     Running tests/cas.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/cas-3fddcb867d6c92cd)
+
+running 8 tests
+test legacy_sqlite_state_is_rejected_without_cleanup ... ok
+test invalid_inputs_never_publish ... ok
+test foreign_files_and_links_are_never_collected ... ok
+test quota_and_exclusive_store_owner ... ok
+test cas_admission_durability_and_references ... ok
+test incremental_gc_progresses_past_pinned_prefix_after_restart ... ok
+test calculated_identity_streams_deduplicates_and_rejects_wrong_size ... ok
+test stored_identity_matches_bytes ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 30.05s

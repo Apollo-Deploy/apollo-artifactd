@@ -1,5 +1,6 @@
 [workspace]
 members = ["crates/artifactd-protocol"]
+exclude = ["vendor/oci-client"]
 resolver = "3"
 
 [package]
@@ -15,7 +16,14 @@ artifactd-protocol = { path = "crates/artifactd-protocol", version = "0.1.0" }
 anyhow = "1"
 sha2 = "0.10"
 hex = "0.4"
-rusqlite = { version = "0.38", features = ["bundled"] }
+redb = "4.3"
+oci-client = { path = "vendor/oci-client", version = "0.18.0", default-features = false, features = ["rustls-tls"] }
+tokio = { version = "1", features = ["rt-multi-thread", "fs", "time", "net"] }
+tokio-util = { version = "0.7", features = ["io", "io-util"] }
+futures-util = "0.3"
+bytes = "1"
+http = "1"
+zeroize = "1"
 rustix = { version = "1.1", features = ["fs", "net", "process", "event"] }
 cap-std = "4"
 oci-spec = "0.9"

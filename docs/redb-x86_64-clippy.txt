@@ -1,0 +1,26 @@
+   Compiling aws-lc-rs v1.18.1
+    Checking aws-lc-sys v0.45.0
+   Compiling rustls v0.23.45
+    Checking artifactd-protocol v0.1.0 (/home/tihan/artifactd-qualification-20261004/crates/artifactd-protocol)
+    Checking fastrand v2.5.0
+    Checking ppv-lite86 v0.2.21
+    Checking wait-timeout v0.2.1
+    Checking bit-vec v0.8.0
+    Checking fnv v1.0.7
+    Checking quick-error v1.2.3
+    Checking tempfile v3.27.0
+    Checking bit-set v0.8.0
+    Checking rand_xorshift v0.4.0
+    Checking rand v0.9.5
+    Checking unarray v0.1.4
+    Checking rand_chacha v0.9.0
+    Checking rusty-fork v0.3.1
+    Checking proptest v1.11.0
+    Checking rustls-webpki v0.103.15
+    Checking tokio-rustls v0.26.6
+    Checking rustls-platform-verifier v0.7.1
+    Checking hyper-rustls v0.27.10
+    Checking reqwest v0.13.5
+    Checking oci-client v0.18.0 (/home/tihan/artifactd-qualification-20261004/vendor/oci-client)
+    Checking apollo-artifactd v0.1.0 (/home/tihan/artifactd-qualification-20261004)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.91s

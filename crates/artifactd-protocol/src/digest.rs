@@ -13,6 +13,7 @@ pub struct ArtifactDigest(String);
 pub type BlobDigest = ArtifactDigest;
 pub type ManifestDigest = ArtifactDigest;
 pub type ConfigDigest = ArtifactDigest;
+pub type PreparedDigest = ArtifactDigest;
 
 impl ArtifactDigest {
     pub fn hex(&self) -> &str {

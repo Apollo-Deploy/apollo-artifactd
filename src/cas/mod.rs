@@ -6,7 +6,6 @@ use crate::{filesystem, state};
 use anyhow::{Result, ensure};
 use artifactd_protocol::ArtifactDigest;
 use cap_std::fs::Dir;
-use rusqlite::Connection;
 use sha2::{Digest, Sha256};
 use std::{
     fs::File,
@@ -18,6 +17,9 @@ use std::{
 pub struct Limits {
     pub max_blob: u64,
     pub max_store: u64,
+    pub max_objects: u64,
+    pub max_temp_bytes: u64,
+    pub max_pending_imports: u32,
     pub max_metadata: u64,
     pub max_graph: usize,
     pub max_output: u64,
@@ -29,6 +31,9 @@ impl Default for Limits {
         Self {
             max_blob: 4 << 30,
             max_store: 16 << 30,
+            max_objects: 1_000_000,
+            max_temp_bytes: 4 << 30,
+            max_pending_imports: 4096,
             max_metadata: 4 << 20,
             max_graph: 128,
             max_output: 16 << 30,
@@ -43,7 +48,7 @@ pub struct Store {
     pub(crate) blobs: Dir,
     pub(crate) temp: Dir,
     pub(crate) prepared: Dir,
-    pub(crate) db: Connection,
+    pub(crate) db: state::State,
     pub limits: Limits,
     _owner: File,
 }
@@ -55,7 +60,14 @@ impl Store {
         let blobs = filesystem::directory(&root, "blobs")?;
         let temp = filesystem::directory(&root, "temp")?;
         let prepared = filesystem::directory(&root, "prepared")?;
-        let db = state::open(&root, path)?;
+        // A legacy SQLite file is never opened or replaced implicitly. The redb
+        // adapter creates only state.redb; callers must perform an explicit
+        // migration before reusing a store containing state.sqlite.
+        ensure!(
+            !path.join("state.sqlite").exists(),
+            "legacy SQLite state requires explicit migration"
+        );
+        let db = state::State::open(&root)?;
         let mut store = Self {
             root,
             blobs,
@@ -71,11 +83,11 @@ impl Store {
 
     /// Rehashes bytes before exposing an immutable read handle.
     pub fn open_blob(&self, digest: &ArtifactDigest) -> Result<File> {
-        let expected: u64 = self.db.query_row(
-            "SELECT size FROM blobs WHERE digest=?1",
-            [digest.as_str()],
-            |r| crate::state::unsigned(r, 0),
-        )?;
+        let expected = self
+            .db
+            .get::<state::Blob>("blobs", digest.as_str())?
+            .ok_or_else(|| anyhow::anyhow!("blob is not admitted"))?
+            .size;
         self.verify_file(digest, expected)
     }
 
@@ -109,21 +121,37 @@ impl Store {
     }
 
     pub fn status(&self) -> Result<serde_json::Value> {
-        let (count, bytes): (u64, u64) = self.db.query_row(
-            "SELECT count(*), coalesce(sum(size),0) FROM blobs",
-            [],
-            |r| Ok((crate::state::unsigned(r, 0)?, crate::state::unsigned(r, 1)?)),
-        )?;
+        let count = self.db.count("blobs")?;
+        let mut bytes = 0u64;
+        let mut after = None;
+        let mut seen = 0u64;
+        loop {
+            let entries = self
+                .db
+                .scan::<state::Blob>("blobs", after.as_deref(), 4096)?;
+            if entries.is_empty() {
+                break;
+            }
+            for (_, blob) in &entries {
+                bytes = bytes
+                    .checked_add(blob.size)
+                    .ok_or_else(|| anyhow::anyhow!("blob bytes overflow"))?;
+            }
+            seen += entries.len() as u64;
+            after = entries.last().map(|(key, _)| key.clone());
+        }
+        ensure!(seen == count, "status scan changed during inspection");
         Ok(
-            serde_json::json!({"blobs": count, "bytes": bytes, "schema": 1, "production_qualified": false}),
+            serde_json::json!({"blobs": count, "bytes": bytes, "schema": crate::state::CURRENT_SCHEMA, "production_qualified": false}),
         )
     }
 
-    pub fn doctor(&self) -> Result<serde_json::Value> {
-        let check: String = self.db.query_row("PRAGMA quick_check", [], |r| r.get(0))?;
-        ensure!(check == "ok", "state integrity check failed");
+    pub fn doctor(&mut self) -> Result<serde_json::Value> {
+        self.verify_live_graphs()?;
         filesystem::sync(&self.root)?;
-        Ok(serde_json::json!({"database": "ok", "durability": "FULL", "exclusive_owner": true}))
+        Ok(
+            serde_json::json!({"database": "open", "database_integrity_checked": false, "live_graphs_verified":true, "engine": "redb", "durability": "Immediate", "exclusive_owner": true}),
+        )
     }
 }
 

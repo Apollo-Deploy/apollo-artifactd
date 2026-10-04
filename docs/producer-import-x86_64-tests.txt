@@ -1,0 +1,27 @@
+   Compiling artifactd-protocol v0.1.0 (/home/tihan/artifactd-qualification-20261004/crates/artifactd-protocol)
+   Compiling apollo-artifactd v0.1.0 (/home/tihan/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.73s
+     Running tests/cas.rs (target/debug/deps/cas-fcaa561233653f12)
+
+running 1 test
+test calculated_identity_streams_deduplicates_and_rejects_wrong_size ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.08s
+
+   Compiling apollo-artifactd v0.1.0 (/home/tihan/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.68s
+     Running tests/recovery.rs (target/debug/deps/recovery-daccc955f71fe6bc)
+
+running 1 test
+test sigkill_during_calculated_import_discards_unresolved_intent ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.01s
+
+   Compiling apollo-artifactd v0.1.0 (/home/tihan/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.55s
+     Running tests/api.rs (target/debug/deps/api-3c1fdd1e05834e45)
+
+running 1 test
+test daemon_fd_contract_idempotency_and_replay ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s

@@ -27,23 +27,50 @@ impl Store {
         ensure!(platform.validate(), "unsupported platform");
         let graph = self.graph(digest)?;
         let image = select(&graph, platform)?;
-        let facts = facts(image, platform);
-        let tx = self.db.transaction()?;
-        for (parent, child) in &graph.edges {
-            tx.execute(
-                "INSERT OR IGNORE INTO edges(parent,child) VALUES (?1,?2)",
-                rusqlite::params![parent.as_str(), child.as_str()],
-            )?;
-        }
-        for image in graph.images.values() {
-            let p = serde_json::to_string(&platform_of(&image.config))?;
-            tx.execute("INSERT INTO roots(digest,kind,platform) VALUES (?1,'manifest',?2) ON CONFLICT(digest) DO NOTHING", rusqlite::params![image.digest.as_str(),p])?;
-        }
-        tx.execute(
-            "INSERT INTO roots(digest,kind) VALUES (?1,'oci') ON CONFLICT(digest) DO NOTHING",
-            [digest.as_str()],
-        )?;
-        tx.commit()?;
+        let facts = facts(digest, image, platform);
+        self.db.transaction(|tx| {
+            let mut by_parent: BTreeMap<&ArtifactDigest, Vec<ArtifactDigest>> = BTreeMap::new();
+            for (parent, child) in &graph.edges {
+                by_parent.entry(parent).or_default().push(child.clone());
+            }
+            for (parent, children) in by_parent {
+                let mut current = tx
+                    .get::<Vec<ArtifactDigest>>("edges", parent.as_str())?
+                    .unwrap_or_default();
+                for child in children {
+                    if !current.contains(&child) {
+                        current.push(child);
+                    }
+                }
+                tx.put("edges", parent.as_str(), &current)?;
+            }
+            for image in graph.images.values() {
+                let root = crate::state::Root {
+                    kind: "manifest".to_owned(),
+                    platform: Some(platform_of(&image.config)),
+                };
+                if tx
+                    .get::<crate::state::Root>("roots", image.digest.as_str())?
+                    .is_none()
+                {
+                    tx.put("roots", image.digest.as_str(), &root)?;
+                }
+            }
+            if tx
+                .get::<crate::state::Root>("roots", digest.as_str())?
+                .is_none()
+            {
+                tx.put(
+                    "roots",
+                    digest.as_str(),
+                    &crate::state::Root {
+                        kind: "oci".to_owned(),
+                        platform: None,
+                    },
+                )?;
+            }
+            Ok(())
+        })?;
         Ok(facts)
     }
 
@@ -58,16 +85,15 @@ impl Store {
     }
 
     pub(crate) fn verify_graph_if_known(&self, digest: &ArtifactDigest) -> Result<()> {
-        let known: bool = self.db.query_row(
-            "SELECT EXISTS(SELECT 1 FROM roots WHERE digest=?1)",
-            [digest.as_str()],
-            |r| r.get(0),
-        )?;
-        let size: u64 = self.db.query_row(
-            "SELECT size FROM blobs WHERE digest=?1",
-            [digest.as_str()],
-            |r| crate::state::unsigned(r, 0),
-        )?;
+        let known = self
+            .db
+            .get::<crate::state::Root>("roots", digest.as_str())?
+            .is_some();
+        let size = self
+            .db
+            .get::<crate::state::Blob>("blobs", digest.as_str())?
+            .ok_or_else(|| anyhow::anyhow!("missing blob"))?
+            .size;
         let looks_oci = if !known && size <= self.limits.max_metadata {
             let bytes = self.metadata(digest)?;
             serde_json::from_slice::<serde_json::Value>(&bytes).is_ok_and(|value| {
@@ -83,9 +109,13 @@ impl Store {
             let graph = self.graph(digest)?;
             let mut persisted = BTreeSet::new();
             for parent in &graph.nodes {
-                let mut q = self.db.prepare("SELECT child FROM edges WHERE parent=?1")?;
-                for child in q.query_map([parent.as_str()], |r| r.get::<_, String>(0))? {
-                    persisted.insert((parent.clone(), child?.parse()?));
+                if let Some(children) = self
+                    .db
+                    .get::<Vec<ArtifactDigest>>("edges", parent.as_str())?
+                {
+                    for child in children {
+                        persisted.insert((parent.clone(), child));
+                    }
                     ensure!(
                         persisted.len() <= self.limits.max_graph,
                         "persisted graph exceeds bound"
@@ -281,6 +311,6 @@ fn select<'a>(graph: &'a Graph, platform: &Platform) -> Result<&'a Image> {
     }
     Ok(matches[0])
 }
-pub fn facts(image: &Image, platform: &Platform) -> serde_json::Value {
-    serde_json::json!({"artifact_digest": image.digest, "manifest_digest": image.digest, "config_digest": image.manifest.config().digest().to_string(), "layer_digests": image.manifest.layers().iter().map(|l| l.digest().to_string()).collect::<Vec<_>>(), "platform": platform})
+pub fn facts(source: &ArtifactDigest, image: &Image, platform: &Platform) -> serde_json::Value {
+    serde_json::json!({"artifact_digest": source, "manifest_digest": image.digest, "config_digest": image.manifest.config().digest().to_string(), "layer_digests": image.manifest.layers().iter().map(|l| l.digest().to_string()).collect::<Vec<_>>(), "platform": platform})
 }

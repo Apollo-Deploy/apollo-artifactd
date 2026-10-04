@@ -4,79 +4,108 @@ use anyhow::{Result, ensure};
 
 impl Store {
     pub(crate) fn recover_prepared(&mut self, max: u32) -> Result<()> {
-        let entries = {
-            let mut q = self.db.prepare("SELECT id,staging,tree_digest,phase FROM prepared WHERE phase!='complete' LIMIT ?1")?;
-            q.query_map([max], |r| {
-                Ok((
-                    r.get::<_, String>(0)?,
-                    r.get::<_, String>(1)?,
-                    r.get::<_, Option<String>>(2)?,
-                    r.get::<_, String>(3)?,
-                ))
-            })?
-            .collect::<Result<Vec<_>, _>>()?
-        };
-        for (id, staging, expected, phase) in entries {
-            ensure!(
-                id.len() == 64
-                    && id
-                        .bytes()
-                        .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)),
-                "corrupt prepared identity"
-            );
-            let token = staging
-                .strip_suffix(".staging")
-                .ok_or_else(|| anyhow::anyhow!("invalid staging record"))?;
-            uuid::Uuid::parse_str(token)?;
-            if phase == "deleting" || phase == "gc_intent" {
-                if self.prepared.symlink_metadata(&id).is_ok() {
-                    let dir = self.prepared.open_dir(&id)?;
-                    if phase == "gc_intent" {
-                        ensure!(
-                            tree::verify(&dir)?
-                                == expected
-                                    .ok_or_else(|| anyhow::anyhow!("missing prepared hash"))?,
-                            "prepared deletion integrity mismatch"
-                        );
-                        self.db
-                            .execute("UPDATE prepared SET phase='deleting' WHERE id=?1", [&id])?;
-                    }
-                    tree::remove(&self.prepared, &id)?;
-                }
-            } else if self.prepared.symlink_metadata(&id).is_ok() {
-                let dir = self.prepared.open_dir(&id)?;
-                ensure!(
-                    tree::verify(&dir)?
-                        == expected
-                            .ok_or_else(|| anyhow::anyhow!("unproven prepared publication"))?,
-                    "prepared publication integrity mismatch"
-                );
-                filesystem::sync(&self.prepared)?;
-                self.db
-                    .execute("UPDATE prepared SET phase='complete' WHERE id=?1", [&id])?;
-                continue;
-            }
-            if self.prepared.symlink_metadata(&staging).is_ok() {
-                tree::remove(&self.prepared, &staging)?;
-            }
-            filesystem::sync(&self.prepared)?;
-            self.db.execute("DELETE FROM prepared WHERE id=?1", [&id])?;
+        ensure!(max > 0 && max <= 4096, "invalid prepared recovery bound");
+        let cursor = self
+            .db
+            .get::<String>("metadata", "prepared_recovery_cursor")?;
+        let mut entries =
+            self.db
+                .scan::<crate::state::Prepared>("prepared", cursor.as_deref(), max as usize)?;
+        if entries.is_empty() && cursor.is_some() {
+            self.db.remove("metadata", "prepared_recovery_cursor")?;
+            entries = self
+                .db
+                .scan::<crate::state::Prepared>("prepared", None, max as usize)?;
+        }
+        let next = entries.last().map(|(id, _)| id.clone());
+        for (id, record) in entries {
+            self.recover_prepared_record(&id, &record)?;
+        }
+        if let Some(next) = next {
+            self.db.put("metadata", "prepared_recovery_cursor", &next)?;
+        } else if cursor.is_some() {
+            self.db.remove("metadata", "prepared_recovery_cursor")?;
         }
         Ok(())
     }
 
-    pub(crate) fn gc_prepared(&mut self, max: u32) -> Result<u32> {
-        let ids = {
-            let mut q = self.db.prepare("WITH RECURSIVE live(digest) AS (SELECT digest FROM pins UNION SELECT digest FROM leases UNION SELECT edges.child FROM edges JOIN live ON edges.parent=live.digest) SELECT id FROM prepared WHERE phase='complete' AND manifest NOT IN (SELECT digest FROM live) LIMIT ?1")?;
-            q.query_map([max], |r| r.get::<_, String>(0))?
-                .collect::<Result<Vec<_>, _>>()?
-        };
-        let tx = self.db.transaction()?;
-        for id in &ids {
-            tx.execute("UPDATE prepared SET phase='gc_intent' WHERE id=?1", [id])?;
+    pub(crate) fn recover_prepared_id(&mut self, id: &str) -> Result<()> {
+        if let Some(record) = self.db.get::<crate::state::Prepared>("prepared", id)? {
+            self.recover_prepared_record(id, &record)?;
         }
-        tx.commit()?;
-        self.recover_prepared(max)?;
+        Ok(())
+    }
+
+    fn recover_prepared_record(&mut self, id: &str, record: &crate::state::Prepared) -> Result<()> {
+        ensure!(
+            id.len() == 64 && id.bytes().all(|b| b.is_ascii_hexdigit()),
+            "corrupt prepared identity"
+        );
+        let token = record
+            .staging
+            .strip_suffix(".staging")
+            .ok_or_else(|| anyhow::anyhow!("invalid staging record"))?;
+        uuid::Uuid::parse_str(token)?;
+        if record.phase == "deleting" || record.phase == "gc_intent" {
+            if self.prepared.symlink_metadata(id).is_ok() {
+                tree::remove(&self.prepared, id)?;
+            }
+        } else if self.prepared.symlink_metadata(id).is_ok() {
+            let expected = record
+                .tree_digest
+                .clone()
+                .ok_or_else(|| anyhow::anyhow!("unproven prepared publication"))?;
+            let dir = self.prepared.open_dir(id)?;
+            ensure!(
+                tree::verify(&dir)? == expected,
+                "prepared publication integrity mismatch"
+            );
+            if record.phase != "complete" {
+                let mut updated = record.clone();
+                updated.phase = "complete".to_owned();
+                self.db.put("prepared", id, &updated)?;
+            }
+            return Ok(());
+        }
+        if self.prepared.symlink_metadata(&record.staging).is_ok() {
+            tree::remove(&self.prepared, &record.staging)?;
+        }
+        filesystem::sync(&self.prepared)?;
+        self.db.remove("prepared", id)?;
+        Ok(())
+    }
+
+    pub(crate) fn gc_prepared(&mut self, max: u32) -> Result<u32> {
+        let mut ids = Vec::new();
+        ensure!(max > 0 && max <= 4096, "invalid prepared gc bound");
+        let cursor = self.db.get::<String>("metadata", "prepared_gc_cursor")?;
+        let mut entries =
+            self.db
+                .scan::<crate::state::Prepared>("prepared", cursor.as_deref(), max as usize)?;
+        if entries.is_empty() && cursor.is_some() {
+            self.db.remove("metadata", "prepared_gc_cursor")?;
+            entries = self
+                .db
+                .scan::<crate::state::Prepared>("prepared", None, max as usize)?;
+        }
+        let next = entries.last().map(|(id, _)| id.clone());
+        for (id, record) in entries {
+            if record.phase == "complete" && !self.referenced_by_handles(&record.manifest)? {
+                ids.push(id);
+            }
+        }
+        for id in &ids {
+            if let Some(mut record) = self.db.get::<crate::state::Prepared>("prepared", id)? {
+                record.phase = "gc_intent".to_owned();
+                self.db.put("prepared", id, &record)?;
+            }
+            self.recover_prepared_id(id)?;
+        }
+        if let Some(next) = next {
+            self.db.put("metadata", "prepared_gc_cursor", &next)?;
+        } else if cursor.is_some() {
+            self.db.remove("metadata", "prepared_gc_cursor")?;
+        }
         Ok(ids.len() as u32)
     }
 }

@@ -55,10 +55,10 @@ pub fn send(socket: impl AsFd, bytes: &[u8], fd: Option<&OwnedFd>) -> std::io::R
     let mut space = [MaybeUninit::uninit(); rustix::cmsg_space!(ScmRights(1))];
     let mut ancillary = SendAncillaryBuffer::new(&mut space);
     let rights = fd.map(|fd| [fd.as_fd()]);
-    if let Some(rights) = rights.as_ref() {
-        if !ancillary.push(SendAncillaryMessage::ScmRights(rights)) {
-            return Err(std::io::Error::other("FD packet limit"));
-        }
+    if let Some(rights) = rights.as_ref()
+        && !ancillary.push(SendAncillaryMessage::ScmRights(rights))
+    {
+        return Err(std::io::Error::other("FD packet limit"));
     }
     let n = net::sendmsg(
         socket,
