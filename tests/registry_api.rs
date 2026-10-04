@@ -161,6 +161,7 @@ fn registry_api_fd_credentials_journal_and_prepared_facts() {
                     architecture: "amd64".into(),
                     variant: None,
                 },
+                pin: None,
             },
         ),
         Some(archive.as_file()),

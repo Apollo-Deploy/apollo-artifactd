@@ -1,4 +1,5 @@
 //! OCI types come from oci-spec; this module enforces graph integrity policy.
+mod admission;
 mod archive;
 use crate::Store;
 use anyhow::{Result, bail, ensure};
@@ -19,61 +20,6 @@ struct Graph {
 }
 
 impl Store {
-    pub fn admit_oci(
-        &mut self,
-        digest: &ArtifactDigest,
-        platform: &Platform,
-    ) -> Result<serde_json::Value> {
-        ensure!(platform.validate(), "unsupported platform");
-        let graph = self.graph(digest)?;
-        let image = select(&graph, platform)?;
-        let facts = facts(digest, image, platform);
-        self.db.transaction(|tx| {
-            let mut by_parent: BTreeMap<&ArtifactDigest, Vec<ArtifactDigest>> = BTreeMap::new();
-            for (parent, child) in &graph.edges {
-                by_parent.entry(parent).or_default().push(child.clone());
-            }
-            for (parent, children) in by_parent {
-                let mut current = tx
-                    .get::<Vec<ArtifactDigest>>("edges", parent.as_str())?
-                    .unwrap_or_default();
-                for child in children {
-                    if !current.contains(&child) {
-                        current.push(child);
-                    }
-                }
-                tx.put("edges", parent.as_str(), &current)?;
-            }
-            for image in graph.images.values() {
-                let root = crate::state::Root {
-                    kind: "manifest".to_owned(),
-                    platform: Some(platform_of(&image.config)),
-                };
-                if tx
-                    .get::<crate::state::Root>("roots", image.digest.as_str())?
-                    .is_none()
-                {
-                    tx.put("roots", image.digest.as_str(), &root)?;
-                }
-            }
-            if tx
-                .get::<crate::state::Root>("roots", digest.as_str())?
-                .is_none()
-            {
-                tx.put(
-                    "roots",
-                    digest.as_str(),
-                    &crate::state::Root {
-                        kind: "oci".to_owned(),
-                        platform: None,
-                    },
-                )?;
-            }
-            Ok(())
-        })?;
-        Ok(facts)
-    }
-
     pub fn resolve(&self, digest: &ArtifactDigest, platform: &Platform) -> Result<Image> {
         ensure!(platform.validate(), "unsupported platform");
         let mut graph = self.graph(digest)?;

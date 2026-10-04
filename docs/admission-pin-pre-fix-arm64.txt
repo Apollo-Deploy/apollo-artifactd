@@ -1,0 +1,20 @@
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.51s
+     Running tests/admission_pin.rs (target/debug/deps/admission_pin-64845e7ffc8d4f83)
+
+running 1 test
+
+thread 'daemon_oci_admission_pin_survives_replay_and_controls_gc' (127247) panicked at tests/admission_pin.rs:168:5:
+assertion failed: verify(&socket, first_digest.clone())
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test daemon_oci_admission_pin_survives_replay_and_controls_gc ... FAILED
+
+failures:
+
+failures:
+    daemon_oci_admission_pin_survives_replay_and_controls_gc
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+CONTROLLED_PRE_FIX_EXIT 101
+error: test failed, to rerun pass `--test admission_pin`

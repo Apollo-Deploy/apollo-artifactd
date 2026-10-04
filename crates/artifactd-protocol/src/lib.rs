@@ -117,9 +117,13 @@ pub enum Action {
     ImportOci {
         digest: ArtifactDigest,
         platform: Platform,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pin: Option<PinId>,
     },
     ImportOciArchive {
         platform: Platform,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        pin: Option<PinId>,
     },
     Inspect {
         digest: ArtifactDigest,

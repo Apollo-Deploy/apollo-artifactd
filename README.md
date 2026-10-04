@@ -31,6 +31,8 @@ target/release/apollo-artifactctl \
 
 For a trusted local producer, omit `digest` from `IMPORT_BLOB`; artifactd calculates and returns SHA-256 while streaming, still enforcing the declared size and quotas. The resolved digest is committed to the import intent before publication.
 
+`IMPORT_OCI` and `IMPORT_OCI_ARCHIVE` accept an optional generic `pin` string. When supplied, verified graph admission and the pin commit in one transaction, and the receipt returns `pin_id`. A conflicting existing pin fails without replacing it. Producers must retain the pin until their artifact lifecycle authorizes `UNPIN`; an import without a pin remains eligible for GC.
+
 The CLI opens local input and sends its FD. Paths do not cross the daemon API. For OPEN_BLOB/OPEN_PREPARED, use `artifactd_protocol::client::call` on Linux: it returns an owned descriptor that the caller retains. The CLI reports and closes returned descriptors on exit. The client package needs no daemon implementation or Apollo business types.
 
 ## Registry transfers

@@ -170,3 +170,14 @@ These are findings, not completed caller migration or consumption qualification.
 The package must not replace the existing Artifact implementation yet. Registry, secure credentials, all caller cutovers, old Zig removal, bounded global GC/concurrency, durable replay guarantees and the remaining qualification campaigns are mandatory work in this request. They are not deferred to a future version. `RED_TEAM_RELEASE_APPROVED` and `APOLLO_ARTIFACTD_PRODUCTION_COMPLETE` have not been earned.
 
 Retained command logs may have trailing whitespace normalized; test results and diagnostics are preserved.
+
+## Atomic OCI admission with a caller pin
+
+[Admission pin qualification](ADMISSION_PIN.md) records the optional generic
+pin on OCI graph/archive admission. Graph roots/edges and pin ownership commit
+in one redb transaction. The real daemon regression covers FD delivery,
+same-digest admission under a fresh token, conflicting pin ownership, GC,
+restart/replay, retained pin protection after restart, and release/collection.
+The controlled old effect fails because GC collects content after admission.
+This closes the artifactd import-to-pin gap; actual buildd publication and
+registry-pull protection still require integration and qualification.

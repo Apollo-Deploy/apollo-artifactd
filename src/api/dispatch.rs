@@ -91,11 +91,21 @@ fn dispatch(
             };
             json!({"artifact_digest":actual,"size":size})
         }
-        Action::ImportOci { digest, platform } => store.admit_oci(digest, platform)?,
-        Action::ImportOciArchive { platform } => store.import_oci_archive(
-            input.ok_or_else(|| anyhow::anyhow!("missing archive FD"))?,
+        Action::ImportOci {
+            digest,
             platform,
-        )?,
+            pin,
+        } => match pin {
+            Some(pin) => store.admit_oci_pinned(digest, platform, pin.as_str())?,
+            None => store.admit_oci(digest, platform)?,
+        },
+        Action::ImportOciArchive { platform, pin } => {
+            let input = input.ok_or_else(|| anyhow::anyhow!("missing archive FD"))?;
+            match pin {
+                Some(pin) => store.import_oci_archive_pinned(input, platform, pin.as_str())?,
+                None => store.import_oci_archive(input, platform)?,
+            }
+        }
         Action::Inspect { digest } | Action::Verify { digest } | Action::EnsureLocal { digest } => {
             let file = store.open_blob(digest)?;
             store.verify_graph_if_known(digest)?;
