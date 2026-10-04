@@ -4,27 +4,6 @@ use artifactd_protocol::ArtifactDigest;
 use std::collections::BTreeSet;
 
 impl Store {
-    pub(crate) fn referenced_by_handles(&self, digest: &ArtifactDigest) -> Result<bool> {
-        for table in ["pins", "leases"] {
-            let mut after = None;
-            loop {
-                let page =
-                    self.db
-                        .scan::<crate::state::Reference>(table, after.as_deref(), 4096)?;
-                if page.is_empty() {
-                    break;
-                }
-                for (_, reference) in &page {
-                    if self.reachable(&reference.digest, digest)? {
-                        return Ok(true);
-                    }
-                }
-                after = page.last().map(|(key, _)| key.clone());
-            }
-        }
-        Ok(false)
-    }
-
     pub fn pin(&mut self, id: &str, digest: &ArtifactDigest) -> Result<()> {
         self.reference("pins", id, digest)
     }
@@ -69,42 +48,6 @@ impl Store {
             return Ok(false);
         };
         self.reachable(&reference.digest, digest)
-    }
-
-    pub(crate) fn protected(&self, digest: &ArtifactDigest) -> Result<bool> {
-        for table in ["pins", "leases"] {
-            let mut after = None;
-            loop {
-                let page =
-                    self.db
-                        .scan::<crate::state::Reference>(table, after.as_deref(), 4096)?;
-                if page.is_empty() {
-                    break;
-                }
-                for (_, reference) in &page {
-                    if self.reachable(&reference.digest, digest)? {
-                        return Ok(true);
-                    }
-                }
-                after = page.last().map(|(key, _)| key.clone());
-            }
-        }
-        let mut after = None;
-        loop {
-            let page =
-                self.db
-                    .scan::<crate::state::Prepared>("prepared", after.as_deref(), 4096)?;
-            if page.is_empty() {
-                break;
-            }
-            for (_, prepared) in &page {
-                if prepared.phase == "complete" && self.reachable(&prepared.manifest, digest)? {
-                    return Ok(true);
-                }
-            }
-            after = page.last().map(|(key, _)| key.clone());
-        }
-        Ok(false)
     }
 
     fn reachable(&self, root: &ArtifactDigest, wanted: &ArtifactDigest) -> Result<bool> {
@@ -165,48 +108,5 @@ impl Store {
             after = page.last().map(|(key, _)| key.clone());
         }
         Ok(())
-    }
-
-    pub fn gc(&mut self, max: u32) -> Result<u32> {
-        ensure!(max > 0 && max <= 4096, "invalid gc bound");
-        self.verify_live_graphs()?;
-        self.reconcile(max)?;
-        self.gc_prepared(max)?;
-        let mut candidates = Vec::new();
-        let cursor = self.db.get::<String>("metadata", "blob_gc_cursor")?;
-        let page = self
-            .db
-            .scan::<crate::state::Blob>("blobs", cursor.as_deref(), max as usize)?;
-        let next = if page.len() == max as usize {
-            page.last().map(|(key, _)| key.clone())
-        } else {
-            None
-        };
-        for (digest, blob) in page {
-            let digest: ArtifactDigest = digest.parse()?;
-            if !self.protected(&digest)? {
-                candidates.push((digest, blob.size));
-            }
-        }
-        // Cursor and deletion intents commit together. A crash before effects
-        // leaves all selected candidates recoverable; pinned prefixes cannot
-        // permanently starve later blobs, including across restarts.
-        self.db.transaction(|tx| {
-            for (digest, size) in &candidates {
-                tx.put(
-                    "gc",
-                    digest.as_str(),
-                    &crate::state::Garbage { size: *size },
-                )?;
-            }
-            if let Some(next) = next {
-                tx.put("metadata", "blob_gc_cursor", &next)?;
-            } else {
-                tx.remove("metadata", "blob_gc_cursor")?;
-            }
-            Ok(())
-        })?;
-        self.recover_gc(max)?;
-        Ok(candidates.len() as u32)
     }
 }

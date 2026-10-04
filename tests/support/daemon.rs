@@ -19,11 +19,11 @@ impl Daemon {
                     socket.to_str().unwrap(),
                 ])
                 .stdout(Stdio::null())
-                .stderr(Stdio::null())
+                .stderr(Stdio::inherit())
                 .spawn()
                 .unwrap(),
         );
-        for _ in 0..100 {
+        for _ in 0..6000 {
             if socket.exists() {
                 return (daemon, socket);
             }

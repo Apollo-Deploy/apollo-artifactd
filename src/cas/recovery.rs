@@ -53,20 +53,23 @@ impl Store {
             self.db.remove("imports", &id)?;
             recovered += 1;
         }
+        self.gc_ready(max)?;
         self.recover_prepared(max)?;
         self.recover_gc(max)?;
         Ok(recovered)
     }
 
     pub(crate) fn recover_gc(&mut self, max: u32) -> Result<()> {
-        self.verify_live_graphs()?;
+        if !self.gc_snapshot_ready()? {
+            return Ok(());
+        }
         let entries = self
             .db
             .scan::<crate::state::Garbage>("gc", None, max as usize)?;
         for (digest, garbage) in entries {
             let digest: ArtifactDigest = digest.parse()?;
             ensure!(
-                !self.protected(&digest)?,
+                !self.gc_marked(&digest, false)?,
                 "gc intent conflicts with protected content"
             );
             match self.blobs.symlink_metadata(digest.hex()) {

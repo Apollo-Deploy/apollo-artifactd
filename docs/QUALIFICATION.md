@@ -9,14 +9,14 @@ This evidence covers the new standalone package. It does not qualify the existin
 | Gate | Evidence and remaining work | Result |
 |---|---|---|
 | Migration inventory | [MIGRATION.md](MIGRATION.md) inventories the Zig library, importer, receipts, recovery and callers. Destination labels are not proof of completed porting. | Mapped; incomplete cutover |
-| Independent Rust build | Own protocol crate, Cargo.lock, bundled SQLite and documented C toolchain; release builds on Linux arm64 and x86_64. No Zig or Apollo sibling dependency in this package. | Pass for this package |
+| Independent Rust build | Own protocol crate, Cargo.lock, transactional redb and documented C toolchain; release builds on Linux arm64 and x86_64. No Zig or Apollo sibling dependency in this package. | Pass for this package |
 | CAS | Streaming hash/size checks, private temporary files, fsync, atomic no-overwrite publication, duplicate/concurrent imports and corrupt-content rejection exercised. | Implemented; full failure campaign open |
 | OCI | Local manifests/configs/layers/indexes, amd64/arm64 selection, descriptor/platform substitution tests, archive limits and graph-corruption rejection. | Local subset passes |
-| Registry | PULL/PUSH return unavailable; no registry transfer or credential-provider implementation. ENSURE_LOCAL only verifies existing local content. | Missing |
+| Registry | Authenticated HTTPS push/pull and protected credential FD tests pass on both native architectures; complete registry fault, concurrency and performance qualification remains open. | Implemented; qualification incomplete |
 | Preparation | DiffID, layer ordering, whiteouts, opaque whiteouts, relative-link validation, deterministic hash, atomic publication and prepared recovery tests. GNU/PAX headers, hardlinks and absolute links are rejected. Owner-UID immutability is not enforced by read-only FDs. | Incomplete required portability/security |
-| Pins/leases/GC | Graph reachability, leases, pinned-content protection, bounded deletion batches and ownership checks. Global live-graph validation/reachability work is not incremental. | Incomplete bounded-work gate |
-| Recovery | Actual SIGKILL during streamed import plus synthetic persisted snapshots for CAS publication, prepared publication and post-unlink GC. SQLite sidecar ownership checks and graph classification-loss regression tests. Database pathname reopen still leaves a same-owner TOCTOU window. | Full disk-full/power-loss/crash campaign missing |
-| API | Linux SO_PEERCRED, bounded seqpacket/FD parsing, genuine daemon import/replay/concurrent-client tests. Serial processing can starve other clients. Operation-history pruning weakens long-term mutation replay guarantees. | Incomplete concurrency/idempotency gate |
+| Pins/leases/GC | Verified graph reachability, durable incremental root marking, epoch invalidation, leases, bounded deletion batches and ownership checks. Native root-mutation and prepared-intent recovery tests pass; churn and fault/race qualification remain open. | Incomplete bounded-work gate |
+| Recovery | Actual SIGKILL during streamed import plus synthetic persisted snapshots for CAS publication, prepared publication and post-unlink GC. Capability-opened redb and graph classification-loss regression tests. Legacy SQLite migration and full structural corruption qualification remain open. | Full disk-full/power-loss/crash campaign missing |
+| API | Linux SO_PEERCRED, bounded seqpacket/FD parsing, genuine daemon import/replay/concurrent-client tests. Serial processing can starve other clients. Version-2 bounded allocated-token replay rejects expired tokens before effects; complete concurrency qualification remains open. | Incomplete concurrency/idempotency gate |
 | External integrations | Protocol client is independently usable; BuildKit/buildd/sandboxd/Node/release callers are not migrated. | Missing |
 | Complete Zig removal | Old Artifact implementation, importer and production launch/build paths remain in the original repository. | Missing |
 | Performance/churn | Both native hosts completed 100k blob cycles and 20k zero-layer OCI cycles. Throughput, idle CPU/RSS, thread/FD counts and core p50/p95/p99 recorded below. Daemon operation-journal churn, registry throughput and representative layered-image churn are missing. | Partial measurements |
@@ -76,8 +76,9 @@ bounded to 4096 records. The measurements use debug builds and do not replace
 the blob/OCI churn or release-performance gates above.
 
 Real daemon SIGKILL checks cover partial blob imports and authenticated
-registry pulls on ARM and x86. Both final native workspace suites and
-warning-free clippy checks pass; the source snapshots match the current files.
+registry pulls on ARM and x86. Both native workspace suites and
+warning-free clippy checks passed at that journal revision; its source
+snapshots identify that earlier revision.
 Additional native checks and source snapshots are
 retained in the journal evidence files. [Independent round 5](RED_TEAM_ROUND_5.md)
 closes permanent journal exhaustion while retaining the remaining release
@@ -93,8 +94,10 @@ restores surviving manifest usability without changing its descriptor graph;
 missing children still reject pinning and resolution. The regression fails
 before the repair and passes afterward on both native architectures, followed
 by passing normal workspace suites and warning-free clippy. The separate
-`oci-gc-edge-snapshot-{arm64,x86_64}.json` files match 71 current source and
-qualification files. Global live-root/reachability scanning remains unbounded.
+`oci-gc-edge-snapshot-{arm64,x86_64}.json` files identify the 71 source and
+qualification files from that earlier repair. They precede incremental marking.
+
+[Incremental GC evidence](GC_INCREMENTAL.md) records the subsequent durable mark phases, reference epochs, bounded root scans and native mutation/recovery checks. These replace global GC reachability scans but do not prove the entire churn, latency or fault gate.
 
 The package must not replace the existing Artifact implementation yet. Registry, secure credentials, all caller cutovers, old Zig removal, bounded global GC/concurrency, durable replay guarantees and the remaining qualification campaigns are mandatory work in this request. They are not deferred to a future version. `RED_TEAM_RELEASE_APPROVED` and `APOLLO_ARTIFACTD_PRODUCTION_COMPLETE` have not been earned.
 

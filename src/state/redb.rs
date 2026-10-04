@@ -16,12 +16,12 @@ use std::{fs::File, ops::Bound};
 
 mod records;
 pub use records::{Blob, Garbage, Imported, Operation, Prepared, Reference, Root};
-
-pub const CURRENT_SCHEMA: u32 = 2;
+pub const CURRENT_SCHEMA: u32 = 3;
 pub const MAX_RECORD: usize = 64 * 1024;
 const MAX_SCAN: usize = 4096;
 const METADATA: &str = "metadata";
-const TABLES: [&str; 11] = [
+const GC_REFERENCE_EPOCH: &str = "gc_reference_epoch";
+const TABLES: [&str; 12] = [
     "blobs",
     "imports",
     "roots",
@@ -32,6 +32,7 @@ const TABLES: [&str; 11] = [
     "gc",
     "operations",
     "registry",
+    "gc_marks",
     METADATA,
 ];
 
@@ -40,7 +41,6 @@ type Table = TableDefinition<'static, &'static str, &'static [u8]>;
 fn table(name: &'static str) -> Table {
     TableDefinition::new(name)
 }
-
 fn validate_table(name: &'static str) -> Result<()> {
     ensure!(TABLES.contains(&name), "unknown state table: {name}");
     Ok(())
@@ -51,12 +51,11 @@ fn validate_key(key: &str) -> Result<()> {
     ensure!(!key.as_bytes().contains(&0), "state key contains NUL");
     Ok(())
 }
-
 fn validate_mutation(name: &'static str, key: &str) -> Result<()> {
     validate_table(name)?;
     validate_key(key)?;
     ensure!(
-        !(name == METADATA && key == "schema_version"),
+        !(name == METADATA && matches!(key, "schema_version" | GC_REFERENCE_EPOCH)),
         "schema version is immutable"
     );
     Ok(())
@@ -72,7 +71,6 @@ fn decode<T: DeserializeOwned>(bytes: &[u8]) -> Result<T> {
     ensure!(bytes.len() <= MAX_RECORD, "state record exceeds 64 KiB");
     serde_json::from_slice(bytes).context("decode state record")
 }
-
 /// A single owning redb database. The parent capability is retained so every
 /// committed mutation can sync the directory entry without reopening a path.
 pub struct State {
@@ -116,15 +114,31 @@ impl State {
                 .transpose()?
         };
         match existing {
-            Some(version) => {
+            Some(2) => {
                 ensure!(
-                    version == CURRENT_SCHEMA,
-                    "unsupported state schema {version}"
+                    write.open_table(table("gc_marks"))?.len()? == 0,
+                    "schema 2 gc marks must be empty"
                 );
+                let mut metadata = write.open_table(table(METADATA))?;
+                metadata.insert(GC_REFERENCE_EPOCH, encode(&0u64)?.as_slice())?;
+                metadata.insert("schema_version", encode(&CURRENT_SCHEMA)?.as_slice())?;
             }
+            Some(3) => {
+                let metadata = write.open_table(table(METADATA))?;
+                let epoch = metadata
+                    .get(GC_REFERENCE_EPOCH)?
+                    .map(|value| decode::<u64>(value.value()))
+                    .transpose()?;
+                ensure!(epoch.is_some(), "missing GC reference epoch");
+            }
+            Some(version) => ensure!(
+                version == CURRENT_SCHEMA,
+                "unsupported state schema {version}"
+            ),
             None => {
                 let mut metadata = write.open_table(table(METADATA))?;
                 metadata.insert("schema_version", encode(&CURRENT_SCHEMA)?.as_slice())?;
+                metadata.insert(GC_REFERENCE_EPOCH, encode(&0u64)?.as_slice())?;
             }
         }
         write.set_durability(Durability::Immediate)?;
@@ -169,8 +183,12 @@ impl State {
 
     pub fn transaction<R>(&self, operation: impl FnOnce(&mut StateTx) -> Result<R>) -> Result<R> {
         let write = self.db.begin_write()?;
-        let mut tx = StateTx { write };
+        let mut tx = StateTx {
+            write,
+            dirty: false,
+        };
         let result = operation(&mut tx)?;
+        tx.commit_epoch_if_dirty()?;
         tx.write.set_durability(Durability::Immediate)?;
         tx.write.commit()?;
         filesystem::sync(&self.root)?;
@@ -182,7 +200,6 @@ fn table_checked(name: &'static str) -> Result<Table> {
     validate_table(name)?;
     Ok(table(name))
 }
-
 fn scan_table<T: DeserializeOwned>(
     table: &redb::ReadOnlyTable<&'static str, &'static [u8]>,
     after: Option<&str>,
@@ -212,6 +229,7 @@ fn scan_table<T: DeserializeOwned>(
 
 pub struct StateTx {
     write: WriteTransaction,
+    dirty: bool,
 }
 
 impl StateTx {
@@ -228,6 +246,22 @@ impl StateTx {
     pub fn put<T: Serialize>(&mut self, name: &'static str, key: &str, value: &T) -> Result<()> {
         validate_mutation(name, key)?;
         let bytes = encode(value)?;
+        let changed = {
+            let table = self.write.open_table(table(name))?;
+            table
+                .get(key)?
+                .is_none_or(|current| current.value() != bytes.as_slice())
+        };
+        if !changed {
+            return Ok(());
+        }
+        if name == "prepared" {
+            let previous = self.get::<Prepared>(name, key)?;
+            let prepared: Prepared = decode(&bytes)?;
+            self.dirty |= prepared_dirty(previous.as_ref(), &prepared);
+        } else if matches!(name, "pins" | "leases" | "roots" | "edges") {
+            self.dirty = true;
+        }
         let mut table = self.write.open_table(table(name))?;
         table.insert(key, bytes.as_slice())?;
         Ok(())
@@ -235,8 +269,34 @@ impl StateTx {
 
     pub fn remove(&mut self, name: &'static str, key: &str) -> Result<()> {
         validate_mutation(name, key)?;
+        let existed = {
+            let table = self.write.open_table(table(name))?;
+            table.get(key)?.is_some()
+        };
+        if !existed {
+            return Ok(());
+        }
+        if matches!(name, "pins" | "leases") {
+            self.dirty = true;
+        }
         let mut table = self.write.open_table(table(name))?;
         table.remove(key)?;
+        Ok(())
+    }
+
+    fn commit_epoch_if_dirty(&mut self) -> Result<()> {
+        if !self.dirty {
+            return Ok(());
+        }
+        let current = self
+            .get::<u64>(METADATA, GC_REFERENCE_EPOCH)?
+            .ok_or_else(|| anyhow::anyhow!("missing GC reference epoch"))?;
+        let next = current
+            .checked_add(1)
+            .ok_or_else(|| anyhow::anyhow!("GC reference epoch exhausted"))?;
+        let bytes = encode(&next)?;
+        let mut metadata = self.write.open_table(table(METADATA))?;
+        metadata.insert(GC_REFERENCE_EPOCH, bytes.as_slice())?;
         Ok(())
     }
 
@@ -274,4 +334,17 @@ impl StateTx {
         }
         Ok(output)
     }
+}
+
+fn prepared_dirty(previous: Option<&Prepared>, next: &Prepared) -> bool {
+    if next.phase == "complete" {
+        return true;
+    }
+    if !matches!(next.phase.as_str(), "gc_intent" | "deleting") {
+        return false;
+    }
+    previous.is_none_or(|old| {
+        old.manifest != next.manifest
+            || !matches!(old.phase.as_str(), "complete" | "gc_intent" | "deleting")
+    })
 }

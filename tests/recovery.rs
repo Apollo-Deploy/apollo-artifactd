@@ -94,6 +94,51 @@ fn prepared_publication_reconciles_before_reuse() {
 }
 
 #[test]
+fn prepared_gc_intent_reconciles_with_or_without_tree_effect() {
+    for tree_effect_completed in [false, true] {
+        let root = root();
+        let mut store = Store::open(root.path(), Limits::default()).unwrap();
+        let manifest = image(&mut store, "amd64", &[], false);
+        let prepared = store.prepare(&manifest, &platform("amd64")).unwrap();
+        drop(store);
+
+        let dir =
+            cap_std::fs::Dir::open_ambient_dir(root.path(), cap_std::ambient_authority()).unwrap();
+        let db = State::open(&dir).unwrap();
+        let mut record = db
+            .get::<Prepared>("prepared", prepared.as_str())
+            .unwrap()
+            .unwrap();
+        record.phase = "gc_intent".to_owned();
+        db.put("prepared", prepared.as_str(), &record).unwrap();
+        if tree_effect_completed {
+            std::fs::remove_dir_all(root.path().join("prepared").join(prepared.as_str())).unwrap();
+        }
+        drop(db);
+
+        let reopened = Store::open(root.path(), Limits::default()).unwrap();
+        assert!(reopened.open_blob(&manifest).is_ok());
+        assert!(
+            !root
+                .path()
+                .join("prepared")
+                .join(prepared.as_str())
+                .exists()
+        );
+        drop(reopened);
+        let db = State::open(&dir).unwrap();
+        assert!(
+            db.get::<Prepared>("prepared", prepared.as_str())
+                .unwrap()
+                .is_none()
+        );
+        drop(db);
+        let mut reopened = Store::open(root.path(), Limits::default()).unwrap();
+        assert_eq!(reopened.reconcile(10).unwrap(), 0);
+    }
+}
+
+#[test]
 fn prepared_recovery_cursor_reaches_late_intent_after_many_complete_records() {
     let root = root();
     drop(Store::open(root.path(), Limits::default()).unwrap());

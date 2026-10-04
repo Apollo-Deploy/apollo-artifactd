@@ -77,6 +77,9 @@ impl Store {
             limits,
             _owner: owner,
         };
+        // No persisted mark snapshot is trusted across process lifetimes.
+        // Recovery advances bounded verification before completing deletions.
+        store.gc_reset()?;
         store.reconcile(1024)?;
         Ok(store)
     }

@@ -1,0 +1,19 @@
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.45s
+     Running tests/gc_incremental.rs (target/debug/deps/gc_incremental-6cc64416745a6825)
+
+running 1 test
+
+thread 'late_corrupt_pin_is_found_by_bounded_gc_not_startup' (77880) panicked at tests/gc_incremental.rs:60:65:
+called `Result::unwrap()` on an `Err` value: blob is not admitted
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test late_corrupt_pin_is_found_by_bounded_gc_not_startup ... FAILED
+
+failures:
+
+failures:
+    late_corrupt_pin_is_found_by_bounded_gc_not_startup
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.14s
+
+error: test failed, to rerun pass `--test gc_incremental`

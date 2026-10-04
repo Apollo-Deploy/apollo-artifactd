@@ -3,6 +3,7 @@
 pub mod api;
 pub mod cas;
 pub mod filesystem;
+mod gc;
 pub mod oci;
 pub mod prepare;
 pub mod registry;

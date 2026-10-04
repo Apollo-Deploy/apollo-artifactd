@@ -1,0 +1,161 @@
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.50s
+     Running unittests src/lib.rs (target/debug/deps/apollo_artifactd-4a448aca639f7b3a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/cli.rs (target/debug/deps/apollo_artifactctl-540f38c4f9fee399)
+     Running unittests src/main.rs (target/debug/deps/apollo_artifactd-87969c2ab87caaed)
+     Running tests/api.rs (target/debug/deps/api-8c20b0bb478e2217)
+
+running 1 test
+artifactd request rejected
+test daemon_fd_contract_idempotency_and_replay ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+
+running 8 tests
+     Running tests/cas.rs (target/debug/deps/cas-6116d68c702075eb)
+test legacy_sqlite_state_is_rejected_without_cleanup ... ok
+test foreign_files_and_links_are_never_collected ... ok
+test invalid_inputs_never_publish ... ok
+test quota_and_exclusive_store_owner ... ok
+test incremental_gc_progresses_past_pinned_prefix_after_restart ... ok
+test cas_admission_durability_and_references ... ok
+test calculated_identity_streams_deduplicates_and_rejects_wrong_size ... ok
+test stored_identity_matches_bytes ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.45s
+
+
+running 1 test
+test sigkill_prepared_gc_recovers_partial_tree ... ignored, native SIGKILL prepared GC qualification
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 2 tests
+     Running tests/gc_crash.rs (target/debug/deps/gc_crash-c67e2e52e48bb9e5)
+     Running tests/gc_incremental.rs (target/debug/deps/gc_incremental-6cc64416745a6825)
+test pin_and_lease_invalidate_ready_and_partial_gc_snapshots ... ok
+test late_corrupt_pin_is_found_by_bounded_gc_not_startup ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.50s
+
+
+running 1 test
+     Running tests/journal_api.rs (target/debug/deps/journal_api-c15003e3a7704455)
+test allocated_mutations_replay_conflict_and_restart_with_bounded_journal ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.15s
+
+
+running 1 test
+test public_journal_churn_stays_bounded ... ignored, 100k native journal availability campaign
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test sigkill_import_preserves_intent_and_recovers_without_reexecution ... ignored, native SIGKILL recovery qualification
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 6 tests
+     Running tests/journal_churn.rs (target/debug/deps/journal_churn-488b2aae4e337de7)
+     Running tests/journal_crash.rs (target/debug/deps/journal_crash-f2dc1afcbeff52d5)
+     Running tests/oci.rs (target/debug/deps/oci-080f5d024d88a279)
+test malicious_layout_archive_never_unpacks ... ok
+test multi_platform_and_descriptor_substitution ... ok
+test corrupt_reachability_cannot_authorize_gc ... ok
+test diffid_mismatch_and_symlink_escape_fail_preparation ... ok
+test valid_archive_admission_and_missing_terminator ... ok
+test oci_preparation_verifies_diffid_and_whiteouts ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+
+running 1 test
+     Running tests/oci_gc.rs (target/debug/deps/oci_gc-9c631de32bc0ecb0)
+test gc_reimport_restores_admitted_manifest_reachability ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+
+running 1 test
+test truncated_packets_and_excess_descriptors_are_rejected ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 7 tests
+test crash_import_worker ... ok
+     Running tests/protocol.rs (target/debug/deps/protocol-3e59dd90361ccd8d)
+     Running tests/recovery.rs (target/debug/deps/recovery-a98d8e4489359170)
+test sigkill_during_calculated_import_discards_unresolved_intent ... ok
+test sigkill_during_import_never_resolves_partial_content ... ok
+test publication_and_gc_intents_reconcile_idempotently ... ok
+test prepared_publication_reconciles_before_reuse ... ok
+test prepared_gc_intent_reconciles_with_or_without_tree_effect ... ok
+test prepared_recovery_cursor_reaches_late_intent_after_many_complete_records ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.62s
+
+
+running 1 test
+test https_registry_push_pull_verifies_graph_and_retries ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test registry_api_fd_credentials_journal_and_prepared_facts ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/registry.rs (target/debug/deps/registry-2136830c64677dbe)
+     Running tests/registry_api.rs (target/debug/deps/registry_api-4a1a6625661f272c)
+     Running tests/registry_crash.rs (target/debug/deps/registry_crash-1284ade925cd273f)
+
+running 2 tests
+test tests::mutation_classification_keeps_observations_and_allocation_read_only ... ok
+test tests::operation_tokens_are_canonical_and_round_trip ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/artifactd_protocol-193dc976ffe082cf)
+   Doc-tests apollo_artifactd
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests artifactd_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Checking apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.25s
+/home/apollo-admin/artifactd-qualification-20261004/docs/gc-incremental-final-arm64-snapshot.json

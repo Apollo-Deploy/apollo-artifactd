@@ -47,6 +47,13 @@ impl Store {
             .ok_or_else(|| anyhow::anyhow!("invalid staging record"))?;
         uuid::Uuid::parse_str(token)?;
         if record.phase == "deleting" || record.phase == "gc_intent" {
+            if !self.gc_snapshot_ready()? {
+                return Ok(());
+            }
+            ensure!(
+                !self.gc_marked(&record.manifest, true)?,
+                "prepared GC intent conflicts with active handles"
+            );
             if self.prepared.symlink_metadata(id).is_ok() {
                 tree::remove(&self.prepared, id)?;
             }
@@ -71,7 +78,7 @@ impl Store {
             tree::remove(&self.prepared, &record.staging)?;
         }
         filesystem::sync(&self.prepared)?;
-        self.db.remove("prepared", id)?;
+        self.gc_complete_prepared(id, record)?;
         Ok(())
     }
 
@@ -90,7 +97,7 @@ impl Store {
         }
         let next = entries.last().map(|(id, _)| id.clone());
         for (id, record) in entries {
-            if record.phase == "complete" && !self.referenced_by_handles(&record.manifest)? {
+            if record.phase == "complete" && !self.gc_marked(&record.manifest, true)? {
                 ids.push(id);
             }
         }

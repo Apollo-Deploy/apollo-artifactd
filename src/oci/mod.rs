@@ -85,6 +85,13 @@ impl Store {
     }
 
     pub(crate) fn verify_graph_if_known(&self, digest: &ArtifactDigest) -> Result<()> {
+        self.verified_graph_nodes(digest).map(|_| ())
+    }
+
+    pub(crate) fn verified_graph_nodes(
+        &self,
+        digest: &ArtifactDigest,
+    ) -> Result<BTreeSet<ArtifactDigest>> {
         let known = self
             .db
             .get::<crate::state::Root>("roots", digest.as_str())?
@@ -107,8 +114,21 @@ impl Store {
         // A lost classification row must not turn a pinned OCI graph into a raw blob.
         if known || looks_oci {
             let graph = self.graph(digest)?;
+            ensure!(
+                graph.edges.len() <= self.limits.max_graph,
+                "OCI graph edges exceed bound"
+            );
+            let mut nodes = graph.nodes.clone();
+            for (parent, child) in &graph.edges {
+                nodes.insert(parent.clone());
+                nodes.insert(child.clone());
+            }
+            ensure!(
+                nodes.len() <= self.limits.max_graph.saturating_add(1),
+                "OCI graph nodes exceed bound"
+            );
             let mut persisted = BTreeSet::new();
-            for parent in &graph.nodes {
+            for parent in &nodes {
                 if let Some(children) = self
                     .db
                     .get::<Vec<ArtifactDigest>>("edges", parent.as_str())?
@@ -116,18 +136,26 @@ impl Store {
                     for child in children {
                         persisted.insert((parent.clone(), child));
                     }
-                    ensure!(
-                        persisted.len() <= self.limits.max_graph,
-                        "persisted graph exceeds bound"
-                    );
                 }
             }
+            ensure!(
+                persisted.len() <= self.limits.max_graph,
+                "persisted graph exceeds bound"
+            );
             ensure!(
                 persisted == graph.edges,
                 "persisted OCI reachability mismatch"
             );
+            return Ok(nodes);
         }
-        Ok(())
+        self.open_blob(digest)?;
+        ensure!(
+            self.db
+                .get::<Vec<ArtifactDigest>>("edges", digest.as_str())?
+                .is_none_or(|children| children.is_empty()),
+            "raw blob has persisted graph edges"
+        );
+        Ok(BTreeSet::from([digest.clone()]))
     }
 
     fn graph(&self, root: &ArtifactDigest) -> Result<Graph> {
