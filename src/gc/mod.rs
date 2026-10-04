@@ -125,8 +125,11 @@ impl Store {
                 self.db
                     .scan::<state::Reference>(table, cycle.cursor.as_deref(), budget)?
                     .into_iter()
-                    .map(|(key, record)| (key, Some(record.digest)))
-                    .collect::<Vec<_>>()
+                    .map(|(key, record)| {
+                        record.require_owner()?;
+                        Ok((key, Some(record.digest)))
+                    })
+                    .collect::<Result<Vec<_>>>()?
             } else {
                 self.db
                     .scan::<state::Prepared>(table, cycle.cursor.as_deref(), budget)?

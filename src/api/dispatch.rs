@@ -107,16 +107,17 @@ fn dispatch(
             digest,
             platform,
             pin,
-        } => match pin {
-            Some(pin) => store.admit_oci_pinned(digest, platform, pin.as_str())?,
-            None => store.admit_oci(digest, platform)?,
-        },
+        } => {
+            store.admit_oci_with_pin(digest, platform, pin.as_ref().map(|p| p.as_str()), caller)?
+        }
         Action::ImportOciArchive { platform, pin } => {
             let input = input.ok_or_else(|| anyhow::anyhow!("missing archive FD"))?;
-            match pin {
-                Some(pin) => store.import_oci_archive_pinned(input, platform, pin.as_str())?,
-                None => store.import_oci_archive(input, platform)?,
-            }
+            store.import_oci_archive_with_pin(
+                input,
+                platform,
+                pin.as_ref().map(|p| p.as_str()),
+                caller,
+            )?
         }
         Action::Inspect { digest } | Action::Verify { digest } | Action::EnsureLocal { digest } => {
             let file = store.open_blob(digest)?;
@@ -127,23 +128,23 @@ fn dispatch(
             crate::oci::facts(digest, &store.resolve(digest, platform)?, platform)
         }
         Action::Pin { id, digest } => {
-            store.pin(id.as_str(), digest)?;
+            store.pin_for(id.as_str(), digest, caller)?;
             json!({"pin_id":id})
         }
         Action::Unpin { id } => {
-            store.unpin(id.as_str())?;
+            store.unpin_for(id.as_str(), caller)?;
             json!({"pin_id":id})
         }
         Action::LeaseCreate { id, digest } => {
-            store.lease(id.as_str(), digest)?;
+            store.lease_for(id.as_str(), digest, caller)?;
             json!({"lease_id":id})
         }
         Action::LeaseRelease { id } => {
-            store.release(id.as_str())?;
+            store.release_for(id.as_str(), caller)?;
             json!({"lease_id":id})
         }
         Action::Prepare { digest, platform } => {
-            let id = store.prepare(digest, platform)?;
+            let id = store.prepare_for(digest, platform, caller)?;
             let prepared = store
                 .db
                 .get::<crate::state::Prepared>("prepared", id.as_str())?
@@ -159,14 +160,14 @@ fn dispatch(
         }
         Action::OpenBlob { digest, lease } => {
             ensure!(
-                store.leased(lease.as_str(), digest)?,
+                store.leased_for(lease.as_str(), digest, caller)?,
                 "blob requires covering lease"
             );
             fd = Some(store.open_blob(digest)?.into());
             json!({"artifact_digest":digest})
         }
         Action::OpenPrepared { id, lease } => {
-            fd = Some(store.open_prepared(id, lease.as_str())?.into());
+            fd = Some(store.open_prepared_for(id, lease.as_str(), caller)?.into());
             json!({"prepared_artifact_id":id})
         }
         Action::Gc { max_entries } => json!({"collected":store.gc(*max_entries)?}),
@@ -195,12 +196,14 @@ fn dispatch(
                 .as_ref()
                 .map_err(|_| anyhow::anyhow!("registry runtime unavailable"))?;
             let credentials = crate::registry::Credentials::read(input)?;
-            match pin {
-                Some(pin) => {
-                    registry.pull_pinned(store, reference, platform, credentials, pin.as_str())?
-                }
-                None => registry.pull(store, reference, platform, credentials)?,
-            }
+            registry.pull_with_pin(
+                store,
+                reference,
+                platform,
+                credentials,
+                pin.as_ref().map(|p| p.as_str()),
+                caller,
+            )?
         }
         Action::Push { digest, reference } => {
             let registry = REGISTRY

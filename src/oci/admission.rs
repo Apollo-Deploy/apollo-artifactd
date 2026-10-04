@@ -11,7 +11,8 @@ impl Store {
         digest: &ArtifactDigest,
         platform: &Platform,
     ) -> Result<serde_json::Value> {
-        self.admit_oci_with_pin(digest, platform, None)
+        let caller = crate::state::PeerIdentity::current();
+        self.admit_oci_with_pin(digest, platform, None, &caller)
     }
 
     pub fn admit_oci_pinned(
@@ -20,7 +21,8 @@ impl Store {
         platform: &Platform,
         pin: &str,
     ) -> Result<serde_json::Value> {
-        self.admit_oci_with_pin(digest, platform, Some(pin))
+        let caller = crate::state::PeerIdentity::current();
+        self.admit_oci_with_pin(digest, platform, Some(pin), &caller)
     }
 
     pub(crate) fn admit_oci_with_pin(
@@ -28,6 +30,7 @@ impl Store {
         digest: &ArtifactDigest,
         platform: &Platform,
         pin: Option<&str>,
+        caller: &crate::state::PeerIdentity,
     ) -> Result<serde_json::Value> {
         ensure!(platform.validate(), "unsupported platform");
         let graph = self.graph(digest)?;
@@ -39,6 +42,9 @@ impl Store {
         self.db.transaction(|tx| {
             if let Some(id) = pin {
                 let existing = tx.get::<crate::state::Reference>("pins", id)?;
+                if let Some(reference) = existing.as_ref() {
+                    reference.authorize(caller)?;
+                }
                 ensure!(
                     existing.as_ref().is_none_or(|v| v.digest == *digest),
                     "reference identity conflict"
@@ -94,6 +100,7 @@ impl Store {
                     id,
                     &crate::state::Reference {
                         digest: digest.clone(),
+                        owner: Some(caller.clone()),
                     },
                 )?;
             }

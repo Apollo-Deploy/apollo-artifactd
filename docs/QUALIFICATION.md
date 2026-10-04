@@ -195,3 +195,10 @@ UID/GID token binding, ownerless startup refusal, controlled negative cases,
 and final native ordinary-suite/Clippy/release qualification on both hosts.
 This does not implement pin/lease ownership, delegated consumer lifetime,
 per-principal quotas, or server admission for distinct service UIDs.
+
+[Reference ownership qualification](REFERENCE_OWNERSHIP.md) records owned
+transactional pin/lease creation, removal, and FD access, bounded GC refusal
+on ownerless roots, real kernel GID tests across restart, controlled
+regressions, and native ordinary-suite/Clippy/release builds on both hosts.
+Delegated claims, consumer lifetime, configured roles, and migration of legacy
+references remain mandatory and unqualified.

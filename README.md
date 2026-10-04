@@ -43,7 +43,7 @@ PUSH/PULL accept an optional protected credential-provider FD. The CLI opens it 
 
 ## Protocol and ownership
 
-One version-2 JSON packet per Unix SOCK_SEQPACKET connection, at most 64 KiB and one SCM_RIGHTS FD. Digests are canonical lowercase `sha256:` identities. Import descriptors must be bounded regular files. OPEN requires a live lease. Replayed reads recheck current integrity and liveness.
+One version-2 JSON packet per Unix SOCK_SEQPACKET connection, at most 64 KiB and one SCM_RIGHTS FD. Digests are canonical lowercase `sha256:` identities. Import descriptors must be bounded regular files. OPEN requires a live lease owned by the kernel peer UID/GID. Pins and leases cannot be adopted or removed by another peer, including same-digest retries. See [reference ownership qualification](docs/REFERENCE_OWNERSHIP.md). Replayed reads recheck current integrity and liveness.
 
 Packet delivery waits are bounded to 30 seconds. The client allows up to 600 seconds for an operation response, so verified streaming transfers can complete. A response timeout leaves the operation outcome unknown; retry the same allocated token rather than automatically creating a new mutation.
 

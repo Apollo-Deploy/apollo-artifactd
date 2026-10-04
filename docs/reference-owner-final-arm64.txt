@@ -1,0 +1,256 @@
+COMMAND: /home/apollo-admin/.cargo/bin/cargo test --locked --test reference_owner
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.65s
+     Running tests/reference_owner.rs (target/debug/deps/reference_owner-b0f790c5cb46944e)
+
+running 1 test
+test ownerless_reference_fails_closed_during_gc_without_deleting_blob ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+
+COMMAND: /home/apollo-admin/.cargo/bin/cargo test --locked --test operation_owner_peer --no-run
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.28s
+  Executable tests/operation_owner_peer.rs (target/debug/deps/operation_owner_peer-fdb2e5dd78ba5520)
+COMMAND: sudo -n /home/apollo-admin/artifactd-qualification-20261004/target/debug/deps/operation_owner_peer-fdb2e5dd78ba5520 --ignored --nocapture
+
+running 2 tests
+test kernel_peer_gid_binds_operation_owner_across_restart ... ok
+test kernel_peer_gid_binds_persistent_pin_and_lease_owners ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+COMMAND: /home/apollo-admin/.cargo/bin/cargo test --locked --workspace --all-targets
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.89s
+     Running unittests src/lib.rs (target/debug/deps/apollo_artifactd-6b41f15f916544f5)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/cli.rs (target/debug/deps/apollo_artifactctl-3e0bd1ca6ab829be)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/apollo_artifactd-cb6b0dec510ead6c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/admission_pin.rs (target/debug/deps/admission_pin-64845e7ffc8d4f83)
+
+running 1 test
+test daemon_oci_admission_pin_survives_replay_and_controls_gc ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+
+     Running tests/api.rs (target/debug/deps/api-8ab6c5972546e2c4)
+
+running 1 test
+artifactd request rejected
+test daemon_fd_contract_idempotency_and_replay ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/cas.rs (target/debug/deps/cas-f9a2ccb82cd310d5)
+
+running 8 tests
+test legacy_sqlite_state_is_rejected_without_cleanup ... ok
+test foreign_files_and_links_are_never_collected ... ok
+test invalid_inputs_never_publish ... ok
+test quota_and_exclusive_store_owner ... ok
+test incremental_gc_progresses_past_pinned_prefix_after_restart ... ok
+test cas_admission_durability_and_references ... ok
+test calculated_identity_streams_deduplicates_and_rejects_wrong_size ... ok
+test stored_identity_matches_bytes ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.30s
+
+     Running tests/client_identity.rs (target/debug/deps/client_identity-7cba924b0f1c1355)
+
+running 4 tests
+test privileged_cross_uid_cli_identity_boundary ... ignored, requires explicit root execution and nobody (65534) account
+test wrong_uid_rejects_before_request_or_descriptor_send ... ok
+test valid_uid_endpoint_receives_and_answers_public_request ... ok
+test wrong_uid_rejects_client_allocate_and_cli_autoallocation ... ok
+
+test result: ok. 3 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/doctor.rs (target/debug/deps/doctor-03c929d6df29f7f4)
+
+running 2 tests
+Error: database quarantined; restart and reconciliation required
+test daemon_doctor_corruption_quarantines_and_exits ... ok
+test doctor_fails_closed_after_committed_state_page_corruption ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/gc_crash.rs (target/debug/deps/gc_crash-669f198f409bb3ba)
+
+running 1 test
+test sigkill_prepared_gc_recovers_partial_tree ... ignored, native SIGKILL prepared GC qualification
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/gc_incremental.rs (target/debug/deps/gc_incremental-03eddb2aaf1f4655)
+
+running 2 tests
+test pin_and_lease_invalidate_ready_and_partial_gc_snapshots ... ok
+test late_corrupt_pin_is_found_by_bounded_gc_not_startup ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.48s
+
+     Running tests/journal_api.rs (target/debug/deps/journal_api-f547cc287c696750)
+
+running 1 test
+test allocated_mutations_replay_conflict_and_restart_with_bounded_journal ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 18.61s
+
+     Running tests/journal_churn.rs (target/debug/deps/journal_churn-210bcb1ad52dfb31)
+
+running 1 test
+test public_journal_churn_stays_bounded ... ignored, 100k native journal availability campaign
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/journal_crash.rs (target/debug/deps/journal_crash-d61c42f4bbb230a8)
+
+running 1 test
+test sigkill_import_preserves_intent_and_recovers_without_reexecution ... ignored, native SIGKILL recovery qualification
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/oci.rs (target/debug/deps/oci-1e72a2968c5ffb87)
+
+running 8 tests
+test malformed_oci_archive_pax_is_rejected ... ok
+test malicious_layout_archive_never_unpacks ... ok
+test canonical_duplicate_layout_paths_are_rejected ... ok
+test multi_platform_and_descriptor_substitution ... ok
+test corrupt_reachability_cannot_authorize_gc ... ok
+test diffid_mismatch_and_symlink_escape_fail_preparation ... ok
+test oci_preparation_verifies_diffid_and_whiteouts ... ok
+test valid_archive_admission_and_missing_terminator ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/oci_gc.rs (target/debug/deps/oci_gc-192f850346dcbc78)
+
+running 1 test
+test gc_reimport_restores_admitted_manifest_reachability ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/operation_owner.rs (target/debug/deps/operation_owner-4a203eaad6f55f90)
+
+running 2 tests
+test ownerless_persisted_operation_fails_closed_and_is_preserved ... ok
+test persisted_operation_owner_mismatch_blocks_effect_and_replay ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/operation_owner_peer.rs (target/debug/deps/operation_owner_peer-fdb2e5dd78ba5520)
+
+running 2 tests
+test kernel_peer_gid_binds_operation_owner_across_restart ... ignored, requires explicit root execution for isolated numeric UID/GID peers
+test kernel_peer_gid_binds_persistent_pin_and_lease_owners ... ignored, requires explicit root execution for isolated numeric UID/GID peers
+
+test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/prepare_extensions.rs (target/debug/deps/prepare_extensions-1aae745770fe9b12)
+
+running 5 tests
+test prepare_bounds_decompressed_bytes_across_the_whole_image ... ok
+test prepare_normalizes_current_directory_members_and_rejects_alias_collisions ... ok
+test prepare_normalization_keeps_root_type_and_traversal_guards ... ok
+test prepare_standard_extensions_preserves_effective_paths_sizes_and_framing ... ok
+test prepare_rejects_malformed_and_ambiguous_pax_metadata ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+     Running tests/protocol.rs (target/debug/deps/protocol-010d3a7dd74e093f)
+
+running 1 test
+test truncated_packets_and_excess_descriptors_are_rejected ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/recovery.rs (target/debug/deps/recovery-5725db92f4da1a6d)
+
+running 7 tests
+test crash_import_worker ... ok
+test sigkill_during_import_never_resolves_partial_content ... ok
+test sigkill_during_calculated_import_discards_unresolved_intent ... ok
+test publication_and_gc_intents_reconcile_idempotently ... ok
+test prepared_publication_reconciles_before_reuse ... ok
+test prepared_gc_intent_reconciles_with_or_without_tree_effect ... ok
+test prepared_recovery_cursor_reaches_late_intent_after_many_complete_records ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.80s
+
+     Running tests/reference_owner.rs (target/debug/deps/reference_owner-b0f790c5cb46944e)
+
+running 1 test
+test ownerless_reference_fails_closed_during_gc_without_deleting_blob ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+
+     Running tests/registry.rs (target/debug/deps/registry-0f0c833b5ba097e0)
+
+running 1 test
+test https_registry_push_pull_verifies_graph_and_retries ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/registry_api.rs (target/debug/deps/registry_api-4fdf6c5f6d6ef05f)
+
+running 1 test
+test registry_api_fd_credentials_journal_and_prepared_facts ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/registry_crash.rs (target/debug/deps/registry_crash-79418711eddef850)
+
+running 1 test
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/churn.rs (target/debug/examples/churn-859a2280f9998ea0)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/registry_throughput.rs (target/debug/examples/registry_throughput-c62d5e40f93fd161)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/throughput.rs (target/debug/examples/throughput-b339b0f72655fe4c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/artifactd_protocol-193dc976ffe082cf)
+
+running 2 tests
+test tests::mutation_classification_keeps_observations_and_allocation_read_only ... ok
+test tests::operation_tokens_are_canonical_and_round_trip ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+COMMAND: /home/apollo-admin/.cargo/bin/cargo clippy --locked --workspace --all-targets -- -D warnings
+    Checking apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.92s
+COMMAND: /home/apollo-admin/.cargo/bin/cargo build --locked --release --workspace --all-targets
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `release` profile [optimized] target(s) in 1m 06s
+QUALIFICATION_EXIT=0

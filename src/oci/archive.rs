@@ -11,7 +11,8 @@ impl Store {
         reader: impl Read,
         platform: &Platform,
     ) -> Result<serde_json::Value> {
-        self.import_oci_archive_with_pin(reader, platform, None)
+        let caller = crate::state::PeerIdentity::current();
+        self.import_oci_archive_with_pin(reader, platform, None, &caller)
     }
 
     pub fn import_oci_archive_pinned(
@@ -21,14 +22,16 @@ impl Store {
         pin: &str,
     ) -> Result<serde_json::Value> {
         artifactd_protocol::PinId::try_from(pin.to_owned()).map_err(anyhow::Error::msg)?;
-        self.import_oci_archive_with_pin(reader, platform, Some(pin))
+        let caller = crate::state::PeerIdentity::current();
+        self.import_oci_archive_with_pin(reader, platform, Some(pin), &caller)
     }
 
-    fn import_oci_archive_with_pin(
+    pub(crate) fn import_oci_archive_with_pin(
         &mut self,
         reader: impl Read,
         platform: &Platform,
         pin: Option<&str>,
+        caller: &crate::state::PeerIdentity,
     ) -> Result<serde_json::Value> {
         let mut archive = tar::Archive::new(reader.take(self.limits.max_store + 1));
         archive.set_extension_size_limit(64 * 1024);
@@ -117,7 +120,7 @@ impl Store {
         let digest: ArtifactDigest =
             format!("sha256:{}", hex::encode(Sha256::digest(&bytes))).parse()?;
         self.import_blob(&mut bytes.as_slice(), &digest, bytes.len() as u64)?;
-        let mut facts = self.admit_oci_with_pin(&digest, platform, pin)?;
+        let mut facts = self.admit_oci_with_pin(&digest, platform, pin, caller)?;
         facts["artifact_digest"] = serde_json::to_value(&digest)?;
         Ok(facts)
     }

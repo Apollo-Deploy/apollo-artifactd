@@ -1,0 +1,21 @@
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.16s
+     Running tests/reference_owner.rs (target/debug/deps/reference_owner-b0f790c5cb46944e)
+
+running 1 test
+
+thread 'ownerless_reference_fails_closed_during_gc_without_deleting_blob' (192505) panicked at tests/reference_owner.rs:107:10:
+bounded GC must reach the late legacy root
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ownerless_reference_fails_closed_during_gc_without_deleting_blob ... FAILED
+
+failures:
+
+failures:
+    ownerless_reference_fails_closed_during_gc_without_deleting_blob
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.65s
+
+error: test failed, to rerun pass `--test reference_owner`
+
+CONTROL_EXIT=101

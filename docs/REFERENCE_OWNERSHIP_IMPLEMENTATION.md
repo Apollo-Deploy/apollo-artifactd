@@ -1,12 +1,12 @@
 # Reference ownership implementation
 
-This document maps the next narrow change: persist ownership for CAS pins and leases while preserving the already implemented operation-token owner binding. It does not widen the server admission policy by itself. The current `LEASE_CREATE { id, digest }` wire shape has no recipient field; explicit producer-to-consumer delegation requires the protocol addition described below.
+The owner-binding portion of this implementation map is now implemented and qualified in [REFERENCE_OWNERSHIP.md](REFERENCE_OWNERSHIP.md). Grantee delegation, durable claims, service roles, and per-principal quotas below remain mandatory implementation work. It does not widen the server admission policy by itself. The current `LEASE_CREATE { id, digest }` wire shape has no recipient field; explicit producer-to-consumer delegation requires the protocol addition described below.
 
 ## Baseline
 
 `src/state/records.rs` already defines `PeerIdentity { uid, gid }`, and `Operation.owner` is persisted and checked by `src/api/journal.rs::allocate`, `begin`, and `complete`. `src/api/mod.rs` still admits only the artifactd UID, so reference ownership must be completed before trusted producer and consumer UIDs are admitted.
 
-The remaining unowned surface is `Reference` in `src/state/records.rs`. `src/cas/references.rs` currently stores only `{ digest }`; `unpin`, `release`, and `leased` address records by opaque ID. Pin creation also occurs inside the graph transaction in `src/oci/admission.rs`, `src/oci/archive.rs`, and `src/registry/pull.rs`, so all of those paths must carry the same owner identity into the transaction.
+`Reference` now persists `{ digest, owner }`; creation, removal, and lease use check the caller owner. Grantee and claim state are not implemented yet. Pin creation also occurs inside the graph transaction in `src/oci/admission.rs`, `src/oci/archive.rs`, and `src/registry/pull.rs`, so all of those paths must carry the same owner identity into the transaction.
 
 ## Record shape and compatibility
 
@@ -80,7 +80,7 @@ The current visibility is: `Store::admit_oci` and `Store::admit_oci_pinned` are 
 
 ## Authorization and boundedness
 
-Role checks remain at the API boundary and inside the mutation transaction. Producer/admin may create pins; read-consumer may create leases for an authorized generic grantee; only the stored grantee may open a lease. Owner/grantee release and admin revoke follow the claimed-tree lifecycle described above. Operation tokens remain bound to UID/GID and lease create/release use the existing global 4096-entry journal window. Per-identity allocation quotas are **required future work in this full cutover**; they are not implemented by the current journal, which only enforces the global window.
+Role checks remain at the API boundary and inside the mutation transaction. Producer/admin may create pins; read-consumer may create leases for an authorized generic grantee; only the stored grantee may open a lease. Owner/grantee release and admin revoke follow the claimed-tree lifecycle described above. Operation tokens remain bound to UID/GID and lease create/release use the existing global 4096-entry journal window. Per-identity allocation quotas are **remaining mandatory work in this full cutover**; they are not implemented by the current journal, which only enforces the global window.
 
 ## Qualification
 

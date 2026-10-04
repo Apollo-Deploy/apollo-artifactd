@@ -5,48 +5,109 @@ use std::collections::BTreeSet;
 
 impl Store {
     pub fn pin(&mut self, id: &str, digest: &ArtifactDigest) -> Result<()> {
-        self.reference("pins", id, digest)
+        self.pin_for(id, digest, &crate::state::PeerIdentity::current())
     }
     pub fn lease(&mut self, id: &str, digest: &ArtifactDigest) -> Result<()> {
-        self.reference("leases", id, digest)
+        self.lease_for(id, digest, &crate::state::PeerIdentity::current())
+    }
+    pub(crate) fn pin_for(
+        &mut self,
+        id: &str,
+        digest: &ArtifactDigest,
+        caller: &crate::state::PeerIdentity,
+    ) -> Result<()> {
+        self.reference("pins", id, digest, caller)
+    }
+    pub(crate) fn lease_for(
+        &mut self,
+        id: &str,
+        digest: &ArtifactDigest,
+        caller: &crate::state::PeerIdentity,
+    ) -> Result<()> {
+        self.reference("leases", id, digest, caller)
     }
 
-    fn reference(&mut self, table: &'static str, id: &str, digest: &ArtifactDigest) -> Result<()> {
+    fn reference(
+        &mut self,
+        table: &'static str,
+        id: &str,
+        digest: &ArtifactDigest,
+        caller: &crate::state::PeerIdentity,
+    ) -> Result<()> {
         ensure!(
             id.len() <= 128 && !id.is_empty(),
             "invalid reference identity"
         );
-        ensure!(self.db.count(table)? < 100_000, "reference count limit");
         self.open_blob(digest)?;
         self.verify_graph_if_known(digest)?;
-        let existing = self.db.get::<crate::state::Reference>(table, id)?;
-        ensure!(
-            existing.as_ref().is_none_or(|v| v.digest == *digest),
-            "reference identity conflict"
-        );
-        if existing.is_none() {
-            self.db.put(
-                table,
-                id,
-                &crate::state::Reference {
-                    digest: digest.clone(),
-                },
-            )?;
-        }
-        Ok(())
+        self.db.transaction(|tx| {
+            let existing = tx.get::<crate::state::Reference>(table, id)?;
+            if let Some(reference) = &existing {
+                reference.authorize(caller)?;
+                ensure!(reference.digest == *digest, "reference identity conflict");
+            } else {
+                ensure!(tx.count(table)? < 100_000, "reference count limit");
+                tx.put(
+                    table,
+                    id,
+                    &crate::state::Reference {
+                        digest: digest.clone(),
+                        owner: Some(caller.clone()),
+                    },
+                )?;
+            }
+            Ok(())
+        })
     }
 
     pub fn unpin(&mut self, id: &str) -> Result<()> {
-        self.db.remove("pins", id)
+        self.unpin_for(id, &crate::state::PeerIdentity::current())
     }
     pub fn release(&mut self, id: &str) -> Result<()> {
-        self.db.remove("leases", id)
+        self.release_for(id, &crate::state::PeerIdentity::current())
+    }
+    pub(crate) fn unpin_for(
+        &mut self,
+        id: &str,
+        caller: &crate::state::PeerIdentity,
+    ) -> Result<()> {
+        self.remove_reference("pins", id, caller)
+    }
+    pub(crate) fn release_for(
+        &mut self,
+        id: &str,
+        caller: &crate::state::PeerIdentity,
+    ) -> Result<()> {
+        self.remove_reference("leases", id, caller)
+    }
+    fn remove_reference(
+        &self,
+        table: &'static str,
+        id: &str,
+        caller: &crate::state::PeerIdentity,
+    ) -> Result<()> {
+        self.db.transaction(|tx| {
+            if let Some(reference) = tx.get::<crate::state::Reference>(table, id)? {
+                reference.authorize(caller)?;
+                tx.remove(table, id)?;
+            }
+            Ok(())
+        })
     }
 
     pub fn leased(&self, id: &str, digest: &ArtifactDigest) -> Result<bool> {
+        self.leased_for(id, digest, &crate::state::PeerIdentity::current())
+    }
+    pub(crate) fn leased_for(
+        &self,
+        id: &str,
+        digest: &ArtifactDigest,
+        caller: &crate::state::PeerIdentity,
+    ) -> Result<bool> {
         let Some(reference) = self.db.get::<crate::state::Reference>("leases", id)? else {
             return Ok(false);
         };
+        reference.authorize(caller)?;
         self.reachable(&reference.digest, digest)
     }
 
@@ -85,6 +146,7 @@ impl Store {
                     break;
                 }
                 for (_, reference) in &page {
+                    reference.require_owner()?;
                     self.open_blob(&reference.digest)?;
                     self.verify_graph_if_known(&reference.digest)?;
                 }

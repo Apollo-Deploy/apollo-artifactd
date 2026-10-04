@@ -52,7 +52,10 @@ fn late_corrupt_pin_is_found_by_bounded_gc_not_startup() {
         .put(
             "pins",
             "pin-z-late-corrupt",
-            &apollo_artifactd::state::Reference { digest: missing },
+            &apollo_artifactd::state::Reference {
+                digest: missing,
+                owner: Some(apollo_artifactd::state::PeerIdentity::current()),
+            },
         )
         .unwrap();
     drop(state);

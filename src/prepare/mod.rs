@@ -15,12 +15,21 @@ impl Store {
         source: &ArtifactDigest,
         platform: &Platform,
     ) -> Result<PreparedArtifactId> {
+        self.prepare_for(source, platform, &crate::state::PeerIdentity::current())
+    }
+
+    pub(crate) fn prepare_for(
+        &mut self,
+        source: &ArtifactDigest,
+        platform: &Platform,
+        caller: &crate::state::PeerIdentity,
+    ) -> Result<PreparedArtifactId> {
         let image = self.resolve(source, platform)?;
         ensure!(
             image.digest == *source,
             "preparation requires selected manifest identity"
         );
-        self.admit_oci(source, platform)?;
+        self.admit_oci_with_pin(source, platform, None, caller)?;
         let p = serde_json::to_string(platform)?;
         let identity = format!("{FORMAT}\n{source}\n{p}\n");
         let id = hex::encode(Sha256::digest(identity.as_bytes()));
@@ -103,6 +112,15 @@ impl Store {
     }
 
     pub fn open_prepared(&self, id: &PreparedArtifactId, lease: &str) -> Result<std::fs::File> {
+        self.open_prepared_for(id, lease, &crate::state::PeerIdentity::current())
+    }
+
+    pub(crate) fn open_prepared_for(
+        &self,
+        id: &PreparedArtifactId,
+        lease: &str,
+        caller: &crate::state::PeerIdentity,
+    ) -> Result<std::fs::File> {
         let record = self
             .db
             .get::<crate::state::Prepared>("prepared", id.as_str())?
@@ -113,7 +131,7 @@ impl Store {
         );
         let manifest = record.manifest.to_string();
         ensure!(
-            self.leased(lease, &manifest.parse()?)?,
+            self.leased_for(lease, &manifest.parse()?, caller)?,
             "prepared artifact requires a covering lease"
         );
         let dir = self.prepared.open_dir(id.as_str())?;

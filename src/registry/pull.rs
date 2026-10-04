@@ -20,7 +20,8 @@ impl Registry {
         platform: &Platform,
         credentials: Credentials,
     ) -> Result<serde_json::Value> {
-        self.pull_with_pin(store, value, platform, credentials, None)
+        let caller = crate::state::PeerIdentity::current();
+        self.pull_with_pin(store, value, platform, credentials, None, &caller)
     }
 
     pub fn pull_pinned(
@@ -32,23 +33,25 @@ impl Registry {
         pin: &str,
     ) -> Result<serde_json::Value> {
         artifactd_protocol::PinId::try_from(pin.to_owned()).map_err(anyhow::Error::msg)?;
-        self.pull_with_pin(store, value, platform, credentials, Some(pin))
+        let caller = crate::state::PeerIdentity::current();
+        self.pull_with_pin(store, value, platform, credentials, Some(pin), &caller)
     }
 
-    fn pull_with_pin(
+    pub(crate) fn pull_with_pin(
         &self,
         store: &mut Store,
         value: &str,
         platform: &Platform,
         credentials: Credentials,
         pin: Option<&str>,
+        caller: &crate::state::PeerIdentity,
     ) -> Result<serde_json::Value> {
         ensure!(platform.validate(), "unsupported platform");
         let image = reference(value, true)?;
         let root: ArtifactDigest = image.digest().expect("validated digest").parse()?;
         // A valid local graph is already the immutable requested result.
         if store.resolve(&root, platform).is_ok() {
-            return store.admit_oci_with_pin(&root, platform, pin);
+            return store.admit_oci_with_pin(&root, platform, pin, caller);
         }
         let auth = credentials.auth(&image)?;
         let client = self.client(&credentials, store.limits.max_metadata)?;
@@ -121,7 +124,7 @@ impl Registry {
         }
         // Independently verify the complete graph using artifactd policy. Registry
         // responses are transport inputs, never authoritative graph facts.
-        store.admit_oci_with_pin(&root, platform, pin)
+        store.admit_oci_with_pin(&root, platform, pin, caller)
     }
     fn manifest(
         &self,

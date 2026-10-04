@@ -1,0 +1,22 @@
+COMMAND: /usr/bin/cargo test --locked --test reference_owner
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.24s
+     Running tests/reference_owner.rs (target/debug/deps/reference_owner-1820c544f628f9ee)
+
+running 1 test
+test ownerless_reference_fails_closed_during_gc_without_deleting_blob ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.65s
+
+COMMAND: /usr/bin/cargo test --locked --test operation_owner_peer --no-run
+   Compiling apollo-artifactd v0.1.0 (/home/tihan/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.61s
+  Executable tests/operation_owner_peer.rs (target/debug/deps/operation_owner_peer-514fdd5a70bc0b66)
+COMMAND: sudo -n /home/tihan/artifactd-qualification-20261004/target/debug/deps/operation_owner_peer-514fdd5a70bc0b66 --ignored --nocapture
+
+running 2 tests
+test kernel_peer_gid_binds_operation_owner_across_restart ... ok
+test kernel_peer_gid_binds_persistent_pin_and_lease_owners ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+QUALIFICATION_EXIT=0
