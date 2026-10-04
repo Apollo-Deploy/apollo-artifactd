@@ -1,6 +1,6 @@
 # Dependency acceptance record
 
-This is a conditional implementation review, not production approval. Cargo.lock records the exact dependency graph; the production and fuzz workspaces each have an independent lockfile. No Apollo sibling path or Git dependency is accepted. Production path dependencies are the package-owned protocol crate and the vendored third-party OCI client; neither depends on an Apollo sibling.
+This is a conditional implementation review, not production approval. Cargo.lock records the exact dependency graph; the production and fuzz workspaces each have an independent lockfile. No Apollo sibling path or Git dependency is accepted. Production path dependencies are the package-owned protocol crate and vendored third-party OCI client and tar parser; none depends on an Apollo sibling.
 
 | Mechanism | Accepted crate | Policy imposed by artifactd / remaining limits |
 |---|---|---|
@@ -9,7 +9,7 @@ This is a conditional implementation review, not production approval. Cargo.lock
 | Capability filesystem | cap-std 4.0.3 | Private owner root, anchored handles, explicit component/link policies; reopen O_PATH directory handles read-only for fsync. Same-owner hostile processes remain outside the qualified boundary. |
 | Transaction database | redb 4.3 | Capability-opened private file, Immediate transaction durability, 8 MiB cache, schema version, bounded metadata and persisted mutation intents. No custom database. Legacy SQLite stores fail closed; conversion and corruption qualification remain open. |
 | OCI models | oci-spec 0.9.0 | Standard structs; locally enforce graph/media/digest/size/platform/DiffID relationships and metadata limits. Unsupported descriptor extensions are rejected. |
-| Tar | tar 0.4.46 | Raw entries only; reject extension headers before library buffering, links/devices/path escape and oversized content; strict trailing terminator policy; never use unconstrained unpack. Safe GNU/PAX portability remains missing. |
+| Tar | vendored tar 0.4.46 | Standard GNU/PAX preprocessing with an explicit 64 KiB extension allocation cap in both rootfs passes. Effective paths/links/sizes remain subject to artifactd policy; strict terminators, DiffIDs and output bounds remain enforced. Hardlinks/devices are rejected. OCI layout import currently retains raw-entry restrictions. Both native normal suites, Clippy and release builds pass for bounded extensions; full release qualification remains incomplete. |
 | Compression | flate2 1.1.10 / zstd 0.13.3 | Bound decompressed reads and total output; verify DiffIDs before applying layer effects. Compression mechanisms are library code. Native zstd requires a C toolchain. |
 | JSON | serde / serde_json 1.0.151 | Bounded packet/metadata reads and graph depth/descriptor budgets. JSON is a versioned local protocol; no protobuf implementation is introduced. |
 | CLI/IDs | clap / uuid | Generic identifiers; no credentials in CLI arguments and no shell execution. Registry credentials use a protected FD and are excluded from journal entries and errors; full credential/security qualification remains open. |
@@ -21,7 +21,7 @@ This is a conditional implementation review, not production approval. Cargo.lock
 
 `reqwest` and `rustls` remain responsible for HTTP and TLS. Artifactd requires HTTPS, uses the platform trust store or an explicit private-provider CA, and does not enable invalid-certificate acceptance. Credential providers are size-bounded regular files restricted to their owner; errors from remote requests are sanitized. Authenticated native registry qualification is recorded separately from upstream client tests.
 
-The locked graph includes `webpki-root-certs` 1.0.9 under CDLA-Permissive-2.0. The license was reviewed before allowlisting: it permits use/modification/sharing of the certificate data and requires the license text to accompany shared data. `licenses/CDLA-Permissive-2.0.txt` retains the exact crate license for distribution. Package distributions must include this notice and the vendored OCI client's Apache license. No advisory exception is used.
+The locked graph includes `webpki-root-certs` 1.0.9 under CDLA-Permissive-2.0. The license was reviewed before allowlisting: it permits use/modification/sharing of the certificate data and requires the license text to accompany shared data. `licenses/CDLA-Permissive-2.0.txt` retains the exact crate license for distribution. Package distributions must include this notice and the vendored OCI client's Apache license and the tar parser's MIT/Apache license notices. No advisory exception is used.
 
 ## Tool evidence
 

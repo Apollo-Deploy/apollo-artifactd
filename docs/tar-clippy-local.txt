@@ -1,0 +1,4 @@
+    Blocking waiting for file lock on build directory
+    Checking tar v0.4.46 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/vendor/tar)
+    Checking apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.86s

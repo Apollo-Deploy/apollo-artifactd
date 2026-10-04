@@ -1,0 +1,234 @@
+   Compiling tar v0.4.46 (/home/apollo-admin/artifactd-qualification-20261004/vendor/tar)
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.37s
+     Running tests/prepare_extensions.rs (target/debug/deps/prepare_extensions-1aae745770fe9b12)
+
+running 2 tests
+test prepare_standard_extensions_preserves_effective_paths_sizes_and_framing ... ok
+test prepare_rejects_malformed_and_ambiguous_pax_metadata ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+warning: unnecessary parentheses around function argument
+   --> examples/registry_throughput.rs:126:18
+    |
+126 |             Some((fields.get(11)?.parse::<u64>().ok()? + fields.get(12)?.parse::<u64>().ok()?))
+    |                  ^                                                                           ^
+    |
+    = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+help: remove these parentheses
+    |
+126 -             Some((fields.get(11)?.parse::<u64>().ok()? + fields.get(12)?.parse::<u64>().ok()?))
+126 +             Some(fields.get(11)?.parse::<u64>().ok()? + fields.get(12)?.parse::<u64>().ok()?)
+    |
+
+warning: `apollo-artifactd` (example "registry_throughput" test) generated 1 warning (run `cargo fix --example "registry_throughput" -p apollo-artifactd --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.96s
+     Running unittests src/lib.rs (target/debug/deps/apollo_artifactd-6b41f15f916544f5)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/cli.rs (target/debug/deps/apollo_artifactctl-3e0bd1ca6ab829be)
+     Running unittests src/main.rs (target/debug/deps/apollo_artifactd-cb6b0dec510ead6c)
+     Running tests/api.rs (target/debug/deps/api-8ab6c5972546e2c4)
+
+running 1 test
+artifactd request rejected
+test daemon_fd_contract_idempotency_and_replay ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+
+
+running 8 tests
+     Running tests/cas.rs (target/debug/deps/cas-f9a2ccb82cd310d5)
+test legacy_sqlite_state_is_rejected_without_cleanup ... ok
+test foreign_files_and_links_are_never_collected ... ok
+test invalid_inputs_never_publish ... ok
+test quota_and_exclusive_store_owner ... ok
+test incremental_gc_progresses_past_pinned_prefix_after_restart ... ok
+test calculated_identity_streams_deduplicates_and_rejects_wrong_size ... ok
+test cas_admission_durability_and_references ... ok
+test stored_identity_matches_bytes ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.48s
+
+
+running 2 tests
+     Running tests/doctor.rs (target/debug/deps/doctor-03c929d6df29f7f4)
+Error: database quarantined; restart and reconciliation required
+test doctor_fails_closed_after_committed_state_page_corruption ... ok
+test daemon_doctor_corruption_quarantines_and_exits ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+
+running 1 test
+test sigkill_prepared_gc_recovers_partial_tree ... ignored, native SIGKILL prepared GC qualification
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 2 tests
+     Running tests/gc_crash.rs (target/debug/deps/gc_crash-669f198f409bb3ba)
+     Running tests/gc_incremental.rs (target/debug/deps/gc_incremental-03eddb2aaf1f4655)
+test pin_and_lease_invalidate_ready_and_partial_gc_snapshots ... ok
+test late_corrupt_pin_is_found_by_bounded_gc_not_startup ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.49s
+
+
+running 1 test
+     Running tests/journal_api.rs (target/debug/deps/journal_api-f547cc287c696750)
+test allocated_mutations_replay_conflict_and_restart_with_bounded_journal ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 18.84s
+
+
+running 1 test
+test public_journal_churn_stays_bounded ... ignored, 100k native journal availability campaign
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test sigkill_import_preserves_intent_and_recovers_without_reexecution ... ignored, native SIGKILL recovery qualification
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 6 tests
+     Running tests/journal_churn.rs (target/debug/deps/journal_churn-210bcb1ad52dfb31)
+     Running tests/journal_crash.rs (target/debug/deps/journal_crash-d61c42f4bbb230a8)
+     Running tests/oci.rs (target/debug/deps/oci-1e72a2968c5ffb87)
+test malicious_layout_archive_never_unpacks ... ok
+test multi_platform_and_descriptor_substitution ... ok
+test corrupt_reachability_cannot_authorize_gc ... ok
+test diffid_mismatch_and_symlink_escape_fail_preparation ... ok
+test valid_archive_admission_and_missing_terminator ... ok
+test oci_preparation_verifies_diffid_and_whiteouts ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+
+running 1 test
+     Running tests/oci_gc.rs (target/debug/deps/oci_gc-192f850346dcbc78)
+test gc_reimport_restores_admitted_manifest_reachability ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+
+running 2 tests
+test prepare_standard_extensions_preserves_effective_paths_sizes_and_framing ... ok
+     Running tests/prepare_extensions.rs (target/debug/deps/prepare_extensions-1aae745770fe9b12)
+test prepare_rejects_malformed_and_ambiguous_pax_metadata ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+
+running 1 test
+test truncated_packets_and_excess_descriptors_are_rejected ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 7 tests
+test crash_import_worker ... ok
+test sigkill_during_import_never_resolves_partial_content ... ok
+test sigkill_during_calculated_import_discards_unresolved_intent ... ok
+test publication_and_gc_intents_reconcile_idempotently ... ok
+     Running tests/protocol.rs (target/debug/deps/protocol-010d3a7dd74e093f)
+     Running tests/recovery.rs (target/debug/deps/recovery-5725db92f4da1a6d)
+test prepared_publication_reconciles_before_reuse ... ok
+test prepared_gc_intent_reconciles_with_or_without_tree_effect ... ok
+test prepared_recovery_cursor_reaches_late_intent_after_many_complete_records ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.80s
+
+
+running 1 test
+test https_registry_push_pull_verifies_graph_and_retries ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test registry_api_fd_credentials_journal_and_prepared_facts ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/registry.rs (target/debug/deps/registry-0f0c833b5ba097e0)
+     Running tests/registry_api.rs (target/debug/deps/registry_api-4fdf6c5f6d6ef05f)
+     Running tests/registry_crash.rs (target/debug/deps/registry_crash-79418711eddef850)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 2 tests
+     Running unittests examples/churn.rs (target/debug/examples/churn-859a2280f9998ea0)
+     Running unittests examples/registry_throughput.rs (target/debug/examples/registry_throughput-c62d5e40f93fd161)
+     Running unittests examples/throughput.rs (target/debug/examples/throughput-b339b0f72655fe4c)
+     Running unittests src/lib.rs (target/debug/deps/artifactd_protocol-193dc976ffe082cf)
+test tests::operation_tokens_are_canonical_and_round_trip ... ok
+test tests::mutation_classification_keeps_observations_and_allocation_read_only ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Checking tar v0.4.46 (/home/apollo-admin/artifactd-qualification-20261004/vendor/tar)
+    Checking artifactd-protocol v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004/crates/artifactd-protocol)
+    Checking apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+error: unnecessary parentheses
+   --> examples/registry_throughput.rs:126:18
+    |
+126 |             Some((fields.get(11)?.parse::<u64>().ok()? + fields.get(12)?.parse::<u64>().ok()?))
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: remove them: `fields.get(11)?.parse::<u64>().ok()? + fields.get(12)?.parse::<u64>().ok()?`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#double_parens
+    = note: `-D clippy::double-parens` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::double_parens)]`
+
+error: unnecessary parentheses around function argument
+   --> examples/registry_throughput.rs:126:18
+    |
+126 |             Some((fields.get(11)?.parse::<u64>().ok()? + fields.get(12)?.parse::<u64>().ok()?))
+    |                  ^                                                                           ^
+    |
+    = note: `-D unused-parens` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(unused_parens)]`
+help: remove these parentheses
+    |
+126 -             Some((fields.get(11)?.parse::<u64>().ok()? + fields.get(12)?.parse::<u64>().ok()?))
+126 +             Some(fields.get(11)?.parse::<u64>().ok()? + fields.get(12)?.parse::<u64>().ok()?)
+    |
+
+error: could not compile `apollo-artifactd` (example "registry_throughput") due to 2 previous errors

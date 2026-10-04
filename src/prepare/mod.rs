@@ -1,6 +1,8 @@
 //! Preparation never executes image configuration or customer commands.
+mod extensions;
 mod layers;
 mod recovery;
+mod stream;
 mod tree;
 use crate::{Store, filesystem};
 use anyhow::{Result, ensure};

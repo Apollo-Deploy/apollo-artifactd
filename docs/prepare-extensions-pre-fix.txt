@@ -1,0 +1,33 @@
+   Compiling apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+warning: function `layer` is never used
+  --> tests/support/mod.rs:26:8
+   |
+26 | pub fn layer(entries: &[(&str, &[u8])]) -> Vec<u8> {
+   |        ^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `apollo-artifactd` (test "prepare_extensions") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.82s
+     Running tests/prepare_extensions.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/prepare_extensions-c7060dcc303e8b43)
+
+running 1 test
+test prepare_standard_extensions_preserves_effective_paths_sizes_and_framing ... FAILED
+
+failures:
+
+---- prepare_standard_extensions_preserves_effective_paths_sizes_and_framing stdout ----
+
+thread 'prepare_standard_extensions_preserves_effective_paths_sizes_and_framing' (2524050) panicked at tests/prepare_extensions.rs:70:5:
+gnu: absolute/traversing archive path
+pax: invalid archive path
+pax-size: invalid archive path
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    prepare_standard_extensions_preserves_effective_paths_sizes_and_framing
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.84s
+
+error: test failed, to rerun pass `--test prepare_extensions`

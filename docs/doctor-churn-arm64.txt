@@ -1,0 +1,50 @@
+   Compiling artifactd-protocol v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004/crates/artifactd-protocol)
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `release` profile [optimized] target(s) in 10.18s
+738178e7639efdef644a1b2dd322369b89e659fa84cabf3aee6dbbb50183a0b2  examples/churn.rs
+f7e6b65501704e3123500d39df17c0adf9038f158fd3653e50607a2c3a91bb68  Cargo.lock
+e6e4a032cdc009385e813f05e6566fdddb8adfe1e66aa1cec4e1521112f80a7b  target/release/examples/churn
+{"blob_iteration":0,"resources":{"database_bytes":126976,"fds":11,"status":["VmHWM:\t    3396 kB","VmRSS:\t    3396 kB","Threads:\t1"]}}
+{"blob_iteration":10000,"resources":{"database_bytes":126976,"fds":11,"status":["VmHWM:\t    3632 kB","VmRSS:\t    3632 kB","Threads:\t1"]}}
+{"blob_iteration":20000,"resources":{"database_bytes":126976,"fds":11,"status":["VmHWM:\t    3792 kB","VmRSS:\t    3792 kB","Threads:\t1"]}}
+{"blob_iteration":30000,"resources":{"database_bytes":126976,"fds":11,"status":["VmHWM:\t    3948 kB","VmRSS:\t    3948 kB","Threads:\t1"]}}
+{"blob_iteration":40000,"resources":{"database_bytes":126976,"fds":11,"status":["VmHWM:\t    4104 kB","VmRSS:\t    4104 kB","Threads:\t1"]}}
+{"blob_iteration":50000,"resources":{"database_bytes":126976,"fds":11,"status":["VmHWM:\t    4260 kB","VmRSS:\t    4260 kB","Threads:\t1"]}}
+{"blob_iteration":60000,"resources":{"database_bytes":126976,"fds":11,"status":["VmHWM:\t    4416 kB","VmRSS:\t    4416 kB","Threads:\t1"]}}
+{"blob_iteration":70000,"resources":{"database_bytes":126976,"fds":11,"status":["VmHWM:\t    4572 kB","VmRSS:\t    4572 kB","Threads:\t1"]}}
+{"blob_iteration":80000,"resources":{"database_bytes":126976,"fds":11,"status":["VmHWM:\t    4728 kB","VmRSS:\t    4728 kB","Threads:\t1"]}}
+{"blob_iteration":90000,"resources":{"database_bytes":126976,"fds":11,"status":["VmHWM:\t    4884 kB","VmRSS:\t    4884 kB","Threads:\t1"]}}
+{"oci_iteration":0,"resources":{"database_bytes":126976,"fds":11,"status":["VmHWM:\t    5060 kB","VmRSS:\t    5060 kB","Threads:\t1"]}}
+{"oci_iteration":2000,"resources":{"database_bytes":90112,"fds":11,"status":["VmHWM:\t    5212 kB","VmRSS:\t    5212 kB","Threads:\t1"]}}
+{"oci_iteration":4000,"resources":{"database_bytes":90112,"fds":11,"status":["VmHWM:\t    5244 kB","VmRSS:\t    5244 kB","Threads:\t1"]}}
+{"oci_iteration":6000,"resources":{"database_bytes":90112,"fds":11,"status":["VmHWM:\t    5268 kB","VmRSS:\t    5268 kB","Threads:\t1"]}}
+{"oci_iteration":8000,"resources":{"database_bytes":90112,"fds":11,"status":["VmHWM:\t    5304 kB","VmRSS:\t    5304 kB","Threads:\t1"]}}
+{"oci_iteration":10000,"resources":{"database_bytes":90112,"fds":11,"status":["VmHWM:\t    5332 kB","VmRSS:\t    5332 kB","Threads:\t1"]}}
+{"oci_iteration":12000,"resources":{"database_bytes":90112,"fds":11,"status":["VmHWM:\t    5368 kB","VmRSS:\t    5368 kB","Threads:\t1"]}}
+{"oci_iteration":14000,"resources":{"database_bytes":90112,"fds":11,"status":["VmHWM:\t    5400 kB","VmRSS:\t    5400 kB","Threads:\t1"]}}
+{"oci_iteration":16000,"resources":{"database_bytes":90112,"fds":11,"status":["VmHWM:\t    5428 kB","VmRSS:\t    5428 kB","Threads:\t1"]}}
+{"oci_iteration":18000,"resources":{"database_bytes":90112,"fds":11,"status":["VmHWM:\t    5460 kB","VmRSS:\t    5460 kB","Threads:\t1"]}}
+{"baseline":{"database_bytes":1056768,"fds":11,"status":["VmHWM:\t    3044 kB","VmRSS:\t    3044 kB","Threads:\t1"]},"blob_elapsed_seconds":596.320608362,"blob_latency":{"p50_us":5427,"p95_us":8931,"p99_us":10041},"blob_operations":100000,"final_inventory":{"blobs":0,"edges":0,"gc":0,"gc_marks":0,"imports":0,"leases":0,"metadata":3,"operations":0,"pins":0,"prepared":0,"registry":0,"roots":0},"final_resources":{"database_bytes":90112,"fds":11,"status":["VmHWM:\t    5480 kB","VmRSS:\t    5480 kB","Threads:\t1"]},"final_state":{"blobs":0,"bytes":0,"production_qualified":false,"schema":3},"oci_elapsed_seconds":199.949128744,"oci_latency":{"p50_us":9018,"p95_us":13020,"p99_us":21023},"oci_lifecycles":20000,"restart_doctor":{"database":"open","database_integrity_checked":true,"database_integrity_clean":true,"database_repaired":false,"durability":"Immediate","engine":"redb","exclusive_owner":true,"inspection_scope":"operation_execution","live_graphs_verified":true}}
+	Command being timed: "target/release/examples/churn /home/apollo-admin/artifactd-qualification-20261004/doctor-churn-store.ZjeNVp"
+	User time (seconds): 0.16
+	System time (seconds): 153.14
+	Percent of CPU this job got: 19%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 13:06.42
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 6272
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1211
+	Voluntary context switches: 6565439
+	Involuntary context switches: 15689
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 66080576
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

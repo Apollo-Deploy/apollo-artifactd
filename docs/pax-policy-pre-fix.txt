@@ -1,0 +1,23 @@
+   Compiling tar v0.4.46 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/vendor/tar)
+   Compiling apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.27s
+     Running tests/prepare_extensions.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/prepare_extensions-9927248b3e221849)
+
+running 1 test
+test prepare_rejects_malformed_and_ambiguous_pax_metadata ... FAILED
+
+failures:
+
+---- prepare_rejects_malformed_and_ambiguous_pax_metadata stdout ----
+
+thread 'prepare_rejects_malformed_and_ambiguous_pax_metadata' (2555337) panicked at tests/prepare_extensions.rs:128:5:
+accepted ambiguous PAX: ["malformed", "size", "duplicate"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    prepare_rejects_malformed_and_ambiguous_pax_metadata
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1.16s
+
+error: test failed, to rerun pass `--test prepare_extensions`

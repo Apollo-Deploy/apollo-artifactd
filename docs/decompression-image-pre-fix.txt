@@ -1,0 +1,22 @@
+   Compiling apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.35s
+     Running tests/prepare_extensions.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/prepare_extensions-9927248b3e221849)
+
+running 1 test
+test prepare_bounds_decompressed_bytes_across_the_whole_image ... FAILED
+
+failures:
+
+---- prepare_bounds_decompressed_bytes_across_the_whole_image stdout ----
+
+thread 'prepare_bounds_decompressed_bytes_across_the_whole_image' (2590130) panicked at tests/prepare_extensions.rs:171:62:
+called `Result::unwrap_err()` on an `Ok` value: PreparedArtifactId("8dd8b217857b119b062b3786049fc6932e3355fb42f9ba13952ebfdded603cf8")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    prepare_bounds_decompressed_bytes_across_the_whole_image
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.31s
+
+error: test failed, to rerun pass `--test prepare_extensions`

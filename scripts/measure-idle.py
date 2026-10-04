@@ -8,11 +8,11 @@ import tempfile
 import time
 
 binary = pathlib.Path('target/release/apollo-artifactd').resolve()
-with tempfile.TemporaryDirectory(prefix='artifactd-idle-') as directory:
+with tempfile.TemporaryDirectory(prefix='artifactd-idle-') as directory, \
+        tempfile.TemporaryDirectory(prefix='aid-', dir='/tmp') as runtime_directory:
     root = pathlib.Path(directory)
-    store, runtime = root / 'store', root / 'runtime'
+    store, runtime = root / 'store', pathlib.Path(runtime_directory)
     store.mkdir(mode=0o700)
-    runtime.mkdir(mode=0o700)
     process = subprocess.Popen([str(binary), '--store', str(store), '--socket',
                                 str(runtime / 'api.sock')], stdout=subprocess.DEVNULL,
                                stderr=subprocess.DEVNULL)

@@ -1,0 +1,9 @@
+   Compiling apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.51s
+     Running tests/prepare_extensions.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/prepare_extensions-9927248b3e221849)
+
+running 2 tests
+test prepare_standard_extensions_preserves_effective_paths_sizes_and_framing ... ok
+test prepare_rejects_malformed_and_ambiguous_pax_metadata ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.00s

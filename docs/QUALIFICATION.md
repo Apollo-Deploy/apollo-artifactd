@@ -12,14 +12,14 @@ This evidence covers the new standalone package. It does not qualify the existin
 | Independent Rust build | Own protocol crate, Cargo.lock, transactional redb and documented C toolchain; release builds on Linux arm64 and x86_64. No Zig or Apollo sibling dependency in this package. | Pass for this package |
 | CAS | Streaming hash/size checks, private temporary files, fsync, atomic no-overwrite publication, duplicate/concurrent imports and corrupt-content rejection exercised. | Implemented; full failure campaign open |
 | OCI | Local manifests/configs/layers/indexes, amd64/arm64 selection, descriptor/platform substitution tests, archive limits and graph-corruption rejection. | Local subset passes |
-| Registry | Authenticated HTTPS push/pull and protected credential FD tests pass on both native architectures; complete registry fault, concurrency and performance qualification remains open. | Implemented; qualification incomplete |
-| Preparation | DiffID, layer ordering, whiteouts, opaque whiteouts, relative-link validation, deterministic hash, atomic publication and prepared recovery tests. GNU/PAX headers, hardlinks and absolute links are rejected. Owner-UID immutability is not enforced by read-only FDs. | Incomplete required portability/security |
+| Registry | Authenticated HTTPS push/pull and protected credential FD tests pass on both native architectures; complete registry fault and concurrency qualification remains open; scoped throughput measurements are recorded separately. | Implemented; qualification incomplete |
+| Preparation | DiffID in both passes, image-wide decompression bounds, layer ordering, whiteouts, relative-link validation, deterministic hash and prepared recovery tests. Bounded GNU/PAX interpretation is implemented; final native extended-header qualification is recorded separately. Hardlinks and absolute links remain rejected. Owner-UID immutability is not enforced by read-only FDs. | Incomplete required portability/security |
 | Pins/leases/GC | Verified graph reachability, durable incremental root marking, epoch invalidation, leases, bounded deletion batches and ownership checks. Native root-mutation and prepared-intent recovery tests pass; churn and fault/race qualification remain open. | Incomplete bounded-work gate |
 | Recovery | Actual SIGKILL during streamed import plus synthetic persisted snapshots for CAS publication, prepared publication and post-unlink GC. Capability-opened redb and graph classification-loss regression tests. Legacy SQLite migration and full structural corruption qualification remain open. | Full disk-full/power-loss/crash campaign missing |
 | API | Linux SO_PEERCRED, bounded seqpacket/FD parsing, genuine daemon import/replay/concurrent-client tests. Serial processing can starve other clients. Version-2 bounded allocated-token replay rejects expired tokens before effects; complete concurrency qualification remains open. | Incomplete concurrency/idempotency gate |
 | External integrations | Protocol client is independently usable; BuildKit/buildd/sandboxd/Node/release callers are not migrated. | Missing |
 | Complete Zig removal | Old Artifact implementation, importer and production launch/build paths remain in the original repository. | Missing |
-| Performance/churn | Both native hosts completed 100k blob cycles and 20k zero-layer OCI cycles. Throughput, idle CPU/RSS, thread/FD counts and core p50/p95/p99 recorded below. Daemon operation-journal churn, registry throughput and representative layered-image churn are missing. | Partial measurements |
+| Performance/churn | Both native hosts completed 100k blob cycles and 20k zero-layer OCI cycles. Throughput, idle CPU/RSS, thread/FD counts and core p50/p95/p99 recorded below. Daemon operation-journal churn is recorded separately; registry throughput is now measured below. Representative layered-image churn remains missing. | Partial measurements |
 | Fuzz/property testing | Property tests and three short local sanitizer fuzz smoke runs. No native long campaign or registry-response target. The full required property matrix is not proved. | Partial |
 | Dependency security | Audit and deny pass, tree and CycloneDX SBOM generated. [DEPENDENCIES.md](DEPENDENCIES.md) records security-relevant acceptance limits. | Tool checks pass; review is conditional |
 | Independent red team | [round 1](RED_TEAM_ROUND_1.md), [round 2](RED_TEAM_ROUND_2.md), subsequent review when present. Critical/high mandatory requirements remain open. | Blocked |
@@ -117,6 +117,39 @@ final exact daemon corruption checks, normal workspace suites, warning-free
 clippy and real SIGKILL import/prepared-GC recovery. Both debug snapshots
 match 79 current source/qualification files. These checks precede the new
 two-phase-commit churn measurement and remain separate from earlier churn.
+
+The two-phase-commit churn at `30530f6` completed successfully on both hosts:
+100,000 blob operations and 20,000 zero-layer OCI lifecycles, with restart
+Doctor clean and zero rows in all artifact/import/reference/prepared/GC/journal
+tables. Each retains only three metadata rows. Database samples stabilized
+at 126,976 bytes during blob churn and 90,112 bytes during OCI churn;
+both finish at 90,112 bytes, 11 FDs and one thread. Final sampled RSS was
+5480 kB on ARM and 6292 kB on x86. `doctor-churn-{arm64,x86_64}.txt` includes
+fixture, lockfile and release-runner hashes and process-only time measurements.
+These runs precede the tar changes and do not qualify registry/daemon load or
+representative layered churn.
+
+[Bounded tar extensions](TAR_EXTENSIONS.md) records standard GNU/PAX handling,
+malformed/duplicate metadata rejection and repeated extraction verification.
+Both native final normal suites, warning-free Clippy and release all-targets
+builds passed for the parser changes. Their 97-file source snapshots match
+the production and qualification source at that run; the later registry
+benchmark receipt-check correction changes only the example. These runs are separate
+from the completed Doctor churn and exclude ignored crash campaigns. Dependency audit/deny/tree and the 293-component SBOM have been
+regenerated for the vendored tar lockfile.
+
+[Registry performance](REGISTRY_PERFORMANCE.md) records eight verified 32 MiB
+HTTPS push/pull samples per host. Current 256 MiB verified import/prepare
+results are `tar-performance-{arm64,x86_64}.txt`: ARM 197.98/52.22 MiB/s,
+x86 73.30/18.72 MiB/s. Idle daemon RSS was 5152/5976 KiB respectively,
+13 FDs and one thread, with zero observed CPU ticks over five seconds.
+ARM initially exceeded the Unix socket path length in the measurement
+harness; a private short runtime directory corrected that probe, with the
+successful result retained in `tar-idle-arm64.txt`. These are scoped fixture
+measurements and do not close concurrent daemon or long-run registry gates.
+The subsequent `tar-crash-{arm64,x86_64}.txt` checks passed actual SIGKILL
+recovery for interrupted imports and partial prepared-tree deletion on both
+hosts; they do not replace the full crash/power-loss campaign.
 
 The package must not replace the existing Artifact implementation yet. Registry, secure credentials, all caller cutovers, old Zig removal, bounded global GC/concurrency, durable replay guarantees and the remaining qualification campaigns are mandatory work in this request. They are not deferred to a future version. `RED_TEAM_RELEASE_APPROVED` and `APOLLO_ARTIFACTD_PRODUCTION_COMPLETE` have not been earned.
 

@@ -1,0 +1,1 @@
+{"baseline": {"status": {"VmHWM": "5152 kB", "VmRSS": "5152 kB", "Threads": "1"}, "fds": 13, "cpu_ticks": 0}, "after_idle": {"status": {"VmHWM": "5152 kB", "VmRSS": "5152 kB", "Threads": "1"}, "fds": 13, "cpu_ticks": 0}, "elapsed_seconds": 5.00214311200034, "cpu_seconds": 0.0}

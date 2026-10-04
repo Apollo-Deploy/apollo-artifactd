@@ -22,6 +22,8 @@ patterns = [
     "crates/**/Cargo.toml", "tests/**/*.rs", "vendor/oci-client/src/**/*.rs",
     "vendor/oci-client/Cargo.toml", "vendor/oci-client/LICENSE",
     "vendor/oci-client/ARTIFACTD_PATCH.md", "deploy/*", "licenses/*",
+    "vendor/tar/src/**/*.rs", "vendor/tar/Cargo.toml", "vendor/tar/LICENSE-*",
+    "vendor/tar/ARTIFACTD_PATCH.md", "examples/**/*.rs",
 ]
 sources = sorted({p for pattern in patterns for p in root.glob(pattern)
                   if p.is_file() and not any(part.startswith("._") for part in p.parts)})

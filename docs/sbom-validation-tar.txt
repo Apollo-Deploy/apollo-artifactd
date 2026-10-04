@@ -1,0 +1,4 @@
+PASS: official CycloneDX 1.5 schema, unique references and complete dependency edges
+Schema source: https://raw.githubusercontent.com/CycloneDX/specification/1.5/schema/bom-1.5.schema.json
+Components: 293
+Lockfile SHA-256: 14f140414a34fb6b204cd0a2db3c23f1da567787a8d85923f59b3473544644a0

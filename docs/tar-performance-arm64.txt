@@ -1,0 +1,31 @@
+23c52500af0efddf656dc2f70a2c2595548434b9b8ae99feb115c0d7337f43ec  examples/throughput.rs
+14f140414a34fb6b204cd0a2db3c23f1da567787a8d85923f59b3473544644a0  Cargo.lock
+d107bf591fd8f9b33634308731e56d1c61504d805cb113a532e26df1f0c41b1f  target/release/examples/throughput
+{"bytes":268435456,"fixture":"one uncompressed layer","import_mib_per_second":197.97659306809228,"import_seconds":1.293082157,"prepare_mib_per_second":52.22018138001956,"prepare_seconds":4.902319242,"verification_and_fsync":true}
+	Command being timed: "target/release/examples/throughput /home/apollo-admin/artifactd-qualification-20261004/throughput-tar.xGxpEl"
+	User time (seconds): 7.18
+	System time (seconds): 2.62
+	Percent of CPU this job got: 97%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:10.09
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 3712
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 294
+	Voluntary context switches: 239
+	Involuntary context switches: 55
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 2098312
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+Traceback (most recent call last):
+  File "/home/apollo-admin/artifactd-qualification-20261004/scripts/measure-idle.py", line 23, in <module>
+    raise RuntimeError('qualification daemon did not start')
+RuntimeError: qualification daemon did not start

@@ -1,0 +1,21 @@
+    Blocking waiting for file lock on artifact directory
+   Compiling apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.47s
+     Running tests/oci.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/oci-7fb2c36beea74c87)
+
+running 6 tests
+test malicious_layout_archive_never_unpacks ... ok
+test multi_platform_and_descriptor_substitution ... ok
+test corrupt_reachability_cannot_authorize_gc ... ok
+test diffid_mismatch_and_symlink_escape_fail_preparation ... ok
+test oci_preparation_verifies_diffid_and_whiteouts ... ok
+test valid_archive_admission_and_missing_terminator ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.00s
+
+     Running tests/oci_gc.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/oci_gc-025ea335873e23f9)
+
+running 1 test
+test gc_reimport_restores_admitted_manifest_reachability ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.59s

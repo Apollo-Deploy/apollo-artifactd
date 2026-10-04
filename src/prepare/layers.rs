@@ -1,34 +1,12 @@
-use super::tree;
+use super::{stream::VerifiedReader, tree};
 use crate::{Store, filesystem, oci::Image};
 use anyhow::{Result, bail, ensure};
 use cap_std::fs::Dir;
 use serde::de::DeserializeOwned;
-use sha2::{Digest, Sha256};
 use std::{
     io::{Read, Write},
     path::{Component, Path},
 };
-
-struct VerifiedReader<R> {
-    reader: R,
-    hash: Sha256,
-    size: u64,
-    limit: u64,
-}
-impl<R: Read> Read for VerifiedReader<R> {
-    fn read(&mut self, bytes: &mut [u8]) -> std::io::Result<usize> {
-        let n = self.reader.read(bytes)?;
-        self.size = self
-            .size
-            .checked_add(n as u64)
-            .ok_or_else(|| std::io::Error::other("decompressed size overflow"))?;
-        if self.size > self.limit {
-            return Err(std::io::Error::other("decompression budget exceeded"));
-        }
-        self.hash.update(&bytes[..n]);
-        Ok(n)
-    }
-}
 
 impl Store {
     fn layer_reader(&self, layer: &oci_spec::image::Descriptor) -> Result<Box<dyn Read>> {
@@ -68,6 +46,7 @@ impl Store {
             .saturating_sub(used)
             .min(self.limits.max_output);
         let mut output = 0u64;
+        let mut decompressed = 0u64;
         let mut count = 0usize;
         for (layer, diffid) in image
             .manifest
@@ -77,17 +56,20 @@ impl Store {
         {
             // First pass validates the complete decompressed stream before any
             // layer effects and collects whiteouts independently of tar order.
-            let reader = VerifiedReader {
-                reader: self.layer_reader(layer)?,
-                hash: Sha256::new(),
-                size: 0,
-                limit: available,
-            };
+            let mut second_count = count;
+            let mut second_output = output;
+            let reader = VerifiedReader::new(
+                self.layer_reader(layer)?,
+                available.saturating_sub(decompressed),
+            );
             let mut archive = tar::Archive::new(reader);
+            archive.set_extension_size_limit(64 * 1024);
+            archive.set_extension_total_limit(64 * 1024 * 1024);
             let mut whiteouts = Vec::new();
             let mut entries = std::collections::BTreeSet::new();
-            for entry in archive.entries()?.raw(true) {
-                let entry = entry?;
+            for entry in archive.entries()? {
+                let mut entry = entry?;
+                super::extensions::validate(&mut entry)?;
                 let path = safe_path(entry.path_bytes().as_ref())?;
                 ensure!(entries.insert(path.clone()), "duplicate layer path");
                 count += 1;
@@ -123,33 +105,33 @@ impl Store {
                     whiteouts.push(path);
                 }
             }
-            let mut reader = archive.into_inner();
-            let start = reader.size;
-            let mut tail = [0u8; 64 * 1024];
-            loop {
-                let n = reader.read(&mut tail)?;
-                if n == 0 {
-                    break;
-                }
-                ensure!(
-                    tail[..n].iter().all(|b| *b == 0),
-                    "nonzero data after tar terminator"
-                );
-            }
-            ensure!(
-                reader.size.saturating_sub(start) >= 512,
-                "missing tar end block"
-            );
-            ensure!(
-                format!("sha256:{}", hex::encode(reader.hash.finalize())) == *diffid,
-                "DiffID mismatch"
-            );
+            let layer_bytes = archive.into_inner().finish(diffid)?;
+            decompressed = decompressed
+                .checked_add(layer_bytes)
+                .ok_or_else(|| anyhow::anyhow!("decompressed size overflow"))?;
             for path in whiteouts {
                 whiteout(root, &path)?;
             }
-            let mut archive = tar::Archive::new(self.layer_reader(layer)?);
-            for entry in archive.entries()?.raw(true) {
+            let mut archive =
+                tar::Archive::new(VerifiedReader::new(self.layer_reader(layer)?, layer_bytes));
+            archive.set_extension_size_limit(64 * 1024);
+            archive.set_extension_total_limit(64 * 1024 * 1024);
+            for entry in archive.entries()? {
                 let mut entry = entry?;
+                super::extensions::validate(&mut entry)?;
+                second_count += 1;
+                ensure!(
+                    second_count <= self.limits.max_entries,
+                    "rootfs entry budget exceeded"
+                );
+                ensure!(
+                    entry.size() <= self.limits.max_entry,
+                    "oversized layer entry"
+                );
+                second_output = second_output
+                    .checked_add(entry.size())
+                    .ok_or_else(|| anyhow::anyhow!("output overflow"))?;
+                ensure!(second_output <= available, "rootfs output budget exceeded");
                 let path = safe_path(entry.path_bytes().as_ref())?;
                 let name = path
                     .file_name()
@@ -193,6 +175,11 @@ impl Store {
                 }
                 filesystem::sync(&parent)?;
             }
+            archive.into_inner().finish(diffid)?;
+            ensure!(
+                second_count == count && second_output == output,
+                "layer changed between passes"
+            );
         }
         Ok(output)
     }

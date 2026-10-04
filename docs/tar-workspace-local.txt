@@ -1,0 +1,169 @@
+   Compiling artifactd-protocol v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/crates/artifactd-protocol)
+   Compiling apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.72s
+     Running unittests src/lib.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/apollo_artifactd-9d81695e7486afd1)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/cli.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/apollo_artifactctl-d422496750c0aa5d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/apollo_artifactd-962314ee64f1ff30)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/api.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/api-bfc178974c7a13fd)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cas.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/cas-790e578a673fce5f)
+
+running 8 tests
+test legacy_sqlite_state_is_rejected_without_cleanup ... ok
+test invalid_inputs_never_publish ... ok
+test foreign_files_and_links_are_never_collected ... ok
+test quota_and_exclusive_store_owner ... ok
+test calculated_identity_streams_deduplicates_and_rejects_wrong_size ... ok
+test incremental_gc_progresses_past_pinned_prefix_after_restart ... ok
+test cas_admission_durability_and_references ... ok
+test stored_identity_matches_bytes ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 46.14s
+
+     Running tests/doctor.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/doctor-a12029af9388dd77)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/gc_crash.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/gc_crash-b708a3e2440ca87c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/gc_incremental.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/gc_incremental-e7d8f0e7729dcce5)
+
+running 2 tests
+test pin_and_lease_invalidate_ready_and_partial_gc_snapshots ... ok
+test late_corrupt_pin_is_found_by_bounded_gc_not_startup ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 55.23s
+
+     Running tests/journal_api.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/journal_api-de90c29a74c4a62f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/journal_churn.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/journal_churn-3cd8c3af5b09c12c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/journal_crash.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/journal_crash-32e18e1cd7b13796)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/oci.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/oci-7fb2c36beea74c87)
+
+running 6 tests
+test malicious_layout_archive_never_unpacks ... ok
+test multi_platform_and_descriptor_substitution ... ok
+test corrupt_reachability_cannot_authorize_gc ... ok
+test diffid_mismatch_and_symlink_escape_fail_preparation ... ok
+test oci_preparation_verifies_diffid_and_whiteouts ... ok
+test valid_archive_admission_and_missing_terminator ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.85s
+
+     Running tests/oci_gc.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/oci_gc-025ea335873e23f9)
+
+running 1 test
+test gc_reimport_restores_admitted_manifest_reachability ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.39s
+
+     Running tests/prepare_extensions.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/prepare_extensions-9927248b3e221849)
+
+running 2 tests
+test prepare_standard_extensions_preserves_effective_paths_sizes_and_framing ... ok
+test prepare_rejects_malformed_and_ambiguous_pax_metadata ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.10s
+
+     Running tests/protocol.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/protocol-5fac94daf37e9c95)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/recovery.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/recovery-5f3900658ac8416c)
+
+running 7 tests
+test crash_import_worker ... ok
+test sigkill_during_import_never_resolves_partial_content ... ok
+test sigkill_during_calculated_import_discards_unresolved_intent ... ok
+test publication_and_gc_intents_reconcile_idempotently ... ok
+test prepared_publication_reconciles_before_reuse ... ok
+test prepared_gc_intent_reconciles_with_or_without_tree_effect ... ok
+test prepared_recovery_cursor_reaches_late_intent_after_many_complete_records ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.34s
+
+     Running tests/registry.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/registry-e426974c996b2238)
+
+running 1 test
+test https_registry_push_pull_verifies_graph_and_retries ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/registry_api.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/registry_api-af3e4595158ddfd2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/registry_crash.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/registry_crash-b7f7f7d87836bbbe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/churn.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/examples/churn-7ee6fc9b4f414d25)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/registry_throughput.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/examples/registry_throughput-5f91cfbae4dd49db)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/throughput.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/examples/throughput-c58565919694bd77)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/artifactd_protocol-e01cec55097152eb)
+
+running 2 tests
+test tests::mutation_classification_keeps_observations_and_allocation_read_only ... ok
+test tests::operation_tokens_are_canonical_and_round_trip ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

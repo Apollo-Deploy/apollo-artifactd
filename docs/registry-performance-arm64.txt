@@ -1,0 +1,27 @@
+28dfc65617bd4477120929812f64eb9a4b98f313c142924cede7825695f3a0c3  examples/registry_throughput.rs
+14f140414a34fb6b204cd0a2db3c23f1da567787a8d85923f59b3473544644a0  Cargo.lock
+000c7124219e198cb2da33f45886e07faec16141f86bace1c0a812eeca8fa157  target/release/examples/registry_throughput
+{"fixture":"one unique 32MiB uncompressed layer per round","fresh_target_stores":true,"process_baseline":{"cpu_user_system_ticks":3,"fds":7,"rss_kib":19776,"threads":3},"process_final":{"cpu_user_system_ticks":793,"fds":21,"rss_kib":26772,"threads":5},"process_peak_fds":22,"process_peak_rss_kib":26772,"pull":{"aggregate_mib_per_second":37.56625799563812,"p50_seconds":0.857483977,"p95_seconds":0.875571709,"p99_seconds":0.875571709,"total_mib":256.0},"push":{"aggregate_mib_per_second":12.676597021323952,"p50_seconds":2.526529784,"p95_seconds":2.6081468660000002,"p99_seconds":2.6081468660000002,"total_mib":256.0},"rounds":8,"verification_and_fsync":true}
+	Command being timed: "target/release/examples/registry_throughput /home/apollo-admin/artifactd-qualification-20261004/registry-perf.1hjLc8"
+	User time (seconds): 5.67
+	System time (seconds): 2.27
+	Percent of CPU this job got: 26%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:30.32
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 26300
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 7065
+	Voluntary context switches: 18827
+	Involuntary context switches: 24
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 1585472
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
