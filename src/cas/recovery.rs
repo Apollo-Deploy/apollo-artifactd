@@ -81,26 +81,11 @@ impl Store {
             }
             self.db.transaction(|tx| {
                 tx.remove("edges", digest.as_str())?;
-                let mut after = None;
-                loop {
-                    let page = tx.scan::<Vec<ArtifactDigest>>("edges", after.as_deref(), 4096)?;
-                    if page.is_empty() {
-                        break;
-                    }
-                    let next_after = page.last().map(|(key, _)| key.clone());
-                    for (parent, children) in page {
-                        let filtered: Vec<_> = children
-                            .into_iter()
-                            .filter(|child| child != &digest)
-                            .collect();
-                        if filtered.is_empty() {
-                            tx.remove("edges", &parent)?;
-                        } else {
-                            tx.put("edges", &parent, &filtered)?;
-                        }
-                    }
-                    after = next_after;
-                }
+                // Surviving parents still describe these immutable bytes.
+                // Keep their incoming edges: a missing child fails graph
+                // verification, and exact leaf reimport restores that graph.
+                // Collecting a parent removes its own outgoing edges without
+                // a global scan or rewriting unrelated descriptor relations.
                 tx.remove("roots", digest.as_str())?;
                 tx.remove("blobs", digest.as_str())?;
                 tx.remove("gc", digest.as_str())

@@ -87,6 +87,15 @@ targeted fuzz evidence, not native Linux or full recovery/registry fuzz proof.
 
 ## Release decision
 
+[GC descriptor-edge repair](GC_DESCRIPTOR_EDGES.md) removes the global
+edge-table rewrite performed for every collected blob. Exact leaf reimport
+restores surviving manifest usability without changing its descriptor graph;
+missing children still reject pinning and resolution. The regression fails
+before the repair and passes afterward on both native architectures, followed
+by passing normal workspace suites and warning-free clippy. The separate
+`oci-gc-edge-snapshot-{arm64,x86_64}.json` files match 71 current source and
+qualification files. Global live-root/reachability scanning remains unbounded.
+
 The package must not replace the existing Artifact implementation yet. Registry, secure credentials, all caller cutovers, old Zig removal, bounded global GC/concurrency, durable replay guarantees and the remaining qualification campaigns are mandatory work in this request. They are not deferred to a future version. `RED_TEAM_RELEASE_APPROVED` and `APOLLO_ARTIFACTD_PRODUCTION_COMPLETE` have not been earned.
 
 Retained command logs may have trailing whitespace normalized; test results and diagnostics are preserved.

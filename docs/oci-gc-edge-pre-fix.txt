@@ -1,0 +1,41 @@
+   Compiling artifactd-protocol v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/crates/artifactd-protocol)
+   Compiling apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+warning: function `import` is never used
+  --> tests/support/mod.rs:12:8
+   |
+12 | pub fn import(store: &mut Store, bytes: &[u8]) -> ArtifactDigest {
+   |        ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `layer` is never used
+  --> tests/support/mod.rs:26:8
+   |
+26 | pub fn layer(entries: &[(&str, &[u8])]) -> Vec<u8> {
+   |        ^^^^^
+
+warning: function `image` is never used
+  --> tests/support/mod.rs:38:8
+   |
+38 | pub fn image(
+   |        ^^^^^
+
+warning: `apollo-artifactd` (test "oci_gc") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.29s
+     Running tests/oci_gc.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/oci_gc-ba4f331dfe834b82)
+
+running 1 test
+
+thread 'gc_reimport_restores_admitted_manifest_reachability' (2190563) panicked at tests/oci_gc.rs:81:38:
+called `Result::unwrap()` on an `Err` value: persisted OCI reachability mismatch
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test gc_reimport_restores_admitted_manifest_reachability ... FAILED
+
+failures:
+
+failures:
+    gc_reimport_restores_admitted_manifest_reachability
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+error: test failed, to rerun pass `--test oci_gc`
