@@ -1,0 +1,362 @@
+warning[license-not-encountered]: license was not encountered
+  ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/deny.toml:7:32
+  │
+7 │ allow = ["Apache-2.0", "MIT", "BSD-2-Clause", "BSD-3-Clause", "ISC", "Unicode-3.0", "Zlib", "Apache-2.0 WITH LLVM-exception"]
+  │                                ━━━━━━━━━━━━ unmatched license allowance
+
+warning[license-not-encountered]: license was not encountered
+  ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/deny.toml:7:64
+  │
+7 │ allow = ["Apache-2.0", "MIT", "BSD-2-Clause", "BSD-3-Clause", "ISC", "Unicode-3.0", "Zlib", "Apache-2.0 WITH LLVM-exception"]
+  │                                                                ━━━ unmatched license allowance
+
+warning[duplicate]: found 2 duplicate entries for crate 'io-lifetimes'
+   ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/Cargo.lock:59:1
+   │  
+59 │ ╭ io-lifetimes 2.0.4 registry+https://github.com/rust-lang/crates.io-index
+60 │ │ io-lifetimes 3.0.1 registry+https://github.com/rust-lang/crates.io-index
+   │ ╰────────────────────────────────────────────────────────────────────────┘ lock entries
+   │  
+   ├ io-lifetimes v2.0.4
+     └── fs-set-times v0.20.3
+         └── cap-primitives v4.0.3
+             └── cap-std v4.0.3
+                 └── apollo-artifactd v0.1.0
+   ├ io-lifetimes v3.0.1
+     ├── cap-primitives v4.0.3
+     │   └── cap-std v4.0.3
+     │       └── apollo-artifactd v0.1.0
+     ├── cap-std v4.0.3 (*)
+     └── io-extras v0.19.0
+         ├── cap-primitives v4.0.3 (*)
+         └── cap-std v4.0.3 (*)
+
+warning[duplicate]: found 2 duplicate entries for crate 'syn'
+    ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/Cargo.lock:111:1
+    │  
+111 │ ╭ syn 2.0.119 registry+https://github.com/rust-lang/crates.io-index
+112 │ │ syn 3.0.6 registry+https://github.com/rust-lang/crates.io-index
+    │ ╰───────────────────────────────────────────────────────────────┘ lock entries
+    │  
+    ├ syn v2.0.119
+      ├── darling_core v0.20.11
+      │   ├── darling v0.20.11
+      │   │   └── derive_builder_core v0.20.2
+      │   │       └── derive_builder_macro v0.20.2
+      │   │           └── derive_builder v0.20.2
+      │   │               └── oci-spec v0.9.0
+      │   │                   └── apollo-artifactd v0.1.0
+      │   └── darling_macro v0.20.11
+      │       └── darling v0.20.11 (*)
+      ├── darling_macro v0.20.11 (*)
+      ├── derive_builder_core v0.20.2 (*)
+      ├── derive_builder_macro v0.20.2 (*)
+      ├── getset v0.1.7
+      │   └── oci-spec v0.9.0 (*)
+      └── strum_macros v0.27.2
+          └── oci-spec v0.9.0 (*)
+    ├ syn v3.0.6
+      ├── clap_derive v4.6.7
+      │   └── clap v4.6.7
+      │       └── apollo-artifactd v0.1.0
+      ├── serde_derive v1.0.229
+      │   └── serde v1.0.229
+      │       ├── apollo-artifactd v0.1.0 (*)
+      │       ├── artifactd-protocol v0.1.0
+      │       │   └── apollo-artifactd v0.1.0 (*)
+      │       └── oci-spec v0.9.0
+      │           └── apollo-artifactd v0.1.0 (*)
+      ├── thiserror-impl v2.0.21
+      │   └── thiserror v2.0.21
+      │       ├── artifactd-protocol v0.1.0 (*)
+      │       ├── oci-spec v0.9.0 (*)
+      │       └── rsqlite-vfs v0.1.1
+      │           └── sqlite-wasm-rs v0.5.5
+      │               └── rusqlite v0.38.0
+      │                   └── apollo-artifactd v0.1.0 (*)
+      └── wasm-bindgen-macro-support v0.2.129
+          └── wasm-bindgen-macro v0.2.129
+              └── wasm-bindgen v0.2.129
+                  ├── js-sys v0.3.106
+                  │   └── sqlite-wasm-rs v0.5.5 (*)
+                  └── sqlite-wasm-rs v0.5.5 (*)
+
+warning[duplicate]: found 3 duplicate entries for crate 'windows-sys'
+    ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/Cargo.lock:132:1
+    │  
+132 │ ╭ windows-sys 0.59.0 registry+https://github.com/rust-lang/crates.io-index
+133 │ │ windows-sys 0.60.2 registry+https://github.com/rust-lang/crates.io-index
+134 │ │ windows-sys 0.61.2 registry+https://github.com/rust-lang/crates.io-index
+    │ ╰────────────────────────────────────────────────────────────────────────┘ lock entries
+    │  
+    ├ windows-sys v0.59.0
+      ├── fs-set-times v0.20.3
+      │   └── cap-primitives v4.0.3
+      │       └── cap-std v4.0.3
+      │           └── apollo-artifactd v0.1.0
+      └── winx v0.36.4
+          └── cap-primitives v4.0.3 (*)
+    ├ windows-sys v0.60.2
+      └── io-extras v0.19.0
+          ├── cap-primitives v4.0.3
+          │   └── cap-std v4.0.3
+          │       └── apollo-artifactd v0.1.0
+          └── cap-std v4.0.3 (*)
+    ├ windows-sys v0.61.2
+      ├── anstyle-query v1.1.5
+      │   └── anstream v1.0.0
+      │       └── clap_builder v4.6.7
+      │           └── clap v4.6.7
+      │               └── apollo-artifactd v0.1.0
+      ├── anstyle-wincon v3.0.11
+      │   └── anstream v1.0.0 (*)
+      ├── cap-primitives v4.0.3
+      │   └── cap-std v4.0.3
+      │       └── apollo-artifactd v0.1.0 (*)
+      ├── errno v0.3.14
+      │   └── rustix v1.1.5
+      │       ├── apollo-artifactd v0.1.0 (*)
+      │       ├── artifactd-protocol v0.1.0
+      │       │   └── apollo-artifactd v0.1.0 (*)
+      │       ├── cap-primitives v4.0.3 (*)
+      │       ├── cap-std v4.0.3 (*)
+      │       ├── fs-set-times v0.20.3
+      │       │   └── cap-primitives v4.0.3 (*)
+      │       ├── rustix-linux-procfs v0.1.1
+      │       │   └── cap-primitives v4.0.3 (*)
+      │       ├── tempfile v3.27.0
+      │       │   ├── (dev) apollo-artifactd v0.1.0 (*)
+      │       │   ├── proptest v1.11.0
+      │       │   │   └── (dev) apollo-artifactd v0.1.0 (*)
+      │       │   └── rusty-fork v0.3.1
+      │       │       └── proptest v1.11.0 (*)
+      │       └── xattr v1.6.1
+      │           └── tar v0.4.46
+      │               └── apollo-artifactd v0.1.0 (*)
+      ├── rustix v1.1.5 (*)
+      └── tempfile v3.27.0 (*)
+
+warning[duplicate]: found 2 duplicate entries for crate 'windows-targets'
+    ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/Cargo.lock:135:1
+    │  
+135 │ ╭ windows-targets 0.52.6 registry+https://github.com/rust-lang/crates.io-index
+136 │ │ windows-targets 0.53.5 registry+https://github.com/rust-lang/crates.io-index
+    │ ╰────────────────────────────────────────────────────────────────────────────┘ lock entries
+    │  
+    ├ windows-targets v0.52.6
+      └── windows-sys v0.59.0
+          ├── fs-set-times v0.20.3
+          │   └── cap-primitives v4.0.3
+          │       └── cap-std v4.0.3
+          │           └── apollo-artifactd v0.1.0
+          └── winx v0.36.4
+              └── cap-primitives v4.0.3 (*)
+    ├ windows-targets v0.53.5
+      └── windows-sys v0.60.2
+          └── io-extras v0.19.0
+              ├── cap-primitives v4.0.3
+              │   └── cap-std v4.0.3
+              │       └── apollo-artifactd v0.1.0
+              └── cap-std v4.0.3 (*)
+
+warning[duplicate]: found 2 duplicate entries for crate 'windows_aarch64_gnullvm'
+    ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/Cargo.lock:137:1
+    │  
+137 │ ╭ windows_aarch64_gnullvm 0.52.6 registry+https://github.com/rust-lang/crates.io-index
+138 │ │ windows_aarch64_gnullvm 0.53.1 registry+https://github.com/rust-lang/crates.io-index
+    │ ╰────────────────────────────────────────────────────────────────────────────────────┘ lock entries
+    │  
+    ├ windows_aarch64_gnullvm v0.52.6
+      └── windows-targets v0.52.6
+          └── windows-sys v0.59.0
+              ├── fs-set-times v0.20.3
+              │   └── cap-primitives v4.0.3
+              │       └── cap-std v4.0.3
+              │           └── apollo-artifactd v0.1.0
+              └── winx v0.36.4
+                  └── cap-primitives v4.0.3 (*)
+    ├ windows_aarch64_gnullvm v0.53.1
+      └── windows-targets v0.53.5
+          └── windows-sys v0.60.2
+              └── io-extras v0.19.0
+                  ├── cap-primitives v4.0.3
+                  │   └── cap-std v4.0.3
+                  │       └── apollo-artifactd v0.1.0
+                  └── cap-std v4.0.3 (*)
+
+warning[duplicate]: found 2 duplicate entries for crate 'windows_aarch64_msvc'
+    ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/Cargo.lock:139:1
+    │  
+139 │ ╭ windows_aarch64_msvc 0.52.6 registry+https://github.com/rust-lang/crates.io-index
+140 │ │ windows_aarch64_msvc 0.53.1 registry+https://github.com/rust-lang/crates.io-index
+    │ ╰─────────────────────────────────────────────────────────────────────────────────┘ lock entries
+    │  
+    ├ windows_aarch64_msvc v0.52.6
+      └── windows-targets v0.52.6
+          └── windows-sys v0.59.0
+              ├── fs-set-times v0.20.3
+              │   └── cap-primitives v4.0.3
+              │       └── cap-std v4.0.3
+              │           └── apollo-artifactd v0.1.0
+              └── winx v0.36.4
+                  └── cap-primitives v4.0.3 (*)
+    ├ windows_aarch64_msvc v0.53.1
+      └── windows-targets v0.53.5
+          └── windows-sys v0.60.2
+              └── io-extras v0.19.0
+                  ├── cap-primitives v4.0.3
+                  │   └── cap-std v4.0.3
+                  │       └── apollo-artifactd v0.1.0
+                  └── cap-std v4.0.3 (*)
+
+warning[duplicate]: found 2 duplicate entries for crate 'windows_i686_gnu'
+    ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/Cargo.lock:141:1
+    │  
+141 │ ╭ windows_i686_gnu 0.52.6 registry+https://github.com/rust-lang/crates.io-index
+142 │ │ windows_i686_gnu 0.53.1 registry+https://github.com/rust-lang/crates.io-index
+    │ ╰─────────────────────────────────────────────────────────────────────────────┘ lock entries
+    │  
+    ├ windows_i686_gnu v0.52.6
+      └── windows-targets v0.52.6
+          └── windows-sys v0.59.0
+              ├── fs-set-times v0.20.3
+              │   └── cap-primitives v4.0.3
+              │       └── cap-std v4.0.3
+              │           └── apollo-artifactd v0.1.0
+              └── winx v0.36.4
+                  └── cap-primitives v4.0.3 (*)
+    ├ windows_i686_gnu v0.53.1
+      └── windows-targets v0.53.5
+          └── windows-sys v0.60.2
+              └── io-extras v0.19.0
+                  ├── cap-primitives v4.0.3
+                  │   └── cap-std v4.0.3
+                  │       └── apollo-artifactd v0.1.0
+                  └── cap-std v4.0.3 (*)
+
+warning[duplicate]: found 2 duplicate entries for crate 'windows_i686_gnullvm'
+    ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/Cargo.lock:143:1
+    │  
+143 │ ╭ windows_i686_gnullvm 0.52.6 registry+https://github.com/rust-lang/crates.io-index
+144 │ │ windows_i686_gnullvm 0.53.1 registry+https://github.com/rust-lang/crates.io-index
+    │ ╰─────────────────────────────────────────────────────────────────────────────────┘ lock entries
+    │  
+    ├ windows_i686_gnullvm v0.52.6
+      └── windows-targets v0.52.6
+          └── windows-sys v0.59.0
+              ├── fs-set-times v0.20.3
+              │   └── cap-primitives v4.0.3
+              │       └── cap-std v4.0.3
+              │           └── apollo-artifactd v0.1.0
+              └── winx v0.36.4
+                  └── cap-primitives v4.0.3 (*)
+    ├ windows_i686_gnullvm v0.53.1
+      └── windows-targets v0.53.5
+          └── windows-sys v0.60.2
+              └── io-extras v0.19.0
+                  ├── cap-primitives v4.0.3
+                  │   └── cap-std v4.0.3
+                  │       └── apollo-artifactd v0.1.0
+                  └── cap-std v4.0.3 (*)
+
+warning[duplicate]: found 2 duplicate entries for crate 'windows_i686_msvc'
+    ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/Cargo.lock:145:1
+    │  
+145 │ ╭ windows_i686_msvc 0.52.6 registry+https://github.com/rust-lang/crates.io-index
+146 │ │ windows_i686_msvc 0.53.1 registry+https://github.com/rust-lang/crates.io-index
+    │ ╰──────────────────────────────────────────────────────────────────────────────┘ lock entries
+    │  
+    ├ windows_i686_msvc v0.52.6
+      └── windows-targets v0.52.6
+          └── windows-sys v0.59.0
+              ├── fs-set-times v0.20.3
+              │   └── cap-primitives v4.0.3
+              │       └── cap-std v4.0.3
+              │           └── apollo-artifactd v0.1.0
+              └── winx v0.36.4
+                  └── cap-primitives v4.0.3 (*)
+    ├ windows_i686_msvc v0.53.1
+      └── windows-targets v0.53.5
+          └── windows-sys v0.60.2
+              └── io-extras v0.19.0
+                  ├── cap-primitives v4.0.3
+                  │   └── cap-std v4.0.3
+                  │       └── apollo-artifactd v0.1.0
+                  └── cap-std v4.0.3 (*)
+
+warning[duplicate]: found 2 duplicate entries for crate 'windows_x86_64_gnu'
+    ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/Cargo.lock:147:1
+    │  
+147 │ ╭ windows_x86_64_gnu 0.52.6 registry+https://github.com/rust-lang/crates.io-index
+148 │ │ windows_x86_64_gnu 0.53.1 registry+https://github.com/rust-lang/crates.io-index
+    │ ╰───────────────────────────────────────────────────────────────────────────────┘ lock entries
+    │  
+    ├ windows_x86_64_gnu v0.52.6
+      └── windows-targets v0.52.6
+          └── windows-sys v0.59.0
+              ├── fs-set-times v0.20.3
+              │   └── cap-primitives v4.0.3
+              │       └── cap-std v4.0.3
+              │           └── apollo-artifactd v0.1.0
+              └── winx v0.36.4
+                  └── cap-primitives v4.0.3 (*)
+    ├ windows_x86_64_gnu v0.53.1
+      └── windows-targets v0.53.5
+          └── windows-sys v0.60.2
+              └── io-extras v0.19.0
+                  ├── cap-primitives v4.0.3
+                  │   └── cap-std v4.0.3
+                  │       └── apollo-artifactd v0.1.0
+                  └── cap-std v4.0.3 (*)
+
+warning[duplicate]: found 2 duplicate entries for crate 'windows_x86_64_gnullvm'
+    ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/Cargo.lock:149:1
+    │  
+149 │ ╭ windows_x86_64_gnullvm 0.52.6 registry+https://github.com/rust-lang/crates.io-index
+150 │ │ windows_x86_64_gnullvm 0.53.1 registry+https://github.com/rust-lang/crates.io-index
+    │ ╰───────────────────────────────────────────────────────────────────────────────────┘ lock entries
+    │  
+    ├ windows_x86_64_gnullvm v0.52.6
+      └── windows-targets v0.52.6
+          └── windows-sys v0.59.0
+              ├── fs-set-times v0.20.3
+              │   └── cap-primitives v4.0.3
+              │       └── cap-std v4.0.3
+              │           └── apollo-artifactd v0.1.0
+              └── winx v0.36.4
+                  └── cap-primitives v4.0.3 (*)
+    ├ windows_x86_64_gnullvm v0.53.1
+      └── windows-targets v0.53.5
+          └── windows-sys v0.60.2
+              └── io-extras v0.19.0
+                  ├── cap-primitives v4.0.3
+                  │   └── cap-std v4.0.3
+                  │       └── apollo-artifactd v0.1.0
+                  └── cap-std v4.0.3 (*)
+
+warning[duplicate]: found 2 duplicate entries for crate 'windows_x86_64_msvc'
+    ┌─ /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/Cargo.lock:151:1
+    │  
+151 │ ╭ windows_x86_64_msvc 0.52.6 registry+https://github.com/rust-lang/crates.io-index
+152 │ │ windows_x86_64_msvc 0.53.1 registry+https://github.com/rust-lang/crates.io-index
+    │ ╰────────────────────────────────────────────────────────────────────────────────┘ lock entries
+    │  
+    ├ windows_x86_64_msvc v0.52.6
+      └── windows-targets v0.52.6
+          └── windows-sys v0.59.0
+              ├── fs-set-times v0.20.3
+              │   └── cap-primitives v4.0.3
+              │       └── cap-std v4.0.3
+              │           └── apollo-artifactd v0.1.0
+              └── winx v0.36.4
+                  └── cap-primitives v4.0.3 (*)
+    ├ windows_x86_64_msvc v0.53.1
+      └── windows-targets v0.53.5
+          └── windows-sys v0.60.2
+              └── io-extras v0.19.0
+                  ├── cap-primitives v4.0.3
+                  │   └── cap-std v4.0.3
+                  │       └── apollo-artifactd v0.1.0
+                  └── cap-std v4.0.3 (*)
+
+advisories ok, bans ok, licenses ok, sources ok

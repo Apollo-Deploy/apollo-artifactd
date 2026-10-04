@@ -1,0 +1,10 @@
+{
+  "result": "PASS",
+  "packages": [
+    "artifactd-protocol",
+    "apollo-artifactd"
+  ],
+  "sibling_path_dependencies": 0,
+  "git_dependencies": 0,
+  "production_rust_source_max_lines": 286
+}

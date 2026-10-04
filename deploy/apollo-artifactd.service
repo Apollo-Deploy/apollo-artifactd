@@ -1,0 +1,30 @@
+[Unit]
+Description=Apollo artifact daemon (qualification build)
+After=local-fs.target
+
+[Service]
+Type=simple
+User=artifactd
+Group=artifactd
+UMask=0077
+StateDirectory=apollo-artifactd
+StateDirectoryMode=0700
+RuntimeDirectory=apollo-artifactd
+RuntimeDirectoryMode=0700
+ExecStart=/usr/local/bin/apollo-artifactd --store /var/lib/apollo-artifactd --socket /run/apollo-artifactd/artifactd.sock
+Restart=on-failure
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_UNIX
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/apollo-artifactd /run/apollo-artifactd
+MemoryMax=1G
+TasksMax=16
+LimitNOFILE=256
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,26 @@
+{
+  "store": "/home/apollo-admin/artifactd-churn-arm64.z8WxVZ",
+  "files": {
+    "state.sqlite-wal": 0,
+    "state.sqlite": 86016,
+    "state.sqlite-shm": 32768,
+    "owner.lock": 0
+  },
+  "rows": {
+    "blobs": 0,
+    "imports": 0,
+    "pins": 0,
+    "leases": 0,
+    "roots": 0,
+    "edges": 0,
+    "prepared": 0,
+    "gc": 0,
+    "operations": 0
+  },
+  "integrity": "ok",
+  "directory_entries": {
+    "blobs": 0,
+    "temp": 0,
+    "prepared": 0
+  }
+}

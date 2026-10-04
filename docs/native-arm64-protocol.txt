@@ -1,0 +1,10 @@
+   Compiling artifactd-protocol v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004/crates/artifactd-protocol)
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.46s
+     Running tests/protocol.rs (target/debug/deps/protocol-966dade667a46c90)
+
+running 1 test
+test truncated_packets_and_excess_descriptors_are_rejected ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

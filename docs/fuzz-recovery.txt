@@ -1,0 +1,28 @@
+   Compiling apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+   Compiling artifactd-fuzz v0.0.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/fuzz)
+    Finished `release` profile [optimized + debuginfo] target(s) in 13.42s
+    Finished `release` profile [optimized + debuginfo] target(s) in 0.06s
+     Running `/Users/tihan-nico/Library/Caches/dev-build/rust-target/aarch64-apple-darwin/release/recovery -artifact_prefix=/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/fuzz/artifacts/recovery/ -max_total_time=30 -max_len=1024 /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/fuzz/corpus/recovery`
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2640389100
+INFO: Loaded 1 modules   (462028 inline 8-bit counters): 462028 [0x1040e2b00, 0x1041537cc), 
+INFO: Loaded 1 PC tables (462028 PCs): 462028 [0x1041537d0,0x104860490), 
+INFO:        0 files found in /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/fuzz/corpus/recovery
+INFO: A corpus is not provided, starting from an empty corpus
+#2	INITED cov: 618 ft: 618 corp: 1/1b exec/s: 0 rss: 60Mb
+#4	NEW    cov: 621 ft: 621 corp: 2/3b lim: 4 exec/s: 0 rss: 62Mb L: 2/2 MS: 2 CopyPart-ChangeByte-
+#10	NEW    cov: 621 ft: 623 corp: 3/6b lim: 4 exec/s: 0 rss: 68Mb L: 3/3 MS: 1 InsertByte-
+#14	NEW    cov: 621 ft: 624 corp: 4/9b lim: 4 exec/s: 0 rss: 72Mb L: 3/3 MS: 4 CrossOver-ChangeBit-CrossOver-InsertByte-
+#66	REDUCE cov: 621 ft: 624 corp: 4/8b lim: 4 exec/s: 0 rss: 121Mb L: 1/3 MS: 2 ShuffleBytes-EraseBytes-
+#313	NEW    cov: 621 ft: 626 corp: 5/9b lim: 6 exec/s: 313 rss: 282Mb L: 1/3 MS: 2 ShuffleBytes-CrossOver-
+#512	pulse  cov: 621 ft: 626 corp: 5/9b lim: 6 exec/s: 256 rss: 282Mb
+#576	REDUCE cov: 621 ft: 626 corp: 5/8b lim: 8 exec/s: 192 rss: 282Mb L: 2/3 MS: 3 CrossOver-CrossOver-EraseBytes-
+#715	REDUCE cov: 621 ft: 626 corp: 5/7b lim: 8 exec/s: 178 rss: 282Mb L: 1/3 MS: 4 ChangeBit-ChangeByte-EraseBytes-ChangeByte-
+#1024	pulse  cov: 621 ft: 626 corp: 5/7b lim: 11 exec/s: 204 rss: 283Mb
+#1891	REDUCE cov: 621 ft: 626 corp: 5/6b lim: 17 exec/s: 189 rss: 283Mb L: 2/2 MS: 1 EraseBytes-
+#2048	pulse  cov: 621 ft: 626 corp: 5/6b lim: 17 exec/s: 186 rss: 283Mb
+#2523	REDUCE cov: 621 ft: 626 corp: 5/5b lim: 21 exec/s: 180 rss: 283Mb L: 1/1 MS: 2 EraseBytes-ChangeByte-
+#3157	REDUCE cov: 622 ft: 627 corp: 6/30b lim: 25 exec/s: 185 rss: 283Mb L: 25/25 MS: 4 CopyPart-ShuffleBytes-InsertRepeatedBytes-CopyPart-
+#4096	pulse  cov: 622 ft: 627 corp: 6/30b lim: 33 exec/s: 186 rss: 283Mb
+#5777	DONE   cov: 622 ft: 627 corp: 6/30b lim: 48 exec/s: 186 rss: 283Mb
+Done 5777 runs in 31 second(s)

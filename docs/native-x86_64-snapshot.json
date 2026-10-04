@@ -1,0 +1,40 @@
+{
+  "uname": [
+    "Linux",
+    "vps-6b11ee2e",
+    "6.12.107+deb13-amd64",
+    "#1 SMP PREEMPT_DYNAMIC Debian 6.12.107-1 (2026-08-29)",
+    "x86_64",
+    ""
+  ],
+  "sources": {
+    "Cargo.lock": "da868c3ea4f58b1b6d784cacfecace21d23b35a8d0c7c3478803e3594da6423a",
+    "Cargo.toml": "e3eca7c17a5152d938c2115436dcf999bef25770c9d7b8f486562e5441c61be9",
+    "crates/artifactd-protocol/Cargo.toml": "36ad8804a64c59bf19147731a1586f9c1ba9b01c47ac73255281e33164f6ffee",
+    "crates/artifactd-protocol/src/client.rs": "c217b8d7bd3a95827f921bbdaa67dfe86cdd1fe6a40ac7220660c2418c143af8",
+    "crates/artifactd-protocol/src/digest.rs": "7f20547bc7cc4f9efd086ada3ed39929faf9942a9c2c8b957a782cbeb3399adc",
+    "crates/artifactd-protocol/src/lib.rs": "477af3736f7ce38fa8bcc46288f24c0e23139323fd81c59714a014d3b0f5cda3",
+    "crates/artifactd-protocol/src/wire.rs": "c53fbce03d6c4e52feab1b419639db7ae2512dc1476a1c6147baea603e4e0de4",
+    "src/api/dispatch.rs": "b9de1c22558b815e99ce512639eda6170fc29f88a74c9d9c4795c01a0a517440",
+    "src/api/mod.rs": "b20eb3cfe214810b4d32c6a5aa3e1d0c4b8ebff215c1004f2f967bb801058f31",
+    "src/cas/import.rs": "4d0ee5ba58700a62d9bd4557555338192d020d1ed30d0bb4c07db5544dae2ec0",
+    "src/cas/mod.rs": "c9dd0e7d842e6fcf50f6c84a8849eb7026053b9614135f3938ecbec33786376d",
+    "src/cas/recovery.rs": "7002b277e747ff9c24decb2fbebec30437890d13c0b1815956543258fccd1be0",
+    "src/cas/references.rs": "6116eaaede58a67f3bea898d2f88bc0acd5e52fefa1d8e0de4f316a76ad4f3d7",
+    "src/cli.rs": "52083ebbc5c9d279c4ddf7e15afe27c80b5eb0fe42bd6c977db189a9548ca2a9",
+    "src/filesystem.rs": "fedaaa3b91eadd8bb69535343058c1babe461ad599308fdaf2a4dc6f70c991c1",
+    "src/lib.rs": "8978693c80543ffc6b8c8f2e0ae46ecd1e5bf402398897d62e0f1511aeef4239",
+    "src/main.rs": "4ab75e21a4b6f4ffb856e40d9ad6aa83aec059752134b2e17c36506254d6a0fc",
+    "src/oci/archive.rs": "7ea3c9c48a323518dd0ec958021785ce8fb140e8c6ad79162101aeaa1c63537f",
+    "src/oci/mod.rs": "8553299ccb8cd5027a96fdda7fcb068f0c245161af681f0150d685804d60904b",
+    "src/prepare/layers.rs": "e19b2d6e73b0520a9cf6f47cd1c89ccf2884675ca21fce671da8630800566ad8",
+    "src/prepare/mod.rs": "3cc514471b19a3198e7a8066d9f6b59762671725ca66752507658f6bf0f82d08",
+    "src/prepare/recovery.rs": "5ff87c4b9b6198adf7d0e822f9c1e57d8c09bf8036256d2512afbc4d21708b58",
+    "src/prepare/tree.rs": "c991eb5a69b8656d5a597d0778b25dd01b6307a30a58b6adf8588cb910539ab2",
+    "src/state.rs": "7426a826846128261ccd70400486cdaf1ff9a4370504518579889fa1c39cdeee"
+  },
+  "binaries": {
+    "apollo-artifactd": "325c14af9b7de2ca6e97974a5c1c11df6a97383797ef9d9f91a78c27d2a6c38b",
+    "apollo-artifactctl": "dceb2bf9e7576083653e41b0238075069754178df28fde81948767ac093a8668"
+  }
+}

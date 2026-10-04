@@ -1,0 +1,2 @@
+    Checking apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.70s

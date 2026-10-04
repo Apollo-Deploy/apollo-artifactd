@@ -1,0 +1,9 @@
+/target/
+/fuzz/target/
+/fuzz/artifacts/
+/fuzz/coverage/
+/fuzz/corpus/protocol_oci/*
+!/fuzz/corpus/protocol_oci/seed-*
+/fuzz/corpus/archive/*
+!/fuzz/corpus/archive/valid-layer.tar
+/fuzz/corpus/recovery/

@@ -1,0 +1,2 @@
+   Compiling apollo-artifactd v0.1.0 (/home/tihan/artifactd-qualification-20261004)
+    Finished `release` profile [optimized] target(s) in 44.30s

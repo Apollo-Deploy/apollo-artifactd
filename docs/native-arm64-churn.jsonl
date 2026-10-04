@@ -1,0 +1,21 @@
+{"blob_iteration":0,"resources":{"fds":12,"status":["VmHWM:\t    4364 kB","VmRSS:\t    4364 kB","Threads:\t1"]}}
+{"blob_iteration":10000,"resources":{"fds":12,"status":["VmHWM:\t    4548 kB","VmRSS:\t    4548 kB","Threads:\t1"]}}
+{"blob_iteration":20000,"resources":{"fds":12,"status":["VmHWM:\t    4704 kB","VmRSS:\t    4704 kB","Threads:\t1"]}}
+{"blob_iteration":30000,"resources":{"fds":12,"status":["VmHWM:\t    4860 kB","VmRSS:\t    4860 kB","Threads:\t1"]}}
+{"blob_iteration":40000,"resources":{"fds":12,"status":["VmHWM:\t    5016 kB","VmRSS:\t    5016 kB","Threads:\t1"]}}
+{"blob_iteration":50000,"resources":{"fds":12,"status":["VmHWM:\t    5172 kB","VmRSS:\t    5172 kB","Threads:\t1"]}}
+{"blob_iteration":60000,"resources":{"fds":12,"status":["VmHWM:\t    5328 kB","VmRSS:\t    5328 kB","Threads:\t1"]}}
+{"blob_iteration":70000,"resources":{"fds":12,"status":["VmHWM:\t    5484 kB","VmRSS:\t    5484 kB","Threads:\t1"]}}
+{"blob_iteration":80000,"resources":{"fds":12,"status":["VmHWM:\t    5640 kB","VmRSS:\t    5640 kB","Threads:\t1"]}}
+{"blob_iteration":90000,"resources":{"fds":12,"status":["VmHWM:\t    5796 kB","VmRSS:\t    5796 kB","Threads:\t1"]}}
+{"oci_iteration":0,"resources":{"fds":12,"status":["VmHWM:\t    5960 kB","VmRSS:\t    5960 kB","Threads:\t1"]}}
+{"oci_iteration":2000,"resources":{"fds":12,"status":["VmHWM:\t    5992 kB","VmRSS:\t    5992 kB","Threads:\t1"]}}
+{"oci_iteration":4000,"resources":{"fds":12,"status":["VmHWM:\t    6024 kB","VmRSS:\t    6024 kB","Threads:\t1"]}}
+{"oci_iteration":6000,"resources":{"fds":12,"status":["VmHWM:\t    6056 kB","VmRSS:\t    6056 kB","Threads:\t1"]}}
+{"oci_iteration":8000,"resources":{"fds":12,"status":["VmHWM:\t    6088 kB","VmRSS:\t    6088 kB","Threads:\t1"]}}
+{"oci_iteration":10000,"resources":{"fds":12,"status":["VmHWM:\t    6120 kB","VmRSS:\t    6120 kB","Threads:\t1"]}}
+{"oci_iteration":12000,"resources":{"fds":12,"status":["VmHWM:\t    6148 kB","VmRSS:\t    6148 kB","Threads:\t1"]}}
+{"oci_iteration":14000,"resources":{"fds":12,"status":["VmHWM:\t    6180 kB","VmRSS:\t    6180 kB","Threads:\t1"]}}
+{"oci_iteration":16000,"resources":{"fds":12,"status":["VmHWM:\t    6212 kB","VmRSS:\t    6212 kB","Threads:\t1"]}}
+{"oci_iteration":18000,"resources":{"fds":12,"status":["VmHWM:\t    6244 kB","VmRSS:\t    6244 kB","Threads:\t1"]}}
+{"baseline":{"fds":12,"status":["VmHWM:\t    4152 kB","VmRSS:\t    4152 kB","Threads:\t1"]},"blob_elapsed_seconds":304.940945079,"blob_latency":{"p50_us":2132,"p95_us":5942,"p99_us":7571},"blob_operations":100000,"final_resources":{"fds":12,"status":["VmHWM:\t    7296 kB","VmRSS:\t    4600 kB","Threads:\t1"]},"final_state":{"blobs":0,"bytes":0,"production_qualified":false,"schema":1},"oci_elapsed_seconds":115.08044712,"oci_latency":{"p50_us":4385,"p95_us":8013,"p99_us":19974},"oci_lifecycles":20000}
