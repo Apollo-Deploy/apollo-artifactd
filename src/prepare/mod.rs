@@ -1,5 +1,4 @@
 //! Preparation never executes image configuration or customer commands.
-mod extensions;
 mod layers;
 mod recovery;
 mod stream;

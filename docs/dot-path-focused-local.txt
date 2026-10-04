@@ -1,0 +1,28 @@
+   Compiling apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.59s
+     Running tests/prepare_extensions.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/prepare_extensions-9927248b3e221849)
+
+running 5 tests
+test prepare_normalization_keeps_root_type_and_traversal_guards ... FAILED
+test prepare_bounds_decompressed_bytes_across_the_whole_image ... ok
+test prepare_normalizes_current_directory_members_and_rejects_alias_collisions ... ok
+test prepare_standard_extensions_preserves_effective_paths_sizes_and_framing ... ok
+test prepare_rejects_malformed_and_ambiguous_pax_metadata ... ok
+
+failures:
+
+---- prepare_normalization_keeps_root_type_and_traversal_guards stdout ----
+
+thread 'prepare_normalization_keeps_root_type_and_traversal_guards' (2672187) panicked at tests/prepare_extensions.rs:247:9:
+assertion `left == right` failed
+  left: 1
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    prepare_normalization_keeps_root_type_and_traversal_guards
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.42s
+
+error: test failed, to rerun pass `--test prepare_extensions`

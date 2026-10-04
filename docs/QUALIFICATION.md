@@ -151,6 +151,22 @@ The subsequent `tar-crash-{arm64,x86_64}.txt` checks passed actual SIGKILL
 recovery for interrupted imports and partial prepared-tree deletion on both
 hosts; they do not replace the full crash/power-loss campaign.
 
+[Archive path compatibility](ARCHIVE_PATHS.md) subsequently enables standard
+OCI layout GNU/PAX handling and canonical current-directory members in both
+import and rootfs preparation. Its focused suites, native normal suites,
+Clippy and release all-targets builds pass on both architectures; both
+97-file final snapshots match current production and qualification source.
+The separate ignored registry and real SIGKILL checks also passed on both
+hosts for this production source. They remain scoped coverage, not the full
+power-loss, registry fault or concurrency campaign.
+[Caller cutover findings](CALLER_CUTOVER_FINDINGS.md) identify the actual
+producer paths and mandatory token, peer authorization and pin/GC changes
+needed before integration. [Prepared consumption findings](PREPARED_CONSUMPTION_FINDINGS.md) clarify
+the required UID and privileged sandbox mount boundary. Read-only bind mounts
+do not protect the underlying tree from its store owner; current same-UID
+authentication is insufficient for the intended service separation.
+These are findings, not completed caller migration or consumption qualification.
+
 The package must not replace the existing Artifact implementation yet. Registry, secure credentials, all caller cutovers, old Zig removal, bounded global GC/concurrency, durable replay guarantees and the remaining qualification campaigns are mandatory work in this request. They are not deferred to a future version. `RED_TEAM_RELEASE_APPROVED` and `APOLLO_ARTIFACTD_PRODUCTION_COMPLETE` have not been earned.
 
 Retained command logs may have trailing whitespace normalized; test results and diagnostics are preserved.

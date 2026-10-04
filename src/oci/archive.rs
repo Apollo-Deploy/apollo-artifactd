@@ -12,21 +12,28 @@ impl Store {
         platform: &Platform,
     ) -> Result<serde_json::Value> {
         let mut archive = tar::Archive::new(reader.take(self.limits.max_store + 1));
+        archive.set_extension_size_limit(64 * 1024);
+        archive.set_extension_total_limit(64 * 1024 * 1024);
         let mut names = BTreeSet::new();
         let mut index = None;
         let mut layout = false;
         let mut total = 0u64;
-        for entry in archive.entries()?.raw(true) {
+        for entry in archive.entries()? {
             let mut entry = entry?;
-            let raw = entry.path_bytes();
-            let name = std::str::from_utf8(&raw)?.to_owned();
+            crate::archive_policy::validate_pax(&mut entry)?;
+            let path = crate::archive_policy::safe_path(entry.path_bytes().as_ref())?;
+            let name = path
+                .to_str()
+                .ok_or_else(|| anyhow::anyhow!("invalid archive path"))?
+                .to_owned();
             ensure!(
                 names.len() < self.limits.max_entries && names.insert(name.clone()),
                 "archive duplicate/entry limit"
             );
             if entry.header().entry_type().is_dir() {
                 ensure!(
-                    matches!(name.trim_end_matches('/'), "blobs" | "blobs/sha256"),
+                    (name.is_empty() && entry.size() == 0)
+                        || (matches!(name.as_str(), "blobs" | "blobs/sha256") && entry.size() == 0),
                     "unexpected archive directory"
                 );
                 continue;

@@ -1,0 +1,22 @@
+   Compiling apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.00s
+     Running tests/prepare_extensions.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/prepare_extensions-9927248b3e221849)
+
+running 1 test
+test prepare_normalizes_current_directory_members_and_rejects_alias_collisions ... FAILED
+
+failures:
+
+---- prepare_normalizes_current_directory_members_and_rejects_alias_collisions stdout ----
+
+thread 'prepare_normalizes_current_directory_members_and_rejects_alias_collisions' (2637073) panicked at tests/prepare_extensions.rs:201:73:
+called `Result::unwrap()` on an `Err` value: absolute/traversing archive path
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    prepare_normalizes_current_directory_members_and_rejects_alias_collisions
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.24s
+
+error: test failed, to rerun pass `--test prepare_extensions`

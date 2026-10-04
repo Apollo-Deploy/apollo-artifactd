@@ -171,3 +171,88 @@ fn prepare_bounds_decompressed_bytes_across_the_whole_image() {
     let error = store.prepare(&manifest, &platform("amd64")).unwrap_err();
     assert!(format!("{error:#}").contains("decompression budget exceeded"));
 }
+
+#[test]
+fn prepare_normalizes_current_directory_members_and_rejects_alias_collisions() {
+    // Public prepared output owns normalization; no private path-policy seam.
+    for collision in [false, true] {
+        let root = tempfile::tempdir().unwrap();
+        std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
+        let mut store = Store::open(root.path(), Limits::default()).unwrap();
+        let mut archive = tar::Builder::new(Vec::new());
+        let mut header = tar::Header::new_gnu();
+        header.set_entry_type(tar::EntryType::Directory);
+        header.set_size(0);
+        header.set_mode(0o755);
+        header.set_cksum();
+        archive
+            .append_data(&mut header, "./", std::io::empty())
+            .unwrap();
+        for path in if collision {
+            vec!["./dir/file", "dir/file"]
+        } else {
+            vec!["./dir/file"]
+        } {
+            let mut header = tar::Header::new_gnu();
+            header.set_size(7);
+            header.set_mode(0o644);
+            header.set_cksum();
+            archive
+                .append_data(&mut header, path, b"payload".as_slice())
+                .unwrap();
+        }
+        let manifest = image(&mut store, "amd64", &[archive.into_inner().unwrap()], false);
+        if collision {
+            let error = store.prepare(&manifest, &platform("amd64")).unwrap_err();
+            assert!(
+                error.to_string().contains("duplicate layer path"),
+                "{error:#}"
+            );
+        } else {
+            let prepared = store.prepare(&manifest, &platform("amd64")).unwrap();
+            store.lease("dot-path", &manifest).unwrap();
+            let directory = cap_std::fs::Dir::from_std_file(
+                store.open_prepared(&prepared, "dot-path").unwrap(),
+            );
+            assert_eq!(directory.read("dir/file").unwrap(), b"payload");
+            assert_eq!(directory.read_dir(".").unwrap().count(), 1);
+        }
+    }
+}
+
+#[test]
+fn prepare_normalization_keeps_root_type_and_traversal_guards() {
+    for (path, expected) in [
+        (".", "root archive member must be an empty directory"),
+        ("./../escape", "absolute/traversing archive path"),
+        ("/escape", "invalid archive path"),
+    ] {
+        let root = tempfile::tempdir().unwrap();
+        std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
+        let mut store = Store::open(root.path(), Limits::default()).unwrap();
+        let mut archive = tar::Builder::new(Vec::new());
+        archive
+            .append_pax_extensions([("path", path.as_bytes())])
+            .unwrap();
+        let mut header = tar::Header::new_gnu();
+        header.set_size(1);
+        header.set_mode(0o644);
+        header.set_cksum();
+        archive
+            .append_data(&mut header, "placeholder", b"x".as_slice())
+            .unwrap();
+        let manifest = image(&mut store, "amd64", &[archive.into_inner().unwrap()], false);
+        let error = store.prepare(&manifest, &platform("amd64")).unwrap_err();
+        assert!(error.to_string().contains(expected), "{path}: {error:#}");
+        for entry in std::fs::read_dir(root.path().join("prepared")).unwrap() {
+            assert!(
+                entry
+                    .unwrap()
+                    .file_name()
+                    .to_str()
+                    .unwrap()
+                    .ends_with(".staging")
+            );
+        }
+    }
+}

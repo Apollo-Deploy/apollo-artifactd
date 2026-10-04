@@ -1,0 +1,26 @@
+OCI layout directory-size pre-fix evidence
+===========================================
+
+A temporary copy removed only the `entry.size() == 0` checks from the OCI
+archive directory policy. The test fixture prepends a nonzero `blobs`
+directory to an otherwise valid OCI layout archive, then expects the current
+policy error `unexpected archive directory`.
+
+Temporary workspace:
+  /tmp/artifactd-oci-directory-prefix.yiKeZx
+
+Command:
+  CARGO_TARGET_DIR="$tmp/target" cargo test --manifest-path "$tmp/Cargo.toml" \
+    --test oci valid_archive_admission_and_missing_terminator -- --nocapture
+
+Observed terminal result:
+  running 1 test
+  thread 'valid_archive_admission_and_missing_terminator' panicked at
+  tests/oci.rs:193:10:
+  called `Result::unwrap_err()` on an `Ok` value: Object { ... }
+  test valid_archive_admission_and_missing_terminator ... FAILED
+  test result: FAILED; 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out
+
+The controlled pre-fix importer admitted the otherwise valid archive despite
+its nonzero directory member. The temporary workspace was deleted after the
+run.

@@ -40,7 +40,10 @@ framing, GNU paths, malformed records and newline boundaries. Upstream code,
 licenses and version are preserved; [patch provenance](../vendor/tar/ARTIFACTD_PATCH.md)
 describes the mechanism changes. This fork requires ongoing security review.
 
-Hardlinks, absolute symlink targets, non-UTF-8 names and some OCI-layout
-archive extensions remain unsupported. Cross-UID consumption and owner-UID
+The subsequent archive-path change applies bounded standard extension handling
+to OCI-layout import and accepts canonical `./` members. Its qualification
+is recorded separately in `ARCHIVE_PATHS.md`.
+
+Hardlinks, absolute symlink targets and non-UTF-8 names remain unsupported. Cross-UID consumption and owner-UID
 immutability also remain required work. These limits prevent full rootfs and
 release approval; they are not deferred out of the user's cutover scope.

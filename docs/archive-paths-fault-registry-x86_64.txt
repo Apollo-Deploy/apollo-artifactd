@@ -1,0 +1,36 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.27s
+
+running 1 test
+     Running tests/gc_crash.rs (target/debug/deps/gc_crash-5e6e1ecdb6f9c94a)
+test sigkill_prepared_gc_recovers_partial_tree ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 53.39s
+
+     Running tests/journal_crash.rs (target/debug/deps/journal_crash-d2ab118ccc60f576)
+
+running 1 test
+test sigkill_import_preserves_intent_and_recovers_without_reexecution ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests/registry.rs (target/debug/deps/registry-fc3ac24b5378c5cc)
+
+running 1 test
+test https_registry_push_pull_verifies_graph_and_retries ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.10s
+
+     Running tests/registry_api.rs (target/debug/deps/registry_api-8e221e07b890b986)
+
+running 1 test
+test registry_api_fd_credentials_journal_and_prepared_facts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.21s
+
+     Running tests/registry_crash.rs (target/debug/deps/registry_crash-8b851f9d28db3672)
+
+running 1 test
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob has been running for over 60 seconds
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 272.66s

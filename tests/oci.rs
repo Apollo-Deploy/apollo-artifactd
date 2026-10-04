@@ -152,12 +152,16 @@ fn valid_archive_admission_and_missing_terminator() {
     let index = serde_json::to_vec(&serde_json::json!({"schemaVersion":2,"mediaType":"application/vnd.oci.image.index.v1+json","manifests":[{"mediaType":MANIFEST,"digest":manifest,"size":source_store.open_blob(&manifest).unwrap().metadata().unwrap().len()}]})).unwrap();
     let mut archive = tar::Builder::new(Vec::new());
     let mut append = |path: &str, data: &[u8]| {
+        let path = format!("./{path}");
+        archive
+            .append_pax_extensions([("path", path.as_bytes())])
+            .unwrap();
         let mut h = tar::Header::new_gnu();
         h.set_size(data.len() as u64);
         h.set_mode(0o600);
         h.set_cksum();
         archive
-            .append_data(&mut h, path, Cursor::new(data))
+            .append_data(&mut h, &path, Cursor::new(data))
             .unwrap();
     };
     append("oci-layout", br#"{"imageLayoutVersion":"1.0.0"}"#);
@@ -170,6 +174,29 @@ fn valid_archive_admission_and_missing_terminator() {
         );
     }
     let archive = archive.into_inner().unwrap();
+    let mut bad_prefix = tar::Builder::new(Vec::new());
+    let mut bad_directory = tar::Header::new_gnu();
+    bad_directory.set_entry_type(tar::EntryType::Directory);
+    bad_directory.set_size(1);
+    bad_directory.set_cksum();
+    bad_prefix
+        .append_data(&mut bad_directory, "blobs", &b"x"[..])
+        .unwrap();
+    let bad_prefix = bad_prefix.into_inner().unwrap();
+    let mut bad_archive = bad_prefix[..bad_prefix.len() - 1024].to_vec();
+    bad_archive.extend_from_slice(&archive);
+    let bad_root = tempfile::tempdir().unwrap();
+    std::fs::set_permissions(bad_root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
+    let mut bad_store = Store::open(bad_root.path(), Limits::default()).unwrap();
+    let bad_error = bad_store
+        .import_oci_archive(Cursor::new(bad_archive), &platform("arm64"))
+        .unwrap_err();
+    assert!(
+        bad_error
+            .to_string()
+            .contains("unexpected archive directory")
+    );
+
     for complete in [false, true] {
         let root = tempfile::tempdir().unwrap();
         std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
@@ -191,4 +218,59 @@ fn valid_archive_admission_and_missing_terminator() {
             );
         }
     }
+}
+
+#[test]
+fn malformed_oci_archive_pax_is_rejected() {
+    let root = tempfile::tempdir().unwrap();
+    std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
+    let mut store = Store::open(root.path(), Limits::default()).unwrap();
+    let mut archive = tar::Builder::new(Vec::new());
+    archive
+        .append_pax_extensions([
+            ("path", b"oci-layout".as_slice()),
+            ("path", b"duplicate".as_slice()),
+        ])
+        .unwrap();
+    let mut header = tar::Header::new_gnu();
+    header.set_size(0);
+    header.set_cksum();
+    archive.append(&header, std::io::empty()).unwrap();
+    assert!(
+        store
+            .import_oci_archive(
+                Cursor::new(archive.into_inner().unwrap()),
+                &platform("arm64")
+            )
+            .unwrap_err()
+            .to_string()
+            .contains("duplicate PAX key")
+    );
+}
+
+#[test]
+fn canonical_duplicate_layout_paths_are_rejected() {
+    let root = tempfile::tempdir().unwrap();
+    std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
+    let mut store = Store::open(root.path(), Limits::default()).unwrap();
+    let mut archive = tar::Builder::new(Vec::new());
+    for path in ["blobs", "./blobs"] {
+        let mut header = tar::Header::new_gnu();
+        header.set_entry_type(tar::EntryType::Directory);
+        header.set_size(0);
+        header.set_cksum();
+        archive
+            .append_data(&mut header, path, std::io::empty())
+            .unwrap();
+    }
+    let error = store
+        .import_oci_archive(
+            Cursor::new(archive.into_inner().unwrap()),
+            &platform("arm64"),
+        )
+        .unwrap_err();
+    assert!(
+        error.to_string().contains("archive duplicate/entry limit"),
+        "{error:#}"
+    );
 }

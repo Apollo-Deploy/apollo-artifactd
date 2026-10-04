@@ -69,8 +69,8 @@ impl Store {
             let mut entries = std::collections::BTreeSet::new();
             for entry in archive.entries()? {
                 let mut entry = entry?;
-                super::extensions::validate(&mut entry)?;
-                let path = safe_path(entry.path_bytes().as_ref())?;
+                crate::archive_policy::validate_pax(&mut entry)?;
+                let path = crate::archive_policy::safe_path(entry.path_bytes().as_ref())?;
                 ensure!(entries.insert(path.clone()), "duplicate layer path");
                 count += 1;
                 ensure!(
@@ -78,6 +78,10 @@ impl Store {
                     "rootfs entry budget exceeded"
                 );
                 let kind = entry.header().entry_type();
+                ensure!(
+                    !path.as_os_str().is_empty() || (kind.is_dir() && entry.size() == 0),
+                    "root archive member must be an empty directory"
+                );
                 ensure!(
                     kind.is_file() || kind.is_dir() || kind.is_symlink(),
                     "hardlinks/devices/special entries rejected"
@@ -118,7 +122,7 @@ impl Store {
             archive.set_extension_total_limit(64 * 1024 * 1024);
             for entry in archive.entries()? {
                 let mut entry = entry?;
-                super::extensions::validate(&mut entry)?;
+                crate::archive_policy::validate_pax(&mut entry)?;
                 second_count += 1;
                 ensure!(
                     second_count <= self.limits.max_entries,
@@ -132,7 +136,14 @@ impl Store {
                     .checked_add(entry.size())
                     .ok_or_else(|| anyhow::anyhow!("output overflow"))?;
                 ensure!(second_output <= available, "rootfs output budget exceeded");
-                let path = safe_path(entry.path_bytes().as_ref())?;
+                let path = crate::archive_policy::safe_path(entry.path_bytes().as_ref())?;
+                if path.as_os_str().is_empty() {
+                    ensure!(
+                        entry.header().entry_type().is_dir() && entry.size() == 0,
+                        "root archive member must be an empty directory"
+                    );
+                    continue;
+                }
                 let name = path
                     .file_name()
                     .and_then(|v| v.to_str())
@@ -207,23 +218,6 @@ fn sum_sizes<T: DeserializeOwned>(
     }
 }
 
-fn safe_path(bytes: &[u8]) -> Result<std::path::PathBuf> {
-    ensure!(
-        bytes.len() <= 4096 && !bytes.contains(&0),
-        "invalid archive path"
-    );
-    let text = std::str::from_utf8(bytes)?;
-    let path = Path::new(text.trim_end_matches('/'));
-    ensure!(
-        !path.as_os_str().is_empty() && path.components().count() <= 128,
-        "invalid archive path"
-    );
-    ensure!(
-        path.components().all(|c| matches!(c, Component::Normal(_))),
-        "absolute/traversing archive path"
-    );
-    Ok(path.to_owned())
-}
 fn parent(root: &Dir, path: &Path) -> Result<Dir> {
     let mut dir = root.try_clone()?;
     if let Some(parent) = path.parent() {
