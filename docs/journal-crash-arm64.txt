@@ -1,0 +1,17 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+
+running 1 test
+     Running tests/journal_crash.rs (target/debug/deps/journal_crash-f2dc1afcbeff52d5)
+test sigkill_import_preserves_intent_and_recovers_without_reexecution ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.78s
+
+running 1 test
+     Running tests/registry_crash.rs (target/debug/deps/registry_crash-1284ade925cd273f)
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob has been running for over 60 seconds
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 105.16s

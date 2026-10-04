@@ -65,6 +65,26 @@ Current authenticated HTTPS integration tests passed on both native Linux archit
 
 Latest integration checks are recorded in `registry-final-{arm64,x86_64}-tests.txt`: both the core HTTPS transfer test and the real daemon Unix-FD registry test pass. The API test verifies protected credential FD delivery, secret-free errors/journal records, pre-journal reference rejection and canonical `PreparedDigest` facts. It does not establish all registry response/fault cases. [Cursor recovery evidence](CURSOR_RECOVERY.md) records the subsequent bounded-page progress regressions and both native reruns. Current source/debug binary snapshots are separate from the baseline release binaries and performance logs.
 
+## Bounded daemon operation journal
+
+[Operation journal qualification](OPERATION_JOURNAL.md) records the version-2
+allocated-token contract, the actual pre-fix operation-4097 failure, and
+100,000 public daemon mutation cycles on each native architecture. Expired
+tokens reject effects, retained success/failure results replay, and interrupted
+intents become explicit uncertain failures. Journal semantic auditing is
+bounded to 4096 records. The measurements use debug builds and do not replace
+the blob/OCI churn or release-performance gates above.
+
+Real daemon SIGKILL checks cover partial blob imports and authenticated
+registry pulls on ARM and x86. Both final native workspace suites and
+warning-free clippy checks pass; the source snapshots match the current files.
+Additional native checks and source snapshots are
+retained in the journal evidence files. [Independent round 5](RED_TEAM_ROUND_5.md)
+closes permanent journal exhaustion while retaining the remaining release
+findings. `journal-protocol-fuzz.txt` records a 30-second sanitized macOS
+protocol/OCI/token-parser campaign: 268,854 inputs and no finding. This is
+targeted fuzz evidence, not native Linux or full recovery/registry fuzz proof.
+
 ## Release decision
 
 The package must not replace the existing Artifact implementation yet. Registry, secure credentials, all caller cutovers, old Zig removal, bounded global GC/concurrency, durable replay guarantees and the remaining qualification campaigns are mandatory work in this request. They are not deferred to a future version. `RED_TEAM_RELEASE_APPROVED` and `APOLLO_ARTIFACTD_PRODUCTION_COMPLETE` have not been earned.

@@ -1,4 +1,6 @@
 mod dispatch;
+mod journal;
+mod journal_recovery;
 use crate::{Limits, Store, filesystem};
 use anyhow::{Result, ensure};
 use artifactd_protocol::{Request, Response, VERSION, wire};
@@ -16,6 +18,7 @@ pub fn serve(store: &Path, path: &Path) -> Result<()> {
         "run artifactd as an unprivileged dedicated user"
     );
     let mut store = Store::open(store, Limits::default())?;
+    journal_recovery::audit(&store, true)?;
     let parent = path
         .parent()
         .ok_or_else(|| anyhow::anyhow!("missing socket parent"))?;

@@ -1,0 +1,342 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.26
+   Compiling libc v0.2.190
+   Compiling find-msvc-tools v0.1.14
+   Compiling shlex v2.0.1
+   Compiling pkg-config v0.3.34
+   Compiling stable_deref_trait v1.2.1
+   Compiling itoa v1.0.18
+   Compiling pin-project-lite v0.2.17
+   Compiling dunce v1.0.5
+   Compiling bytes v1.12.1
+   Compiling fs_extra v1.3.0
+   Compiling futures-core v0.3.34
+   Compiling bitflags v2.13.2
+   Compiling serde_core v1.0.229
+   Compiling typenum v1.20.1
+   Compiling memchr v2.8.3
+   Compiling writeable v0.6.4
+   Compiling aws-lc-rs v1.18.1
+   Compiling smallvec v1.16.2
+   Compiling litemap v0.8.3
+   Compiling once_cell v1.21.4
+   Compiling serde v1.0.229
+   Compiling cfg-if v1.0.5
+   Compiling icu_normalizer_data v2.3.0
+   Compiling ident_case v1.0.1
+   Compiling utf8_iter v1.0.4
+   Compiling strsim v0.11.1
+   Compiling fnv v1.0.7
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling zeroize v1.9.0
+   Compiling zmij v1.0.23
+   Compiling icu_properties_data v2.3.0
+   Compiling jobserver v0.1.35
+   Compiling http v1.5.0
+   Compiling cc v1.6.0
+   Compiling mio v1.2.4
+   Compiling socket2 v0.6.5
+   Compiling cmake v0.1.58
+   Compiling aws-lc-sys v0.45.0
+   Compiling core-foundation-sys v0.8.7
+   Compiling darling_core v0.20.11
+   Compiling synstructure v0.14.0
+   Compiling serde_json v1.0.151
+   Compiling rustix v1.1.5
+   Compiling percent-encoding v2.3.2
+   Compiling http-body v1.1.0
+   Compiling errno v0.3.14
+   Compiling rustls-pki-types v1.15.1
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling tokio-macros v2.7.2
+   Compiling serde_derive v1.0.229
+   Compiling darling_macro v0.20.11
+   Compiling zerofrom v0.1.8
+   Compiling futures-macro v0.3.34
+   Compiling untrusted v0.9.0
+   Compiling tokio v1.53.2
+   Compiling version_check v0.9.5
+   Compiling yoke v0.8.3
+   Compiling futures-task v0.3.34
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling slab v0.4.12
+   Compiling rustls v0.23.45
+   Compiling httparse v1.10.1
+   Compiling futures-util v0.3.34
+   Compiling generic-array v0.14.7
+   Compiling tinystr v0.8.4
+   Compiling icu_locale_core v2.3.0
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.3.0
+   Compiling darling v0.20.11
+   Compiling icu_provider v2.3.1
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling try-lock v0.2.5
+   Compiling subtle v2.6.1
+   Compiling ipnet v2.12.2
+   Compiling tower-service v0.3.3
+   Compiling heck v0.5.0
+   Compiling log v0.4.34
+   Compiling thiserror v2.0.21
+   Compiling idna_adapter v1.2.2
+   Compiling want v0.3.1
+   Compiling derive_builder_core v0.20.2
+   Compiling thiserror-impl v2.0.21
+   Compiling tracing-attributes v0.1.31
+   Compiling form_urlencoded v1.2.2
+   Compiling zstd-sys v2.1.0+zstd.1.5.7
+   Compiling tracing-core v0.1.36
+   Compiling hybrid-array v0.4.15
+   Compiling aho-corasick v1.1.5
+   Compiling futures-channel v0.3.34
+   Compiling unicode-xid v0.2.6
+   Compiling autocfg v1.5.1
+   Compiling atomic-waker v1.1.2
+   Compiling konst_macro_rules v0.2.19
+   Compiling io-lifetimes v2.0.4
+   Compiling io-lifetimes v3.0.1
+   Compiling regex-syntax v0.8.11
+   Compiling num-traits v0.2.19
+   Compiling konst v0.2.20
+   Compiling hyper v1.11.1
+   Compiling const_format_proc_macros v0.2.34
+   Compiling regex-automata v0.4.18
+   Compiling tracing v0.1.44
+   Compiling derive_builder_macro v0.20.2
+   Compiling idna v1.1.0
+   Compiling core-foundation v0.10.1
+   Compiling security-framework-sys v2.17.0
+   Compiling sync_wrapper v1.0.2
+   Compiling getrandom v0.4.3
+   Compiling utf8parse v0.2.2
+   Compiling tower-layer v0.3.3
+   Compiling base64 v0.23.1
+   Compiling io-extras v0.19.0
+   Compiling hyper-util v0.1.21
+   Compiling tower v0.5.3
+   Compiling anstyle-parse v1.0.0
+   Compiling security-framework v3.7.0
+   Compiling regex v1.13.1
+   Compiling url v2.5.8
+   Compiling derive_builder v0.20.2
+   Compiling const_format v0.2.36
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling strum_macros v0.27.2
+   Compiling getset v0.1.7
+   Compiling strum v0.27.2
+   Compiling zstd-safe v7.3.0
+   Compiling colorchoice v1.0.5
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling futures-sink v0.3.34
+   Compiling anstyle-query v1.1.5
+   Compiling const-oid v0.10.2
+   Compiling crc32fast v1.5.2
+   Compiling cap-primitives v4.0.3
+   Compiling anstyle v1.0.14
+   Compiling tinyvec v1.13.3
+   Compiling ryu v1.0.23
+   Compiling serde_urlencoded v0.7.1
+   Compiling unicode-normalization v0.1.25
+   Compiling anstream v1.0.0
+   Compiling digest v0.11.3
+   Compiling tokio-util v0.7.19
+   Compiling fs-set-times v0.20.3
+   Compiling tower-http v0.6.11
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling http-body-util v0.1.5
+   Compiling iana-time-zone v0.1.65
+   Compiling cpufeatures v0.3.1
+   Compiling maybe-owned v0.3.4
+   Compiling redb v4.3.0
+   Compiling clap_lex v1.1.1
+   Compiling ambient-authority v0.0.2
+   Compiling simd-adler32 v0.3.10
+   Compiling anyhow v1.0.104
+   Compiling cap-std v4.0.3
+   Compiling adler2 v2.0.1
+   Compiling clap_builder v4.6.7
+   Compiling miniz_oxide v0.9.1
+   Compiling sha2 v0.11.0
+   Compiling chrono v0.4.45
+   Compiling digest v0.10.7
+   Compiling olpc-cjson v0.1.4
+   Compiling oci-spec v0.10.0
+   Compiling clap_derive v4.6.7
+   Compiling xattr v1.6.1
+   Compiling libfuzzer-sys v0.4.13
+   Compiling cpufeatures v0.2.17
+   Compiling filetime v0.2.29
+   Compiling http-auth v0.1.10
+   Compiling unicase v2.9.0
+   Compiling hex v0.4.3
+   Compiling base64 v0.22.1
+   Compiling clap v4.6.7
+   Compiling tar v0.4.46
+   Compiling sha2 v0.10.9
+   Compiling flate2 v1.1.10
+   Compiling zstd v0.13.3
+   Compiling uuid v1.27.0
+   Compiling oci-spec v0.9.0
+   Compiling artifactd-protocol v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/crates/artifactd-protocol)
+   Compiling fastrand v2.5.0
+   Compiling arbitrary v1.4.2
+   Compiling tempfile v3.27.0
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.6
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.13.5
+   Compiling oci-client v0.18.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/vendor/oci-client)
+   Compiling apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+   Compiling artifactd-fuzz v0.0.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/fuzz)
+    Finished `release` profile [optimized + debuginfo] target(s) in 2m 24s
+    Finished `release` profile [optimized + debuginfo] target(s) in 0.27s
+     Running `/Users/tihan-nico/Library/Caches/dev-build/rust-target/aarch64-apple-darwin/release/protocol_oci -artifact_prefix=/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/fuzz/artifacts/protocol_oci/ -max_total_time=30 -rss_limit_mb=512 -max_len=65536 -print_final_stats=1 -verbosity=0 /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/fuzz/corpus/protocol_oci`
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO:     1200 files found in /Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/fuzz/corpus/protocol_oci
+INFO: seed corpus: files: 1200 min: 1b max: 415b total: 30255b rss: 49Mb
+	NEW_FUNC[1/1]: 0x000102bedc44 in _RNvMNtCskz1kcnNEWqq_5alloc5allocNtB2_6Global17grow_impl_runtimeCsiB9jLsC5cPG_12protocol_oci alloc.rs:216
+	NEW_FUNC[1/4]: 0x000103b3bea0 in _RINvXs6_NtCsf4gegaz8yYg_10serde_json5errorNtB6_5ErrorNtNtCsgkcQzOkLUyr_10serde_core2de5Error6customNtNtCs3mX7F9USQuM_8oci_spec5error12OciSpecErrorECsiB9jLsC5cPG_12protocol_oci error.rs:435
+	NEW_FUNC[2/4]: 0x000102c17434 in _RNvXsZ_NtCskz1kcnNEWqq_5alloc6stringNtB5_6StringNtNtCsiRtIPFIIYTg_4core3fmt5Write9write_strCsiB9jLsC5cPG_12protocol_oci string.rs:3344
+	NEW_FUNC[1/2]: 0x000102d57e70 in _RNvNtCskz1kcnNEWqq_5alloc3fmt6formatCs3mX7F9USQuM_8oci_spec+0x0 (protocol_oci:arm64+0x1002cbe70)
+	NEW_FUNC[2/2]: 0x000102da54ec in _RNvXs1i_NtCsiRtIPFIIYTg_4core3fmtReNtB6_7Display3fmtCs3mX7F9USQuM_8oci_spec+0x0 (protocol_oci:arm64+0x1003194ec)
+	NEW_FUNC[1/1]: 0x000102b72934 in _RINvXsh_NtCsf4gegaz8yYg_10serde_json2deINtB6_6MapKeyNtNtB8_4read9SliceReadENtNtCsgkcQzOkLUyr_10serde_core2de12Deserializer15deserialize_anyNtNvXNvXsD_NtB1d_5implsINtNtCsiRtIPFIIYTg_4core6result6ResultppENtB1d_11Deserialize11deserializeNtB2i_5FieldB3f_11deserialize12FieldVisitorECsiB9jLsC5cPG_12protocol_oci de.rs:2215
+	NEW_FUNC[1/2]: 0x000102c17c7c in _RNvXs_NtCsgkcQzOkLUyr_10serde_core2deNtNvXs17_NtB4_5implsyNtB4_11Deserialize11deserialize16PrimitiveVisitorNtB4_8Expected3fmtCsiB9jLsC5cPG_12protocol_oci mod.rs:494
+	NEW_FUNC[2/2]: 0x000103a68010 in _RNvXNvXs17_NtNtCsgkcQzOkLUyr_10serde_core2de5implsyNtBb_11Deserialize11deserializeNtB2_16PrimitiveVisitorNtBb_7Visitor9expecting+0x0 (protocol_oci:arm64+0x100fdc010)
+	NEW_FUNC[1/3]: 0x000102aa17a8 in _RINvNtCsiRtIPFIIYTg_4core3ptr13drop_in_placeINtNtB4_6option6OptionNtNtCskz1kcnNEWqq_5alloc6string6StringEECsiB9jLsC5cPG_12protocol_oci mod.rs:805
+	NEW_FUNC[2/3]: 0x000102aada58 in _RINvNtCsiRtIPFIIYTg_4core3ptr13drop_in_placeNtNtCs3mX7F9USQuM_8oci_spec5image2OsECsiB9jLsC5cPG_12protocol_oci mod.rs:805
+	NEW_FUNC[1/1]: 0x000102ab3ad8 in _RINvNtCsiRtIPFIIYTg_4core3ptr13drop_in_placeNtNtNtCs3mX7F9USQuM_8oci_spec5image6digest6DigestECsiB9jLsC5cPG_12protocol_oci mod.rs:805
+	NEW_FUNC[1/2]: 0x000102b491f8 in _RINvXs9_NtCsf4gegaz8yYg_10serde_json2deINtB6_9MapAccessNtNtB8_4read9SliceReadENtNtCsgkcQzOkLUyr_10serde_core2de9MapAccess13next_key_seedNtNtNtNtCs6QB8hc33qgK_5serde7private2de7content14ContentVisitorECsiB9jLsC5cPG_12protocol_oci de.rs:1986
+	NEW_FUNC[2/2]: 0x000102b7803c in _RINvXsj_NtNtNtCs6QB8hc33qgK_5serde7private2de7contentNtB6_14ContentVisitorNtNtCsgkcQzOkLUyr_10serde_core2de7Visitor9visit_mapINtNtCsf4gegaz8yYg_10serde_json2de9MapAccessNtNtB24_4read9SliceReadEECsiB9jLsC5cPG_12protocol_oci de.rs:488
+	NEW_FUNC[1/2]: 0x000102ad4e9c in _RINvXNvXs3e_NtNtCsgkcQzOkLUyr_10serde_core2de5implsINtNtNtNtCs4njH4SvjArg_3std11collections4hash3map7HashMappppENtBc_11Deserialize11deserializeINtB3_10MapVisitorNtNtCskz1kcnNEWqq_5alloc6string6StringB2z_NtNtNtBW_4hash6random11RandomStateENtBc_7Visitor9visit_mapINtNtCsf4gegaz8yYg_10serde_json2de9MapAccessNtNtB4g_4read9SliceReadEECsiB9jLsC5cPG_12protocol_oci impls.rs:1536
+	NEW_FUNC[2/2]: 0x000102bcba80 in _RINvYINtNtCsf4gegaz8yYg_10serde_json2de9MapAccessNtNtB8_4read9SliceReadENtNtCsgkcQzOkLUyr_10serde_core2de9MapAccess15next_entry_seedINtNtCsiRtIPFIIYTg_4core6marker11PhantomDataNtNtCskz1kcnNEWqq_5alloc6string6StringEB26_ECsiB9jLsC5cPG_12protocol_oci mod.rs:1873
+	NEW_FUNC[1/2]: 0x000102ae4804 in _RINvXs0_NvXNvNtNtCs3mX7F9USQuM_8oci_spec5image10descriptor1__NtBb_10DescriptorNtNtCsgkcQzOkLUyr_10serde_core2de11Deserialize11deserializeNtB6_9___VisitorNtB1g_7Visitor9visit_seqINtNtCsf4gegaz8yYg_10serde_json2de9SeqAccessNtNtB2U_4read9SliceReadEECsiB9jLsC5cPG_12protocol_oci descriptor.rs:9
+	NEW_FUNC[2/2]: 0x000102afebbc in _RINvXs0_NvXNvNtNtCs3mX7F9USQuM_8oci_spec5image6configs0_1__NtBb_6ConfigNtNtCsgkcQzOkLUyr_10serde_core2de11Deserialize11deserializeNtB6_9___VisitorNtB19_7Visitor9visit_seqINtNtCsf4gegaz8yYg_10serde_json2de9SeqAccessNtNtB2N_4read9SliceReadEECsiB9jLsC5cPG_12protocol_oci config.rs:276
+	NEW_FUNC[1/2]: 0x000102c17c18 in _RNvXs_NtCsgkcQzOkLUyr_10serde_core2deNtNvXNvNtNtCs3mX7F9USQuM_8oci_spec5image6configs4_1__NtBG_6RootFsNtB4_11Deserialize11deserialize9___VisitorNtB4_8Expected3fmtCsiB9jLsC5cPG_12protocol_oci mod.rs:494
+	NEW_FUNC[2/2]: 0x000102d6e0f4 in _RNvXs0_NvXNvNtNtCs3mX7F9USQuM_8oci_spec5image6configs4_1__NtBa_6RootFsNtNtCsgkcQzOkLUyr_10serde_core2de11Deserialize11deserializeNtB5_9___VisitorNtB18_7Visitor9expecting+0x0 (protocol_oci:arm64+0x1002e20f4)
+	NEW_FUNC[1/2]: 0x000102b78a34 in _RINvXsj_NtNtNtCs6QB8hc33qgK_5serde7private2de7contentNtB6_14ContentVisitorNtNtCsgkcQzOkLUyr_10serde_core2de7Visitor9visit_seqINtNtCsf4gegaz8yYg_10serde_json2de9SeqAccessNtNtB24_4read9SliceReadEECsiB9jLsC5cPG_12protocol_oci de.rs:476
+	NEW_FUNC[2/2]: 0x000103b8ed5c in _RNvMs3_NtCskz1kcnNEWqq_5alloc7raw_vecINtB5_6RawVecNtNtNtCsgkcQzOkLUyr_10serde_core7private7content7ContentE8grow_oneCsiB9jLsC5cPG_12protocol_oci mod.rs:186
+	NEW_FUNC[1/1]: 0x000102aa6114 in _RINvNtCsiRtIPFIIYTg_4core3ptr13drop_in_placeINtNtCskz1kcnNEWqq_5alloc3vec3VecNtNtNtCsgkcQzOkLUyr_10serde_core7private7content7ContentEECsiB9jLsC5cPG_12protocol_oci mod.rs:805
+	NEW_FUNC[1/3]: 0x000102ab6418 in _RINvNtNtCs3mX7F9USQuM_8oci_spec5image6config18deserialize_as_vecQINtNtCsf4gegaz8yYg_10serde_json2de12DeserializerNtNtB16_4read9SliceReadEECsiB9jLsC5cPG_12protocol_oci config.rs:376
+	NEW_FUNC[2/3]: 0x000102b1f9ec in _RINvXs5_NtCsf4gegaz8yYg_10serde_json2deQINtB6_12DeserializerNtNtB8_4read9SliceReadENtNtCsgkcQzOkLUyr_10serde_core2de12Deserializer15deserialize_mapINtNvXs3e_NtB1l_5implsINtNtNtNtCs4njH4SvjArg_3std11collections4hash3map7HashMappppENtB1l_11Deserialize11deserialize10MapVisitorNtNtCskz1kcnNEWqq_5alloc6string6StringNtNtNtCs3mX7F9USQuM_8oci_spec5image6config10GoMapSerdeNtNtNtB2Q_4hash6random11RandomStateEECsiB9jLsC5cPG_12protocol_oci de.rs:1788
+	NEW_FUNC[1/7]: 0x000102ad5668 in _RINvXNvXs3e_NtNtCsgkcQzOkLUyr_10serde_core2de5implsINtNtNtNtCs4njH4SvjArg_3std11collections4hash3map7HashMappppENtBc_11Deserialize11deserializeINtB3_10MapVisitorNtNtCskz1kcnNEWqq_5alloc6string6StringNtNtNtCs3mX7F9USQuM_8oci_spec5image6config10GoMapSerdeNtNtNtBW_4hash6random11RandomStateENtBc_7Visitor9visit_mapINtNtCsf4gegaz8yYg_10serde_json2de9MapAccessNtNtB54_4read9SliceReadEECsiB9jLsC5cPG_12protocol_oci impls.rs:1536
+	NEW_FUNC[2/7]: 0x000102b36698 in _RINvXs5_NtCsf4gegaz8yYg_10serde_json2deQINtB6_12DeserializerNtNtB8_4read9SliceReadENtNtCsgkcQzOkLUyr_10serde_core2de12Deserializer18deserialize_structNtNvXNvNtNtCs3mX7F9USQuM_8oci_spec5image6configs2_1__NtB2v_10GoMapSerdeNtB1l_11Deserialize11deserialize9___VisitorECsiB9jLsC5cPG_12protocol_oci de.rs:1820
+	NEW_FUNC[1/2]: 0x000102c17bf0 in _RNvXs_NtCsgkcQzOkLUyr_10serde_core2deNtNvXNvNtNtCs3mX7F9USQuM_8oci_spec5image6configs0_1__NtBG_6ConfigNtB4_11Deserialize11deserialize9___VisitorNtB4_8Expected3fmtCsiB9jLsC5cPG_12protocol_oci mod.rs:494
+	NEW_FUNC[2/2]: 0x000102d6e0ac in _RNvXs0_NvXNvNtNtCs3mX7F9USQuM_8oci_spec5image6configs0_1__NtBa_6ConfigNtNtCsgkcQzOkLUyr_10serde_core2de11Deserialize11deserializeNtB5_9___VisitorNtB18_7Visitor9expecting+0x0 (protocol_oci:arm64+0x1002e20ac)
+	NEW_FUNC[1/1]: 0x000102b026d8 in _RINvXs0_NvXNvNtNtCs3mX7F9USQuM_8oci_spec5image6configs4_1__NtBb_6RootFsNtNtCsgkcQzOkLUyr_10serde_core2de11Deserialize11deserializeNtB6_9___VisitorNtB19_7Visitor9visit_seqINtNtCsf4gegaz8yYg_10serde_json2de9SeqAccessNtNtB2N_4read9SliceReadEECsiB9jLsC5cPG_12protocol_oci config.rs:420
+###### Recommended dictionary. ######
+"subject" # Uses: 742
+"version" # Uses: 756
+"\001\000\000\005" # Uses: 693
+"\377\377\377\377" # Uses: 696
+"annannot ati " # Uses: 515
+"result" # Uses: 600
+";;;;;;;" # Uses: 493
+"\000\000\000\000" # Uses: 464
+"6\001\000\000" # Uses: 465
+"rootfs" # Uses: 401
+"os.version" # Uses: 415
+"\001\000\000\025" # Uses: 425
+"\377\377\377\377\377\377\377\011" # Uses: 423
+"os" # Uses: 450
+"artifactType" # Uses: 305
+"oersion" # Uses: 332
+"\000\000\000\000\000\000\000?" # Uses: 393
+"\357\377\377\377" # Uses: 380
+"\003\000\000\000" # Uses: 397
+"\000\000\000\000\000\000\000\034" # Uses: 353
+"annotations" # Uses: 324
+"\3075:B" # Uses: 333
+"\001\000\000\000\000\000\000\000" # Uses: 340
+"layers" # Uses: 338
+"e " # Uses: 364
+"config" # Uses: 324
+"manifests" # Uses: 303
+";;;;;;;{" # Uses: 279
+"\003\000\000\000\000\000\000\200" # Uses: 293
+"\001\021\000\000" # Uses: 274
+" t" # Uses: 317
+"breated" # Uses: 314
+"Labels" # Uses: 306
+"E\000\000\000\000\000\000\000" # Uses: 274
+"\377\377\377\377\377\377\377\034" # Uses: 281
+"4roktfs" # Uses: 245
+"\313\314\314\014" # Uses: 275
+"size" # Uses: 245
+"history" # Uses: 278
+"\376\377\377\377\377\377\377\377" # Uses: 249
+"\011\000\000\000" # Uses: 277
+"amdnux" # Uses: 220
+"\005\000\000\000\000\000\000\000" # Uses: 230
+"\000\000\000\373" # Uses: 241
+"\363\377\377\377" # Uses: 222
+" a" # Uses: 227
+"\001\000\000\000\000\000\000\215" # Uses: 219
+"variant" # Uses: 207
+"\201\377\377\377\377\377\377\377" # Uses: 218
+"action" # Uses: 170
+"e\000\000\000\000\000\000\000" # Uses: 175
+"createD" # Uses: 194
+"\345\377\377\377" # Uses: 219
+"application/vnd.oci.image.manifest.v1+0json" # Uses: 150
+"author" # Uses: 206
+"4\001" # Uses: 203
+"\003\000\000\000\000\000\000\000" # Uses: 185
+"\377\377\377\366" # Uses: 163
+"\000\000\000\000\000\000\000[" # Uses: 134
+"User" # Uses: 155
+"\376\377\377\360" # Uses: 165
+"\002\000" # Uses: 162
+"application/vnd.oci.image.manifest.v1+json" # Uses: 112
+"\000\000\000\000\000\000\000\201" # Uses: 160
+"\001\000\000\000\000\000\000\022" # Uses: 135
+"5\000\000\000\000\000\000\000" # Uses: 147
+"\377\377\377\377\377\377\377\205" # Uses: 136
+"\373\377\377\377" # Uses: 150
+"\375\377\377\377" # Uses: 115
+"\212\000\000\000\000\000\000\000" # Uses: 121
+"\001\012" # Uses: 128
+"amd28" # Uses: 125
+"schumaVersion" # Uses: 119
+"urls" # Uses: 109
+"\376\377\377\377" # Uses: 112
+"oon_id" # Uses: 92
+"\033\000\000\000" # Uses: 102
+"\225\000\000\000\000\000\000\000" # Uses: 81
+"\374\377\377\377" # Uses: 92
+"\360\377\377\377" # Uses: 82
+"\367\377\377\377" # Uses: 78
+"\377\377\377\377\377\377\377\377" # Uses: 80
+"digest" # Uses: 89
+"c;eted" # Uses: 88
+"created" # Uses: 71
+"0.+," # Uses: 65
+"adm46" # Uses: 64
+"amd64" # Uses: 63
+"\356\377\377\377" # Uses: 64
+"\027\000\000\000" # Uses: 53
+"\001\000\0000" # Uses: 40
+")\000\000\000\000\000\000\000" # Uses: 51
+"\004\000" # Uses: 31
+"\000\000\000\000\000\000\000\000" # Uses: 38
+"architecture-" # Uses: 22
+"architecture" # Uses: 28
+"\000\000\000\000\000\000\000\010" # Uses: 35
+"applica@ion/vnd.oci.image.conf" # Uses: 21
+"schemaVersion" # Uses: 27
+"k\000\000\000\000\000\000\000" # Uses: 20
+###### End of recommended dictionary. ######
+stat::number_of_executed_units: 268854
+stat::average_exec_per_sec:     8672
+stat::new_units_added:          2007
+stat::slowest_unit_time_sec:    0
+stat::peak_rss_mb:              282

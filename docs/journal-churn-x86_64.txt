@@ -1,0 +1,11 @@
+   Compiling apollo-artifactd v0.1.0 (/home/tihan/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.76s
+     Running tests/journal_churn.rs (target/debug/deps/journal_churn-ce7567ee2230f6a0)
+
+running 1 test
+test public_journal_churn_stays_bounded has been running for over 60 seconds
+journal churn operations=100000 elapsed_ms=819731 p50_us=5527 p95_us=7615 p99_us=160618 baseline=Sample { rss_kib: 12680, hwm_kib: 12680, cpu_ticks: 0, threads: 1, fds: 13 } peak=Sample { rss_kib: 21520, hwm_kib: 21520, cpu_ticks: 79641, threads: 1, fds: 14 }
+journal churn state_bytes=2707456 operations=4064 registry=0
+test public_journal_churn_stays_bounded ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 820.04s

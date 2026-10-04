@@ -3,7 +3,7 @@ mod digest;
 pub use digest::{ArtifactDigest, BlobDigest, ConfigDigest, ManifestDigest, PreparedDigest};
 use serde::{Deserialize, Serialize};
 
-pub const VERSION: u32 = 1;
+pub const VERSION: u32 = 2;
 pub const MAX_PACKET: usize = 64 * 1024;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
@@ -61,6 +61,38 @@ id!(PinId);
 id!(LeaseId);
 id!(PreparedArtifactId);
 
+impl OperationId {
+    pub fn token(epoch: &str, sequence: u64) -> Result<Self, &'static str> {
+        if sequence == 0
+            || epoch.len() != 32
+            || !epoch
+                .bytes()
+                .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
+        {
+            return Err("invalid operation token");
+        }
+        Self::try_from(format!("{epoch}_{sequence:020}")).map_err(|_| "invalid operation token")
+    }
+
+    pub fn token_parts(&self) -> Result<(&str, u64), &'static str> {
+        let (epoch, sequence) = self.0.split_once('_').ok_or("invalid operation token")?;
+        if epoch.len() != 32
+            || !epoch
+                .bytes()
+                .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
+            || sequence.len() != 20
+            || !sequence.bytes().all(|byte| byte.is_ascii_digit())
+        {
+            return Err("invalid operation token");
+        }
+        let sequence = sequence.parse().map_err(|_| "invalid operation token")?;
+        if sequence == 0 {
+            return Err("invalid operation token");
+        }
+        Ok((epoch, sequence))
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Request {
@@ -76,6 +108,7 @@ pub struct Request {
     deny_unknown_fields
 )]
 pub enum Action {
+    OperationAllocate,
     ImportBlob {
         #[serde(default)]
         digest: Option<BlobDigest>,
@@ -146,12 +179,63 @@ pub enum Action {
     Capabilities,
 }
 
+impl Action {
+    pub fn is_mutation(&self) -> bool {
+        !matches!(
+            self,
+            Self::OperationAllocate
+                | Self::Inspect { .. }
+                | Self::Verify { .. }
+                | Self::Resolve { .. }
+                | Self::OpenBlob { .. }
+                | Self::OpenPrepared { .. }
+                | Self::Status
+                | Self::Doctor
+                | Self::Capabilities
+        )
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Response {
     pub version: u32,
     pub operation_id: OperationId,
     pub result: Result<serde_json::Value, String>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Action, OperationId};
+
+    #[test]
+    fn operation_tokens_are_canonical_and_round_trip() {
+        let token = OperationId::token("0123456789abcdef0123456789abcdef", 1).unwrap();
+        assert_eq!(
+            token.as_str(),
+            "0123456789abcdef0123456789abcdef_00000000000000000001"
+        );
+        assert_eq!(
+            token.token_parts().unwrap(),
+            ("0123456789abcdef0123456789abcdef", 1)
+        );
+        assert!(OperationId::token("0123456789ABCDEF0123456789abcdef", 1).is_err());
+        assert!(OperationId::token("0123456789abcdef0123456789abcdef", 0).is_err());
+    }
+
+    #[test]
+    fn mutation_classification_keeps_observations_and_allocation_read_only() {
+        assert!(!Action::OperationAllocate.is_mutation());
+        assert!(!Action::Status.is_mutation());
+        assert!(
+            !Action::OpenPrepared {
+                id: "prepared".to_string().try_into().unwrap(),
+                lease: "lease".to_string().try_into().unwrap(),
+            }
+            .is_mutation()
+        );
+        assert!(Action::Gc { max_entries: 1 }.is_mutation());
+    }
 }
 
 #[cfg(target_os = "linux")]

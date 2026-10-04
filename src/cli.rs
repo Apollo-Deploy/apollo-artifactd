@@ -15,14 +15,19 @@ fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     #[cfg(target_os = "linux")]
     {
-        let request = artifactd_protocol::Request {
-            version: artifactd_protocol::VERSION,
-            operation_id: args
-                .operation_id
-                .unwrap_or_else(|| uuid::Uuid::new_v4().to_string())
+        let action: artifactd_protocol::Action = serde_json::from_str(&args.action)?;
+        let operation_id = match args.operation_id {
+            Some(operation_id) => operation_id.try_into().map_err(anyhow::Error::msg)?,
+            None if action.is_mutation() => artifactd_protocol::client::allocate(&args.socket)?,
+            None => uuid::Uuid::new_v4()
+                .to_string()
                 .try_into()
                 .map_err(anyhow::Error::msg)?,
-            action: serde_json::from_str(&args.action)?,
+        };
+        let request = artifactd_protocol::Request {
+            version: artifactd_protocol::VERSION,
+            operation_id,
+            action,
         };
         let input = args.input.map(std::fs::File::open).transpose()?;
         let (response, fd) = apollo_artifactd::api::call(&args.socket, &request, input.as_ref())?;

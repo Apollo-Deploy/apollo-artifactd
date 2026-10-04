@@ -56,85 +56,17 @@ fn recorded(
         );
     }
     // Observations must reflect current integrity and liveness, including replay.
-    if matches!(
-        request.action,
-        Action::Status
-            | Action::Doctor
-            | Action::Capabilities
-            | Action::Inspect { .. }
-            | Action::Verify { .. }
-            | Action::Resolve { .. }
-            | Action::EnsureLocal { .. }
-            | Action::OpenBlob { .. }
-            | Action::OpenPrepared { .. }
-    ) {
+    if !request.action.is_mutation() {
         return dispatch(store, &request.action, input);
     }
     let payload = serde_json::to_string(&request.action)?;
-    let prior = store
-        .db
-        .get::<crate::state::Operation>("operations", request.operation_id.as_str())?;
-    let open = matches!(
-        request.action,
-        Action::OpenBlob { .. } | Action::OpenPrepared { .. }
-    );
-    if let Some(record) = prior {
-        ensure!(record.request == payload, "operation identity conflict");
-        if record.phase == "complete" && !open {
-            let result: Result<Value, String> = serde_json::from_str(
-                &record
-                    .result
-                    .ok_or_else(|| anyhow::anyhow!("missing operation result"))?,
-            )?;
-            return result.map(|v| (v, None)).map_err(anyhow::Error::msg);
-        }
-    } else {
-        ensure!(
-            store.db.count("operations")? < 4096,
-            "operation journal capacity exhausted"
-        );
-        record(
-            store,
-            request.operation_id.as_str(),
-            &crate::state::Operation {
-                request: payload.clone(),
-                phase: "intent".to_owned(),
-                result: None,
-                sequence: 0,
-            },
-            registry,
-        )?;
+    if let Some(result) = super::journal::begin(store, &request.operation_id, &payload, registry)? {
+        return result.map(|v| (v, None)).map_err(anyhow::Error::msg);
     }
     let outcome = dispatch(store, &request.action, input);
     let saved: Result<&Value, String> = outcome.as_ref().map(|(v, _)| v).map_err(|e| e.to_string());
-    record(
-        store,
-        request.operation_id.as_str(),
-        &crate::state::Operation {
-            request: payload,
-            phase: if outcome.is_ok() {
-                "complete"
-            } else {
-                "failed"
-            }
-            .to_owned(),
-            result: Some(serde_json::to_string(&saved)?),
-            sequence: 0,
-        },
-        registry,
-    )?;
-    // Preserve retry identities. Capacity exhaustion rejects new operations;
-    // it never discards a result and silently re-executes an old operation ID.
+    super::journal::complete(store, &request.operation_id, &payload, &saved, registry)?;
     outcome
-}
-fn record(store: &Store, id: &str, value: &crate::state::Operation, registry: bool) -> Result<()> {
-    store.db.transaction(|tx| {
-        tx.put("operations", id, value)?;
-        if registry {
-            tx.put("registry", id, value)?;
-        }
-        Ok(())
-    })
 }
 fn dispatch(
     store: &mut Store,
@@ -213,8 +145,16 @@ fn dispatch(
         Action::Reconcile { max_operations } => {
             json!({"recovered":store.reconcile(*max_operations)?})
         }
+        Action::OperationAllocate => {
+            let id = super::journal::allocate(store)?;
+            json!({"operation_id":id,"retention_window":super::journal::WINDOW})
+        }
         Action::Status => store.status()?,
-        Action::Doctor => store.doctor()?,
+        Action::Doctor => {
+            let mut facts = store.doctor()?;
+            facts["operation_journal"] = super::journal_recovery::audit(store, false)?;
+            facts
+        }
         Action::Capabilities => {
             json!({"version":VERSION,"fd_transport":"SCM_RIGHTS","credentials":"SO_PEERCRED","registry_credentials":"PRIVATE_FD","platforms":["linux/amd64","linux/arm64"],"registry":true,"production_qualified":false})
         }

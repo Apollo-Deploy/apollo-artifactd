@@ -73,6 +73,17 @@ pub fn send(socket: impl AsFd, bytes: &[u8], fd: Option<&OwnedFd>) -> std::io::R
 }
 
 pub fn wait(socket: impl AsFd, write: bool) -> std::io::Result<()> {
+    wait_for(socket, write, 30)
+}
+
+/// Bounded wait for an artifact operation response; packet delivery stays short.
+pub fn wait_for(socket: impl AsFd, write: bool, seconds: u32) -> std::io::Result<()> {
+    if !(1..=600).contains(&seconds) {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "invalid socket deadline",
+        ));
+    }
     let flags = if write {
         rustix::event::PollFlags::OUT
     } else {
@@ -80,7 +91,7 @@ pub fn wait(socket: impl AsFd, write: bool) -> std::io::Result<()> {
     };
     let mut fds = [rustix::event::PollFd::new(&socket, flags)];
     let timeout = rustix::event::Timespec {
-        tv_sec: 30,
+        tv_sec: seconds.into(),
         tv_nsec: 0,
     };
     let n = rustix::event::poll(&mut fds, Some(&timeout))?;

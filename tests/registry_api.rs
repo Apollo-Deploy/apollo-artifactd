@@ -5,7 +5,7 @@ mod daemon;
 
 use apollo_artifactd::state::{Operation, State};
 use artifactd_protocol::{
-    Action, ArtifactDigest, Platform, PreparedDigest, Request, VERSION, client::call,
+    Action, ArtifactDigest, Platform, PreparedDigest, Request, VERSION, client, client::call,
 };
 use daemon::Daemon;
 use sha2::{Digest, Sha256};
@@ -17,11 +17,19 @@ use std::{
 };
 
 fn request(id: &str, action: Action) -> Request {
+    request_id(id.to_owned().try_into().unwrap(), action)
+}
+
+fn request_id(operation_id: artifactd_protocol::OperationId, action: Action) -> Request {
     Request {
         version: VERSION,
-        operation_id: id.to_owned().try_into().unwrap(),
+        operation_id,
         action,
     }
+}
+
+fn mutation(socket: &std::path::Path, action: Action) -> Request {
+    request_id(client::allocate(socket).unwrap(), action)
 }
 
 fn digest(bytes: &[u8]) -> ArtifactDigest {
@@ -145,8 +153,8 @@ fn registry_api_fd_credentials_journal_and_prepared_facts() {
     let (archive, expected_root) = archive();
     let imported = call(
         &socket,
-        &request(
-            "archive-import",
+        &mutation(
+            &socket,
             Action::ImportOciArchive {
                 platform: Platform {
                     os: "linux".into(),
@@ -165,27 +173,25 @@ fn registry_api_fd_credentials_journal_and_prepared_facts() {
     assert_eq!(root, expected_root);
 
     let credentials = private_credentials(Path::new(&credential_path));
-    let pushed = call(
+    let push_request = mutation(
         &socket,
-        &request(
-            "registry-push",
-            Action::Push {
-                digest: root.clone(),
-                reference: reference.clone(),
-            },
-        ),
-        Some(&credentials),
-    )
-    .unwrap()
-    .0
-    .result
-    .unwrap();
+        Action::Push {
+            digest: root.clone(),
+            reference: reference.clone(),
+        },
+    );
+    let push_operation = push_request.operation_id.clone();
+    let pushed = call(&socket, &push_request, Some(&credentials))
+        .unwrap()
+        .0
+        .result
+        .unwrap();
     assert_eq!(pushed["artifact_digest"], serde_json::json!(root));
     drop(credentials);
     let state = stop_and_state(source.path(), daemon);
     assert!(
         state
-            .get::<Operation>("operations", "registry-push")
+            .get::<Operation>("operations", push_operation.as_str())
             .unwrap()
             .is_some()
     );
@@ -201,8 +207,8 @@ fn registry_api_fd_credentials_journal_and_prepared_facts() {
     let credentials = private_credentials(Path::new(&credential_path));
     let pulled = call(
         &target_socket,
-        &request(
-            "registry-pull",
+        &mutation(
+            &target_socket,
             Action::Pull {
                 reference: pinned,
                 platform: Platform {
@@ -242,8 +248,8 @@ fn registry_api_fd_credentials_journal_and_prepared_facts() {
         serde_json::from_value(resolved["manifest_digest"].clone()).unwrap();
     let prepared = call(
         &target_socket,
-        &request(
-            "prepare",
+        &mutation(
+            &target_socket,
             Action::Prepare {
                 digest: manifest,
                 platform: Platform {
@@ -271,55 +277,52 @@ fn registry_api_fd_credentials_journal_and_prepared_facts() {
     serde_json::to_writer(bad_file.as_file(), &bad_credentials).unwrap();
     bad_file.as_file_mut().seek(SeekFrom::Start(0)).unwrap();
     std::fs::set_permissions(bad_file.path(), std::fs::Permissions::from_mode(0o600)).unwrap();
-    let auth_failure = call(
+    let auth_request = mutation(
         &target_socket,
-        &request(
-            "auth-failure",
-            Action::Push {
-                digest: root.clone(),
-                reference: reference.clone(),
-            },
-        ),
-        Some(bad_file.as_file()),
-    )
-    .unwrap()
-    .0
-    .result
-    .unwrap_err();
+        Action::Push {
+            digest: root.clone(),
+            reference: reference.clone(),
+        },
+    );
+    let auth_operation = auth_request.operation_id.clone();
+    let auth_failure = call(&target_socket, &auth_request, Some(bad_file.as_file()))
+        .unwrap()
+        .0
+        .result
+        .unwrap_err();
     assert!(!auth_failure.contains(secret));
 
-    let invalid = call(
+    let invalid_request = mutation(
         &target_socket,
-        &request(
-            "invalid-reference",
-            Action::Pull {
-                reference: "https://user:secret@example.invalid/repo:tag".into(),
-                platform: Platform {
-                    os: "linux".into(),
-                    architecture: "amd64".into(),
-                    variant: None,
-                },
+        Action::Pull {
+            reference: "https://user:secret@example.invalid/repo:tag".into(),
+            platform: Platform {
+                os: "linux".into(),
+                architecture: "amd64".into(),
+                variant: None,
             },
-        ),
-        None,
-    )
-    .unwrap()
-    .0
-    .result
-    .unwrap_err();
+        },
+    );
+    let invalid_operation = invalid_request.operation_id.clone();
+    let invalid = call(&target_socket, &invalid_request, None)
+        .unwrap()
+        .0
+        .result
+        .unwrap_err();
     assert!(!invalid.contains("secret"));
     drop(target_daemon);
     let target_dir =
         cap_std::fs::Dir::open_ambient_dir(target.path(), cap_std::ambient_authority()).unwrap();
     let target_state = State::open(&target_dir).unwrap();
-    assert!(
-        target_state
-            .get::<Operation>("operations", "invalid-reference")
-            .unwrap()
-            .is_none()
-    );
+    let reservation = target_state
+        .get::<Operation>("operations", invalid_operation.as_str())
+        .unwrap()
+        .unwrap();
+    assert_eq!(reservation.phase, "allocated");
+    assert!(reservation.request.is_empty());
+    assert!(reservation.result.is_none());
     let failed = target_state
-        .get::<Operation>("operations", "auth-failure")
+        .get::<Operation>("operations", auth_operation.as_str())
         .unwrap()
         .unwrap();
     assert!(!serde_json::to_string(&failed).unwrap().contains(secret));

@@ -1,0 +1,39 @@
+Apollo Artifactd journal-capacity proof (pre-fix)
+================================================
+
+Date: 2026-10-04
+Host: apollo-node-01
+Architecture: aarch64
+Source: apollo-artifactd commit da3ffb4
+
+The old daemon was built from a private git archive of commit da3ffb4 on
+apollo-node-01.  The host toolchain reported rustc 1.99.0 (b940084d7
+2026-09-28) and cargo 1.99.0 (5f94df478 2026-08-27).  The isolated build
+completed successfully with:
+
+  CARGO_TARGET_DIR=/tmp/artifactd-preproof.artifactd-preproof.vEHYzO-target \
+    cargo build --locked --offline --bin apollo-artifactd
+
+The daemon was run as one private process with a fresh private store and
+runtime directory under /tmp, and no existing Apollo service was used.  The
+probe used only Python's standard library and a Unix SOCK_SEQPACKET socket.
+It sent version-1 JSON requests with unique operation IDs op-0001 through
+op-4097.  Each request used a new client connection because this daemon
+closes the accepted connection after handling one request.  Every request
+used the harmless GC action with max_entries=1.
+
+Probe command:
+
+  /usr/bin/time -f 'elapsed_seconds=%e' \
+    python3 /tmp/journal_probe.py <private-runtime>/artifactd.sock
+
+Observed output (9.53 seconds):
+
+  {"n":1,"response":{"version":1,"operation_id":"op-0001","result":{"Ok":{"collected":0}}}}
+  {"n":4096,"response":{"version":1,"operation_id":"op-4096","result":{"Ok":{"collected":0}}}}
+  {"n":4097,"response":{"version":1,"operation_id":"op-4097","result":{"Err":"operation journal capacity exhausted"}}}
+
+Thus the 4,097th distinct operation is rejected with the exact permanent
+journal-capacity error after 4,096 successful journal entries.  The daemon,
+store, runtime, socket, and log were terminated or removed by the probe
+cleanup trap after the run.  No credentials were supplied or recorded.

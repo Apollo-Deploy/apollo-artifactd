@@ -25,7 +25,6 @@ target/release/apollo-artifactctl \
   --action '{"operation":"CAPABILITIES"}'
 target/release/apollo-artifactctl \
   --socket /absolute/private/artifact-runtime/artifactd.sock \
-  --operation-id import-example \
   --input /absolute/path/to/blob \
   --action '{"operation":"IMPORT_BLOB","digest":"sha256:<64 lowercase hex>","size":123}'
 ```
@@ -42,7 +41,13 @@ PUSH/PULL accept an optional protected credential-provider FD. The CLI opens it 
 
 ## Protocol and ownership
 
-One version-1 JSON packet per Unix SOCK_SEQPACKET connection, at most 64 KiB and one SCM_RIGHTS FD. Digests are canonical lowercase `sha256:` identities. Import descriptors must be bounded regular files. OPEN requires a live lease. Replayed reads recheck current integrity and liveness. Mutations persist intent and completion. The journal retains at most 4096 records and rejects new operation IDs when full; existing IDs remain replayable. This permanent exhaustion does not meet the daemon churn release gate.
+One version-2 JSON packet per Unix SOCK_SEQPACKET connection, at most 64 KiB and one SCM_RIGHTS FD. Digests are canonical lowercase `sha256:` identities. Import descriptors must be bounded regular files. OPEN requires a live lease. Replayed reads recheck current integrity and liveness.
+
+Packet delivery waits are bounded to 30 seconds. The client allows up to 600 seconds for an operation response, so verified streaming transfers can complete. A response timeout leaves the operation outcome unknown; retry the same allocated token rather than automatically creating a new mutation.
+
+Mutations use daemon-issued `OperationId` tokens from `OPERATION_ALLOCATE`; the CLI allocates automatically unless `--operation-id` supplies a token for a retry. The durable journal retains up to 4096 reservations/results. Under allocation pressure, it retires the oldest terminal results and unused reservations in batches, advancing a durable retirement floor. A retired token returns `operation expired` and never repeats an effect. Within the retained window, both success and failure replay their original result; a different request with the same token is rejected.
+
+Startup audits the bounded journal before accepting clients. Interrupted intents become terminal failures reporting an uncertain outcome: inspect the artifact/reference or remote registry before attempting a new operation. The daemon does not repeat unknown effects after restart. `DOCTOR` reports journal semantic verification separately from database structural integrity. Existing nonempty version-1 journals are preserved and rejected pending a qualified migration; no protocol fallback exists. See [operation journal qualification](docs/OPERATION_JOURNAL.md) for native daemon churn and crash evidence and remaining release gates.
 
 Both peers authenticate SO_PEERCRED against the current effective UID. This implementation assumes cooperating processes under the dedicated service UID. A read-only FD and filesystem mode do not prevent that UID from changing inode permissions. Hostile same-UID isolation and cross-UID consumers are not qualified. redb uses the capability-opened private FD directly. Legacy state.sqlite stores are rejected without modification; state migration and corruption qualification remain open.
 
