@@ -1,0 +1,15 @@
+/target/
+/fuzz/target/
+/fuzz/artifacts/
+/fuzz/coverage/
+/fuzz/corpus/protocol_oci/*
+!/fuzz/corpus/protocol_oci/seed-*
+/fuzz/corpus/archive/*
+!/fuzz/corpus/archive/valid-layer.tar
+/fuzz/corpus/recovery/
+/fuzz/corpus/registry_responses/*
+!/fuzz/corpus/registry_responses/manifest
+!/fuzz/corpus/registry_responses/index
+!/fuzz/corpus/registry_responses/auth-error
+!/fuzz/corpus/registry_responses/unknown-error
+!/fuzz/corpus/registry_responses/nested-error

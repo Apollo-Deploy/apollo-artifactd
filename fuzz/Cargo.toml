@@ -1,0 +1,48 @@
+[package]
+name = "artifactd-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[workspace]
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+apollo-artifactd = { path = ".." }
+artifactd-protocol = { path = "../crates/artifactd-protocol" }
+serde_json = "1"
+oci-spec = "0.9"
+tempfile = "3"
+cap-std = "4"
+oci-client = { path = "../vendor/oci-client", version = "0.18.0", default-features = false, features = ["rustls-tls"] }
+
+[[bin]]
+name = "protocol_oci"
+path = "fuzz_targets/protocol_oci.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "archive"
+path = "fuzz_targets/archive.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "recovery"
+path = "fuzz_targets/recovery.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "registry_responses"
+path = "fuzz_targets/registry_responses.rs"
+test = false
+doc = false
+bench = false

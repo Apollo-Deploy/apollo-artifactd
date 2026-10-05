@@ -1,0 +1,55 @@
+[workspace]
+members = ["crates/artifactd-protocol", "crates/artifactd-client-ffi"]
+exclude = ["vendor/oci-client", "vendor/tar", "vendor/redb"]
+resolver = "3"
+
+[package]
+name = "apollo-artifactd"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.93"
+license = "MIT"
+description = "Standalone content-addressed OCI artifact service"
+
+[dependencies]
+artifactd-protocol = { path = "crates/artifactd-protocol", version = "0.1.0" }
+anyhow = "1"
+sha2 = "0.10"
+hex = "0.4"
+redb = { path = "vendor/redb", version = "=4.3.0" }
+oci-client = { path = "vendor/oci-client", version = "0.18.0", default-features = false, features = ["rustls-tls"] }
+tokio = { version = "1", features = ["rt-multi-thread", "fs", "time", "net"] }
+tokio-util = { version = "0.7", features = ["io", "io-util"] }
+futures-util = "0.3"
+bytes = "1"
+http = "1"
+zeroize = "1"
+rustix = { version = "1.1", features = ["fs", "net", "process", "event"] }
+cap-std = "4"
+oci-spec = "0.9"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tar = { path = "vendor/tar", version = "0.4.46" }
+flate2 = "1"
+zstd = "0.13"
+uuid = { version = "1", features = ["v4"] }
+clap = { version = "4", features = ["derive"] }
+
+[dev-dependencies]
+rustix = { version = "1.1", features = ["thread"] }
+tempfile = "3"
+proptest = "1"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+overflow-checks = true
+
+[[bin]]
+name = "apollo-artifactd"
+path = "src/main.rs"
+
+[[bin]]
+name = "apollo-artifactctl"
+path = "src/cli.rs"
