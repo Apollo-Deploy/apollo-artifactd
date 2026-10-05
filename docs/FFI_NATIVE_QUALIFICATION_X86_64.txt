@@ -1,0 +1,31 @@
+Rust artifactd-client-ffi native daemon qualification (tihan-apollo, x86_64)
+Date: 2026-10-05
+Checkout: /home/tihan/artifactd-ffi-qual/apollo-artifactd
+Target: /home/tihan/artifactd-ffi-target (isolated; no shared churn target)
+
+Build:
+  CARGO_TARGET_DIR=/home/tihan/artifactd-ffi-target cargo build --release -p apollo-artifactd -p artifactd-client-ffi
+
+Fixture and protocol path:
+  generated OCI layout archive; imported through apollo-artifactctl IMPORT_OCI_ARCHIVE
+  C harness linked against libartifactd_client_ffi.so
+  daemon SO_PEERCRED accepted same service UID
+
+Observed harness output:
+  Resolve returned verified=true, manifest/config/layer descriptors and platform linux/amd64
+  Pin succeeded with generic ffi-pin
+  LeaseCreate returned lease_b901a4056a7d47989850834c97d71dc2_00000000000000000004
+  OpenBlob returned an FD; read 16 bytes
+  LeaseRelease and Unpin succeeded
+  FFI_HARNESS_OK
+
+Credential pull: no authenticated registry fixture was available in this isolated run; no credentials were placed in argv, logs, or artifact state.
+
+Remote binary hashes:
+4335e5a6aabf4b65e57b1e3b1cc05c8d97e3b270a948afb41ef1afdb0086806d  /home/tihan/artifactd-ffi-target/release/libartifactd_client_ffi.so
+10841abefe18f2304b030efadee3f601b024cfb4e523e0d2191dfab94e4a6b71  /home/tihan/artifactd-ffi-target/release/apollo-artifactd
+c3bddf0e9665ca37092a68e8133649a52cfaed267ba0001a80a0c66ad3b612b5  /home/tihan/artifactd-ffi-target/release/apollo-artifactctl
+Local source qualification hashes:
+  artifactd-client-ffi/src/lib.rs lines are split into lib/actions/facts modules; cargo fmt/check passed.
+  apollo-node/src/workload/artifactd_client.zig is a generic opaque C ABI adapter; zig test src/workload/artifactd_client.zig -fno-emit-bin passed.
+  Full apollo-node native build was not claimed: macOS host cannot compile existing remote.zig memfd_create() path; production Linux build requires --artifactd-client-lib=<Rust static library>.

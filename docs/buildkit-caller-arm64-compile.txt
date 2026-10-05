@@ -1,0 +1,3 @@
+    Checking apollo-postgres v0.1.0 (/home/apollo-admin/artifactd-legacy-integration-20261005/APIs/apollo-deployment-api/crates/apollo-postgres)
+    Checking apollo-control-plane v0.1.0 (/home/apollo-admin/artifactd-legacy-integration-20261005/APIs/apollo-deployment-api/crates/apollo-control-plane)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.66s

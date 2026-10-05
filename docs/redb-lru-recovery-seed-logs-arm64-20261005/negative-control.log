@@ -1,0 +1,52 @@
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2564970356
+INFO: Loaded 1 modules   (694796 inline 8-bit counters): 694796 [0xc78d35628b20, 0xc78d356d252c), 
+INFO: Loaded 1 PC tables (694796 PCs): 694796 [0xc78d356d2530,0xc78d3616c5f0), 
+/home/apollo-admin/artifactd-native-fuzz-20261005-hxzd8un9/focused-recovery-20261005/negative-target/aarch64-unknown-linux-gnu/release/recovery: Running 1 inputs 1 time(s) each.
+Running: /tmp/apollo-artifactd-redb-lru-20261005.a3iVB3/fuzz/corpus/recovery/seed-foreign-temp
+
+thread '<unnamed>' (520223) panicked at fuzz_targets/recovery.rs:88:45:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+==520223== ERROR: libFuzzer: deadly signal
+/usr/bin/llvm-symbolizer: error: 'linux-vdso.so.1': No such file or directory
+    #0 0xc78d320d4104 in __sanitizer_print_stack_trace (/home/apollo-admin/artifactd-native-fuzz-20261005-hxzd8un9/focused-recovery-20261005/negative-target/aarch64-unknown-linux-gnu/release/recovery+0x1564104) (BuildId: cfbbc33084a133cacbe165a96cb1b33f6b82e08b)
+    #1 0xc78d32209ce4 in fuzzer::PrintStackTrace() /home/apollo-admin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libfuzzer-sys-0.4.13/libfuzzer/FuzzerUtil.cpp:210:5
+    #2 0xc78d321da8e0 in fuzzer::Fuzzer::CrashCallback() /home/apollo-admin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libfuzzer-sys-0.4.13/libfuzzer/FuzzerLoop.cpp:231:3
+    #3 0xee55f52d38f4  (linux-vdso.so.1+0x8f4) (BuildId: 042ef62b4b451eb0edb20abab20c48690add3a53)
+    #4 0xee55f4dd74d4  (/lib/aarch64-linux-gnu/libc.so.6+0x874d4) (BuildId: 27027b96e5b8c475fc327aa445bea1c71d37b4e2)
+    #5 0xee55f4d8cb38 in raise (/lib/aarch64-linux-gnu/libc.so.6+0x3cb38) (BuildId: 27027b96e5b8c475fc327aa445bea1c71d37b4e2)
+    #6 0xee55f4d77dfc in abort (/lib/aarch64-linux-gnu/libc.so.6+0x27dfc) (BuildId: 27027b96e5b8c475fc327aa445bea1c71d37b4e2)
+    #7 0xc78d3203a4c8 in std::sys::pal::unix::abort_internal /rustc/28221559263a3976766cf305940e80e30cf9ba8a/library/std/src/sys/pal/unix/mod.rs:300:14
+    #8 0xc78d3203a2c8 in std::process::abort /rustc/28221559263a3976766cf305940e80e30cf9ba8a/library/std/src/process.rs:2639:5
+    #9 0xc78d31f2151c in libfuzzer_sys::initialize::{closure#0} /home/apollo-admin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libfuzzer-sys-0.4.13/src/lib.rs:94:9
+    #10 0xc78d34966fbc in <alloc::boxed::Box<dyn for<'a, 'b> core::ops::function::Fn<(&'a std::panic::PanicHookInfo<'b>,), Output = ()> + core::marker::Sync + core::marker::Send> as core::ops::function::Fn<(&std::panic::PanicHookInfo,)>>::call /rustc/28221559263a3976766cf305940e80e30cf9ba8a/library/alloc/src/boxed.rs:2328:9
+    #11 0xc78d34966fbc in std::panicking::panic_with_hook /rustc/28221559263a3976766cf305940e80e30cf9ba8a/library/std/src/panicking.rs:819:13
+    #12 0xc78d349529ac in std::panicking::panic_handler::{closure#0} /rustc/28221559263a3976766cf305940e80e30cf9ba8a/library/std/src/panicking.rs:685:13
+    #13 0xc78d3494bc00 in std::sys::backtrace::__rust_end_short_backtrace::<std::panicking::panic_handler::{closure#0}, !> /rustc/28221559263a3976766cf305940e80e30cf9ba8a/library/std/src/sys/backtrace.rs:182:18
+    #14 0xc78d34953a8c in __rustc::rust_begin_unwind /rustc/28221559263a3976766cf305940e80e30cf9ba8a/library/std/src/panicking.rs:676:5
+    #15 0xc78d3203b794 in core::panicking::panic_fmt /rustc/28221559263a3976766cf305940e80e30cf9ba8a/library/core/src/panicking.rs:80:14
+    #16 0xc78d3203b508 in core::result::unwrap_failed /rustc/28221559263a3976766cf305940e80e30cf9ba8a/library/core/src/result.rs:1866:5
+    #17 0xc78d3216dd00 in unwrap<alloc::vec::Vec<u8, alloc::alloc::Global>, core::io::error::Error> /home/apollo-admin/.rustup/toolchains/nightly-aarch64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/result.rs:1232:23
+    #18 0xc78d3216dd00 in recovery::_::__libfuzzer_sys_run /home/apollo-admin/artifactd-native-fuzz-20261005-hxzd8un9/focused-recovery-20261005/negative-source/fuzz/fuzz_targets/recovery.rs:88:45
+    #19 0xc78d3217037c in rust_fuzzer_test_input /home/apollo-admin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libfuzzer-sys-0.4.13/src/lib.rs:276:60
+    #20 0xc78d321d6b98 in {closure#0} /home/apollo-admin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libfuzzer-sys-0.4.13/src/lib.rs:62:9
+    #21 0xc78d321d6b98 in std::panicking::catch_unwind::do_call::<libfuzzer_sys::test_input_wrap::{closure#0}, i32> /home/apollo-admin/.rustup/toolchains/nightly-aarch64-unknown-linux-gnu/lib/rustlib/src/rust/library/std/src/panicking.rs:573:43
+    #22 0xc78d321d7448 in __rust_try libfuzzer_sys.64f736da648d3b68-cgu.0
+    #23 0xc78d321d6494 in catch_unwind<i32, libfuzzer_sys::test_input_wrap::{closure_env#0}> /home/apollo-admin/.rustup/toolchains/nightly-aarch64-unknown-linux-gnu/lib/rustlib/src/rust/library/std/src/panicking.rs:541:19
+    #24 0xc78d321d6494 in catch_unwind<libfuzzer_sys::test_input_wrap::{closure_env#0}, i32> /home/apollo-admin/.rustup/toolchains/nightly-aarch64-unknown-linux-gnu/lib/rustlib/src/rust/library/std/src/panic.rs:359:14
+    #25 0xc78d321d6494 in LLVMFuzzerTestOneInput /home/apollo-admin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libfuzzer-sys-0.4.13/src/lib.rs:60:22
+    #26 0xc78d321dc380 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /home/apollo-admin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libfuzzer-sys-0.4.13/libfuzzer/FuzzerLoop.cpp:619:13
+    #27 0xc78d321e5b9c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /home/apollo-admin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libfuzzer-sys-0.4.13/libfuzzer/FuzzerDriver.cpp:335:6
+    #28 0xc78d321ebb2c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /home/apollo-admin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libfuzzer-sys-0.4.13/libfuzzer/FuzzerDriver.cpp:871:9
+    #29 0xc78d321d9110 in main /home/apollo-admin/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libfuzzer-sys-0.4.13/libfuzzer/FuzzerMain.cpp:20:10
+    #30 0xee55f4d784c0  (/lib/aarch64-linux-gnu/libc.so.6+0x284c0) (BuildId: 27027b96e5b8c475fc327aa445bea1c71d37b4e2)
+    #31 0xee55f4d78594 in __libc_start_main (/lib/aarch64-linux-gnu/libc.so.6+0x28594) (BuildId: 27027b96e5b8c475fc327aa445bea1c71d37b4e2)
+    #32 0xc78d3203bb2c in _start (/home/apollo-admin/artifactd-native-fuzz-20261005-hxzd8un9/focused-recovery-20261005/negative-target/aarch64-unknown-linux-gnu/release/recovery+0x14cbb2c) (BuildId: cfbbc33084a133cacbe165a96cb1b33f6b82e08b)
+
+NOTE: libFuzzer has rudimentary signal handlers.
+      Combine libFuzzer with AddressSanitizer or similar for better crash reports.
+SUMMARY: libFuzzer: deadly signal
+MS: 0 ; base unit: 0000000000000000000000000000000000000000
+0x7b,0x22,0x72,0x65,0x63,0x6f,0x72,0x64,0x22,0x3a,0x7b,0x22,0x74,0x65,0x6d,0x70,0x22,0x3a,0x22,0x66,0x6f,0x72,0x65,0x69,0x67,0x6e,0x22,0x2c,0x22,0x64,0x69,0x67,0x65,0x73,0x74,0x22,0x3a,0x6e,0x75,0x6c,0x6c,0x2c,0x22,0x73,0x69,0x7a,0x65,0x22,0x3a,0x30,0x7d,0x7d,0xa,
+{\"record\":{\"temp\":\"foreign\",\"digest\":null,\"size\":0}}\012

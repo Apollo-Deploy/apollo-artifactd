@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/apollo-admin/artifactd-config-negative-20261005-207ezcqz/smoke.py", line 114, in <module>
+    assert action({"operation": "STATUS"})["blobs"] == 0, "durable caller cleanup must release retention"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: durable caller cleanup must release retention

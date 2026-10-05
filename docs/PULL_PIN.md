@@ -7,6 +7,15 @@ committed before success; `pin_id` is returned. Omitting the pin preserves an
 unprotected cache import. Pin conflict, identity, capacity and epoch checks
 remain owned by the shared admission transaction.
 
+When a credential FD is supplied, its declared registry authority is checked
+before either the network or cache path. A cache hit still uses the verified
+local graph without contacting the registry; it is not a fresh remote
+authorization check. This validation does not clone secret strings into an
+unused authentication object on the cache path. The focused cache-authority
+regression passes on macOS,
+x86_64 Linux, and ARM64 Linux at the later 2026-10-05 source revision. Its temporary
+negative control returned the cached graph with mismatched credentials.
+
 The existing authenticated registry daemon test is the primary transport owner.
 It pushes a layered image to an isolated HTTPS registry, pulls it through a
 protected credential FD with a pin, runs GC before preparation, restarts and

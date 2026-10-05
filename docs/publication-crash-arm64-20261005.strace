@@ -1,0 +1,2 @@
+linkat(6, "00a331d8-2561-4c1c-9b6e-3867f800b9fb.part", 5, "7466896d8c733d61ff82701419e8820b5eddc4e2cc3dcd07e8092fb6f61925fc", 0) = 0 (DELAYED)
++++ killed by SIGKILL +++

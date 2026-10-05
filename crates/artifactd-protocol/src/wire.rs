@@ -10,6 +10,7 @@ use rustix::{
 use std::{
     io::{IoSlice, IoSliceMut},
     mem::MaybeUninit,
+    time::{Duration, Instant},
 };
 
 pub fn receive(socket: impl AsFd) -> std::io::Result<(Vec<u8>, Option<OwnedFd>)> {
@@ -84,19 +85,58 @@ pub fn wait_for(socket: impl AsFd, write: bool, seconds: u32) -> std::io::Result
             "invalid socket deadline",
         ));
     }
+    wait_for_control(socket, write, seconds, || Ok(()))
+}
+
+/// Polls in one-second bounded intervals, allowing callers to cancel or enforce
+/// an external deadline without blocking until the full operation timeout.
+pub fn wait_for_control<F>(
+    socket: impl AsFd,
+    write: bool,
+    seconds: u32,
+    mut control: F,
+) -> std::io::Result<()>
+where
+    F: FnMut() -> std::io::Result<()>,
+{
+    if !(1..=600).contains(&seconds) {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "invalid socket deadline",
+        ));
+    }
     let flags = if write {
         rustix::event::PollFlags::OUT
     } else {
         rustix::event::PollFlags::IN
     };
     let mut fds = [rustix::event::PollFd::new(&socket, flags)];
-    let timeout = rustix::event::Timespec {
-        tv_sec: seconds.into(),
-        tv_nsec: 0,
-    };
-    let n = rustix::event::poll(&mut fds, Some(&timeout))?;
-    if n != 1 || !fds[0].revents().contains(flags) {
-        return Err(std::io::Error::other("socket timeout or hangup"));
+    let deadline = Instant::now() + Duration::from_secs(seconds.into());
+    let terminal = rustix::event::PollFlags::ERR
+        | rustix::event::PollFlags::HUP
+        | rustix::event::PollFlags::NVAL;
+    loop {
+        control()?;
+        let remaining = deadline.saturating_duration_since(Instant::now());
+        if remaining.is_zero() {
+            break;
+        }
+        let timeout = rustix::event::Timespec {
+            tv_sec: remaining.as_secs().min(1).try_into().unwrap_or(1),
+            tv_nsec: if remaining.as_secs() == 0 {
+                remaining.subsec_nanos().into()
+            } else {
+                0
+            },
+        };
+        let n = rustix::event::poll(&mut fds, Some(&timeout))?;
+        let revents = fds[0].revents();
+        if n == 1 && revents.contains(flags) {
+            return Ok(());
+        }
+        if revents.intersects(terminal) {
+            return Err(std::io::Error::other("socket hangup or poll error"));
+        }
     }
-    Ok(())
+    Err(std::io::Error::other("socket timeout or hangup"))
 }

@@ -18,7 +18,7 @@
     "properties": [
       {
         "name": "artifactd:cargo-lock-sha256",
-        "value": "14f140414a34fb6b204cd0a2db3c23f1da567787a8d85923f59b3473544644a0"
+        "value": "c06bbc3bfc2be2ce121d3bf0940903432c5ade61b44b40337c7a3a5179740f9b"
       },
       {
         "name": "artifactd:scope",
@@ -27,6 +27,18 @@
     ]
   },
   "components": [
+    {
+      "type": "library",
+      "bom-ref": "local#artifactd-client-ffi@0.1.0",
+      "name": "artifactd-client-ffi",
+      "version": "0.1.0",
+      "purl": "pkg:cargo/artifactd-client-ffi@0.1.0",
+      "licenses": [
+        {
+          "expression": "Apache-2.0"
+        }
+      ]
+    },
     {
       "type": "library",
       "bom-ref": "local#artifactd-protocol@0.1.0",
@@ -54,6 +66,24 @@
         {
           "name": "artifactd:vendored-fork",
           "value": "vendor/oci-client/ARTIFACTD_PATCH.md"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "local#redb@4.3.0",
+      "name": "redb",
+      "version": "4.3.0",
+      "purl": "pkg:cargo/redb@4.3.0",
+      "licenses": [
+        {
+          "expression": "MIT OR Apache-2.0"
+        }
+      ],
+      "properties": [
+        {
+          "name": "artifactd:vendored-fork",
+          "value": "vendor/redb/ARTIFACTD_PATCH.md"
         }
       ]
     },
@@ -1901,18 +1931,6 @@
     },
     {
       "type": "library",
-      "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#redb@4.3.0",
-      "name": "redb",
-      "version": "4.3.0",
-      "purl": "pkg:cargo/redb@4.3.0",
-      "licenses": [
-        {
-          "expression": "MIT OR Apache-2.0"
-        }
-      ]
-    },
-    {
-      "type": "library",
       "bom-ref": "registry+https://github.com/rust-lang/crates.io-index#regex-automata@0.4.18",
       "name": "regex-automata",
       "version": "0.4.18",
@@ -3562,6 +3580,7 @@
       "dependsOn": [
         "local#artifactd-protocol@0.1.0",
         "local#oci-client@0.18.0",
+        "local#redb@4.3.0",
         "local#tar@0.4.46",
         "registry+https://github.com/rust-lang/crates.io-index#anyhow@1.0.104",
         "registry+https://github.com/rust-lang/crates.io-index#bytes@1.12.1",
@@ -3573,7 +3592,6 @@
         "registry+https://github.com/rust-lang/crates.io-index#http@1.5.0",
         "registry+https://github.com/rust-lang/crates.io-index#oci-spec@0.9.0",
         "registry+https://github.com/rust-lang/crates.io-index#proptest@1.11.0",
-        "registry+https://github.com/rust-lang/crates.io-index#redb@4.3.0",
         "registry+https://github.com/rust-lang/crates.io-index#rustix@1.1.5",
         "registry+https://github.com/rust-lang/crates.io-index#serde@1.0.229",
         "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151",
@@ -3584,6 +3602,15 @@
         "registry+https://github.com/rust-lang/crates.io-index#uuid@1.27.0",
         "registry+https://github.com/rust-lang/crates.io-index#zeroize@1.9.0",
         "registry+https://github.com/rust-lang/crates.io-index#zstd@0.13.3"
+      ]
+    },
+    {
+      "ref": "local#artifactd-client-ffi@0.1.0",
+      "dependsOn": [
+        "local#artifactd-protocol@0.1.0",
+        "registry+https://github.com/rust-lang/crates.io-index#oci-spec@0.9.0",
+        "registry+https://github.com/rust-lang/crates.io-index#serde_json@1.0.151",
+        "registry+https://github.com/rust-lang/crates.io-index#thiserror@2.0.21"
       ]
     },
     {
@@ -3616,6 +3643,12 @@
         "registry+https://github.com/rust-lang/crates.io-index#tokio@1.53.2",
         "registry+https://github.com/rust-lang/crates.io-index#tracing@0.1.44",
         "registry+https://github.com/rust-lang/crates.io-index#unicase@2.9.0"
+      ]
+    },
+    {
+      "ref": "local#redb@4.3.0",
+      "dependsOn": [
+        "registry+https://github.com/rust-lang/crates.io-index#libc@0.2.190"
       ]
     },
     {
@@ -4674,12 +4707,6 @@
       "ref": "registry+https://github.com/rust-lang/crates.io-index#rand_xorshift@0.4.0",
       "dependsOn": [
         "registry+https://github.com/rust-lang/crates.io-index#rand_core@0.9.5"
-      ]
-    },
-    {
-      "ref": "registry+https://github.com/rust-lang/crates.io-index#redb@4.3.0",
-      "dependsOn": [
-        "registry+https://github.com/rust-lang/crates.io-index#libc@0.2.190"
       ]
     },
     {

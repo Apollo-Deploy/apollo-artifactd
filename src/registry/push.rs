@@ -25,6 +25,16 @@ impl Registry {
             destination.digest().is_none_or(|v| v == digest.as_str()),
             "push destination digest mismatch"
         );
+        // A raw CAS blob is never an OCI publication source. Admission records
+        // the verified graph and its descriptor relationships before any
+        // registry authentication or transfer can have an external effect.
+        ensure!(
+            store
+                .db
+                .get::<crate::state::Root>("roots", digest.as_str())?
+                .is_some(),
+            "push requires admitted OCI root"
+        );
         store.verify_graph_if_known(digest)?;
         let client = self.client(&credentials, store.limits.max_metadata)?;
         let auth = credentials.auth(&destination)?;
@@ -42,7 +52,7 @@ impl Registry {
         }
         for manifest in &manifests {
             let pinned = destination.clone_with_digest(manifest.digest.as_str().to_owned());
-            self.push_manifest(&client, &pinned, manifest, store)?;
+            self.push_manifest(&client, &pinned, manifest, store, &auth)?;
         }
         if destination.tag().is_some() {
             self.push_manifest(
@@ -50,6 +60,7 @@ impl Registry {
                 &destination,
                 manifests.last().expect("root manifest"),
                 store,
+                &auth,
             )?;
             let root = manifests.last().expect("root manifest");
             let (observed, _) = remote(self.runtime.block_on(client.pull_manifest_raw(
@@ -125,6 +136,7 @@ impl Registry {
         image: &Reference,
         manifest: &Manifest,
         store: &Store,
+        auth: &oci_client::secrets::RegistryAuth,
     ) -> Result<()> {
         let content_type = http::HeaderValue::from_str(&manifest.media_type)?;
         let expected = bytes::Bytes::from(store.metadata(&manifest.digest)?);
@@ -140,7 +152,7 @@ impl Registry {
                 let pinned = image.clone_with_digest(manifest.digest.as_str().to_owned());
                 let (bytes, _) = remote(self.runtime.block_on(client.pull_manifest_raw(
                     &pinned,
-                    &oci_client::secrets::RegistryAuth::Anonymous,
+                    auth,
                     &[&manifest.media_type],
                 )))?;
                 ensure!(

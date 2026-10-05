@@ -1,0 +1,38 @@
+Apollo Artifactd persistent fixture qualification — x86_64
+
+Host: tihan-apollo
+Architecture: x86_64
+Artifactd source checkout: 2fa93104d3a6b688a41140a9440581a5c5cb602b
+Qualification binaries:
+  apollo-artifactd  sha256:6ad9705431e8935d8642327e8bdc4f65912eb4fba601d4f5e66c72bc99bf3ab6
+  apollo-artifactctl sha256:65484cee6ceaa5aabf8fe77935cbc7bbc2b76d3434bf68f5ceae2c0587180f22
+Fixture source:
+  persistent_artifactd_fixture.py sha256:05a418732a99bff6ef9f455e6144a4668f398c683fc7dc26506873bfee05ad87
+
+Command:
+  sudo -n python3 /tmp/run-artifactd-qual.py tihan-apollo /var/lib/apollo-verification/authority-workers-artifactd-qual-tihan-apollo
+
+Observed output:
+  STATUS_START=ok
+  IMPORT_FIRST={"version":3,"operation_id":"9b4b1bf9fa854a9d9c960c457decc144_00000000000000000002","result":{"Ok":{"artifact_digest":"sha256:5d98408f41ecfaf2b5e81b7e5493652235b02a4779c5a816dc86aa3660b447bb","size":41}}}
+  STATUS_RESTART=ok
+  INSPECT_RESTART={"version":3,"operation_id":"0ded778d-20d9-4113-8bd4-08247f301ce2","result":{"Ok":{"artifact_digest":"sha256:5d98408f41ecfaf2b5e81b7e5493652235b02a4779c5a816dc86aa3660b447bb","size":41,"verified":true}}}
+  STOP=ok
+
+Negative control: one byte in the staged daemon was changed. Restart was rejected with
+`RuntimeError: Artifactd campaign identity changed` before systemd launch.
+The transient qualification unit was inactive after the run.
+
+Additional bounded controls on the same isolated campaign:
+  MISSING_STORE_REJECTED=established Artifactd state is missing or foreign
+  FOREIGN_UNIT_REJECTED=existing Artifactd unit is not owned by this campaign
+  FOREIGN_UNIT_STILL_ACTIVE=pid:<dummy transient PID>
+The foreign same-name transient `/bin/sleep` unit remained active with the same PID
+until the control stopped it; no foreign unit was stopped by the fixture.
+
+Stale foreign socket retry control (same helper object, isolated root):
+  STALE_FOREIGN_REJECTED=foreign Artifactd socket
+  STALE_FOREIGN_REMOVED=owned-test-socket
+  STALE_RETRY_STATUS=ok
+  FD_COUNTS=baseline:4,after_reject:4,after_start:7,after_close:4
+  CLEANUP=campaign-and-derived-state-removed

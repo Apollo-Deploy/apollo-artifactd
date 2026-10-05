@@ -1,0 +1,29 @@
+{
+  "host": "tihan-apollo",
+  "qualification_workspace": "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi",
+  "files": {
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/crates/apollo-buildkit-publisher/src/lib.rs": "f63ad7088057c9ec9212e1c94ea3371116e2c681f780a34b3586c953b98e2ec5",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/crates/apollo-buildkit-publisher/src/archive.rs": "1232a0b978f11d995f336f52dac8f7014f9e5f27b7cf7caea73ad03b3cadbd50",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/crates/apollo-buildkit-publisher/src/publication.rs": "edd1eb9db7767b8e830bb12ab9d7f4db931dea24233c28815f820ab716e1053d",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/crates/apollo-buildkit-publisher/src/config_lease.rs": "9217e65379596b3299308e4b07ed68768149bfc4fb73bfc990496e66db59bc0c",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/crates/apollo-buildkit-publisher/src/intent_files.rs": "aa97c7a9ba2e3c6cfe7ab7f4d55f369bdbe6c9fbb218c8360273b61d8fb4cd55",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/crates/apollo-buildkit-publisher/src/tests.rs": "f32f42e8624516eeb4785fe47c4648943f432f9f22df42b5f29bfe0c2046f172",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/crates/apollo-buildkit-publisher/src/verification.rs": "895c5be7f5b0e88ec1739f00f3992bc3a21d4eae86a0861f08284fe5dbf21894",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/crates/apollo-buildkit-publisher/src/config_blob.rs": "1e8d0c40b43270f640f4cfc2fe795dce77b7acadaac140c2dd9c6708cdedfa65",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/crates/apollo-buildkit-publisher/src/receipt_facts.rs": "742701b9732ef95d8785f63993a3c79c5cdec2df7725d9d2370b59cb167ff874",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/crates/apollo-buildkit-publisher/src/receipt.rs": "4725dc3b21f3530de83630dafa9d90e492b52983187df420ab55d4c5041270af",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/crates/apollo-buildkit-publisher/src/error.rs": "48bb93868bfe1b77a761d1135fdc96f5e1763e1de54f86be66c47ca82eed705a",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/crates/apollo-buildkit-publisher/src/configuration.rs": "2418f52f18479ddce33320a59e2b0e3c4a6f0e02d933a0d4972b937d3a598559",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/Cargo.lock": "5fec508a9fd01f5c7c279a78ce414d16ce9de5e89b1123d9aa1e09c7a63632ac",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/qualification/src/main.rs": "ecf34372198e664057c54f7b5eeb7a8a210e7dc9b487fbf2af8a417acf9b5602",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/smoke.py": "8ce74cc676409726edd7fc56106d1d1fd22fc6977c68d4a7ec6eaad30baf366d",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/APIs/apollo-deployment-api/target/debug/artifactd-publisher-qualification": "06edc71a250343da23ca49e54c420d4503c49d1628f738dccef9c8c76e4fc06e",
+    "/home/tihan/artifactd-qualification-20261004/target/release/apollo-artifactd": "f90c45c6af42df402749b883526f9f557236cd763815b5ea025255dbc2c1eff5",
+    "/home/tihan/artifactd-qualification-20261004/target/release/apollo-artifactctl": "807820c042951e3d517f725095707d0c095ef9f3ce6920d851f222f24a7a465a",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/Open-Source/apollo-artifactd/crates/artifactd-protocol/Cargo.toml": "7e65454d6454d330e12e1319e06c231c3d539ef8d3d389e0c6cbe10e8b38c127",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/Open-Source/apollo-artifactd/crates/artifactd-protocol/src/lib.rs": "c74c3a32ec9567e62ae69dd143b6f4300890dbc54d4d06692c86aa1583bfee38",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/Open-Source/apollo-artifactd/crates/artifactd-protocol/src/client.rs": "287b69dfaa090ff3a159db01e336e0e9f9333a47aa716d32304d04e54d309725",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/Open-Source/apollo-artifactd/crates/artifactd-protocol/src/digest.rs": "86339d0fb7d887025b8b286641ce8d6fb2c3f3f1172069f260cbefdcded3d09f",
+    "/home/tihan/artifactd-config-lease-20261005-_qsh2_zi/Open-Source/apollo-artifactd/crates/artifactd-protocol/src/wire.rs": "bb66b6948705d5c6eb89f5fa75cd932bb44448cebdfa784705655cc22d77c471"
+  }
+}

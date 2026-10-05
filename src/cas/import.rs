@@ -33,6 +33,8 @@ impl Store {
         size: u64,
     ) -> Result<ArtifactDigest> {
         ensure!(size <= self.limits.max_blob, "blob exceeds limit");
+        let mut replacing_size = None;
+        let mut replacement_peak_extra = 0u64;
         if let Some(digest) = digest
             && let Some(blob) = self
                 .db
@@ -40,13 +42,26 @@ impl Store {
         {
             let stored_size = blob.size;
             ensure!(stored_size == size, "duplicate size mismatch");
-            self.verify_file(digest, size)?;
-            let (actual, actual_size) = super::hash(reader, size)?;
-            ensure!(
-                actual == *digest && actual_size == size,
-                "duplicate input mismatch"
-            );
-            return Ok(digest.clone());
+            if self.verify_file(digest, size).is_ok() {
+                let (actual, actual_size) = super::hash(reader, size)?;
+                ensure!(
+                    actual == *digest && actual_size == size,
+                    "duplicate input mismatch"
+                );
+                return Ok(digest.clone());
+            }
+            replacing_size = Some(blob.size);
+            // The recorded logical size can understate a corrupt final leaf.
+            // Admission must cover both that leaf and the staged replacement
+            // while the atomic rename is pending.
+            let actual_size = match filesystem::read(&self.blobs, digest.hex()) {
+                Ok(file) => file.metadata()?.len(),
+                Err(error) if is_not_found(&error) => 0,
+                Err(error) => return Err(error),
+            };
+            replacement_peak_extra = actual_size.saturating_sub(blob.size);
+            // A DB-recorded object whose bytes fail verification is repaired
+            // through the normal private staging and atomic replacement path.
         }
 
         let objects = self.db.count("blobs")? + self.db.count("imports")?;
@@ -58,7 +73,7 @@ impl Store {
             "temporary",
         )?;
         ensure!(
-            objects < self.limits.max_objects,
+            objects < self.limits.max_objects || replacing_size.is_some(),
             "object count quota exhausted"
         );
         ensure!(
@@ -90,6 +105,7 @@ impl Store {
         ensure!(
             usage
                 .checked_add(size)
+                .and_then(|value| value.checked_add(replacement_peak_extra))
                 .is_some_and(|n| n <= self.limits.max_store),
             "store quota exhausted"
         );
@@ -119,7 +135,7 @@ impl Store {
                     size,
                 },
             )?;
-            self.publish_blob(&temp, &actual, size)?;
+            self.publish_blob(&temp, &actual, size, replacing_size.is_some())?;
             Ok(actual)
         })();
         if result.is_err() {
@@ -172,11 +188,33 @@ impl Store {
         Ok(actual)
     }
 
-    fn publish_blob(&self, temp: &str, digest: &ArtifactDigest, expected: u64) -> Result<()> {
+    fn publish_blob(
+        &self,
+        temp: &str,
+        digest: &ArtifactDigest,
+        expected: u64,
+        allow_replacement: bool,
+    ) -> Result<()> {
         match self.temp.hard_link(temp, &self.blobs, digest.hex()) {
             Ok(()) => {}
             Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => {
+                if self.verify_file(digest, expected).is_ok() {
+                    self.temp.remove_file(temp)?;
+                    filesystem::sync(&self.temp)?;
+                    return Ok(());
+                }
+                ensure!(
+                    allow_replacement,
+                    "unrecorded digest collision refuses replacement"
+                );
+                // Validate the existing leaf's ownership, type, link count and
+                // permissions before an atomic same-directory replacement.
+                let _existing = filesystem::read(&self.blobs, digest.hex())?;
+                self.temp.rename(temp, &self.blobs, digest.hex())?;
+                filesystem::sync(&self.temp)?;
+                filesystem::sync(&self.blobs)?;
                 self.verify_file(digest, expected)?;
+                return Ok(());
             }
             Err(e) => return Err(e.into()),
         }
@@ -210,4 +248,11 @@ fn sum_sizes<T: DeserializeOwned>(
         }
         after = page.last().map(|(key, _)| key.clone());
     }
+}
+
+fn is_not_found(error: &anyhow::Error) -> bool {
+    error.downcast_ref::<rustix::io::Errno>() == Some(&rustix::io::Errno::NOENT)
+        || error
+            .downcast_ref::<std::io::Error>()
+            .is_some_and(|error| error.kind() == std::io::ErrorKind::NotFound)
 }

@@ -1,4 +1,4 @@
-use super::{stream::VerifiedReader, tree};
+use super::{stream::VerifiedReader, symlink, tree};
 use crate::{Store, filesystem, oci::Image};
 use anyhow::{Result, bail, ensure};
 use cap_std::fs::Dir;
@@ -98,7 +98,7 @@ impl Store {
                     let target = entry
                         .link_name_bytes()
                         .ok_or_else(|| anyhow::anyhow!("missing link target"))?;
-                    safe_target(&path, &target)?;
+                    symlink::safe_target(&path, &target)?;
                 }
                 if path
                     .file_name()
@@ -169,7 +169,7 @@ impl Store {
                         let target = entry
                             .link_name_bytes()
                             .ok_or_else(|| anyhow::anyhow!("missing link target"))?;
-                        let target = safe_target(&path, &target)?;
+                        let target = symlink::safe_target(&path, &target)?;
                         parent.symlink_contents(target, name)?;
                     } else {
                         let mut file = filesystem::create(&parent, name)?;
@@ -232,28 +232,6 @@ fn parent(root: &Dir, path: &Path) -> Result<Dir> {
         }
     }
     Ok(dir)
-}
-pub(super) fn safe_target(path: &Path, bytes: &[u8]) -> Result<String> {
-    ensure!(
-        !bytes.is_empty() && bytes.len() <= 4096 && !bytes.contains(&0),
-        "invalid link target"
-    );
-    let text = std::str::from_utf8(bytes)?;
-    let target = Path::new(text);
-    ensure!(!target.is_absolute(), "absolute symlink target rejected");
-    let mut depth = path.parent().map_or(0, |p| p.components().count());
-    for component in target.components() {
-        match component {
-            Component::Normal(_) => depth += 1,
-            Component::CurDir => {}
-            Component::ParentDir => {
-                ensure!(depth > 0, "symlink escape");
-                depth -= 1;
-            }
-            _ => bail!("invalid symlink target"),
-        }
-    }
-    Ok(text.to_owned())
 }
 fn whiteout(root: &Dir, path: &Path) -> Result<()> {
     let dir = parent(root, path)?;

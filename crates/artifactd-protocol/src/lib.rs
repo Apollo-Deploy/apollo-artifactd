@@ -3,8 +3,15 @@ mod digest;
 pub use digest::{ArtifactDigest, BlobDigest, ConfigDigest, ManifestDigest, PreparedDigest};
 use serde::{Deserialize, Serialize};
 
-pub const VERSION: u32 = 2;
+pub const VERSION: u32 = 3;
 pub const MAX_PACKET: usize = 64 * 1024;
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct PeerIdentity {
+    pub uid: u32,
+    pub gid: u32,
+}
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -60,6 +67,14 @@ id!(OperationId);
 id!(PinId);
 id!(LeaseId);
 id!(PreparedArtifactId);
+
+impl LeaseId {
+    /// A creation token determines one lease identity for its entire lifetime.
+    pub fn from_operation(operation: &OperationId) -> Result<Self, &'static str> {
+        operation.token_parts()?;
+        Self::try_from(format!("lease_{}", operation.as_str()))
+    }
+}
 
 impl OperationId {
     pub fn token(epoch: &str, sequence: u64) -> Result<Self, &'static str> {
@@ -143,8 +158,9 @@ pub enum Action {
         id: PinId,
     },
     LeaseCreate {
-        id: LeaseId,
         digest: ArtifactDigest,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        grantee: Option<PeerIdentity>,
     },
     LeaseRelease {
         id: LeaseId,

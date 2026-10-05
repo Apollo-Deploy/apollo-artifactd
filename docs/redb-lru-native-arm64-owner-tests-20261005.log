@@ -1,0 +1,52 @@
+ Downloading crates ...
+  Downloaded redb v2.6.0
+warning: profile package spec `librocksdb-sys` in profile `dev` did not match any packages
+   Compiling getrandom v0.4.3
+   Compiling rand_core v0.10.1
+   Compiling rustix v1.1.5
+   Compiling redb v2.6.0
+   Compiling linux-raw-sys v0.12.1
+   Compiling chacha20 v0.10.2
+   Compiling redb v4.3.0 (/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3/vendor/redb)
+   Compiling once_cell v1.21.4
+   Compiling rand v0.10.3
+   Compiling tempfile v3.27.0
+   Compiling uuid v1.27.0
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+    --> src/db.rs:2314:18
+     |
+2314 |                 .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |x| {
+     |                  ^^^^^^^^^^^^
+     |
+     = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+     |
+2314 -                 .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |x| {
+2314 +                 .try_update(Ordering::SeqCst, Ordering::SeqCst, |x| {
+     |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+   --> src/tree_store/page_store/header.rs:686:58
+    |
+686 |             let previous = self.operations_until_failure.fetch_update(
+    |                                                          ^^^^^^^^^^^^
+    |
+help: replace the use of the deprecated method
+    |
+686 -             let previous = self.operations_until_failure.fetch_update(
+686 +             let previous = self.operations_until_failure.try_update(
+    |
+
+warning: `redb` (lib test) generated 2 warnings (run `cargo fix --lib -p redb --tests` to apply 2 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.74s
+     Running unittests src/lib.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/redb-885ebac00fffaa26)
+
+running 5 tests
+test tree_store::page_store::lru_cache::test::reinsert_moves_key_to_the_back ... ok
+test tree_store::page_store::lru_cache::test::second_chance_survives_one_eviction_pass ... ok
+test tree_store::page_store::lru_cache::test::replacing_a_value_keeps_its_queue_position ... ok
+test tree_store::page_store::lru_cache::test::queue_stays_bounded_with_hot_key ... ok
+test tree_store::page_store::lru_cache::test::queue_stays_bounded_without_eviction ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 146 filtered out; finished in 0.08s
+

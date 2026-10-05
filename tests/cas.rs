@@ -1,4 +1,7 @@
-use apollo_artifactd::{Limits, Store};
+use apollo_artifactd::{
+    Limits, Store,
+    state::{Imported, State},
+};
 use artifactd_protocol::ArtifactDigest;
 use sha2::{Digest, Sha256};
 use std::{
@@ -33,14 +36,14 @@ fn cas_admission_durability_and_references() {
     store.open_blob(&d).unwrap().read_to_end(&mut read).unwrap();
     assert_eq!(read, data);
     store.pin("retention", &d).unwrap();
-    store.lease("consumer", &d).unwrap();
+    let lease = store.lease(&d).unwrap();
     assert_eq!(store.gc(10).unwrap(), 0);
     store.unpin("retention").unwrap();
     assert_eq!(store.gc(10).unwrap(), 0);
     drop(store);
     let mut store = Store::open(root.path(), Limits::default()).unwrap();
-    assert!(store.leased("consumer", &d).unwrap());
-    store.release("consumer").unwrap();
+    assert!(store.leased(lease.as_str(), &d).unwrap());
+    store.release(lease.as_str()).unwrap();
     assert_eq!(store.gc(10).unwrap(), 1);
     assert!(store.open_blob(&d).is_err());
 }
@@ -81,6 +84,212 @@ fn invalid_inputs_never_publish() {
     assert_eq!(
         std::fs::read_dir(root.path().join("temp")).unwrap().count(),
         0
+    );
+}
+
+#[test]
+fn corrupt_recorded_blob_is_repaired_without_losing_pin_protection() {
+    let (root, mut store) = fixture();
+    let data = b"repairable payload";
+    let d = digest(data);
+    store
+        .import_blob(&mut Cursor::new(data), &d, data.len() as u64)
+        .unwrap();
+    store.pin("repair-pin", &d).unwrap();
+    let path = root.path().join("blobs").join(d.hex());
+    std::fs::remove_file(&path).unwrap();
+    std::fs::write(&path, b"corrupt bytes").unwrap();
+    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o400)).unwrap();
+    assert!(store.open_blob(&d).is_err());
+    store
+        .import_blob(&mut Cursor::new(data), &d, data.len() as u64)
+        .unwrap();
+    let mut output = Vec::new();
+    store
+        .open_blob(&d)
+        .unwrap()
+        .read_to_end(&mut output)
+        .unwrap();
+    assert_eq!(output, data);
+    assert_eq!(store.gc(10).unwrap(), 0);
+}
+
+#[test]
+fn wrong_repair_input_does_not_replace_corrupt_blob() {
+    let (root, mut store) = fixture();
+    let data = b"repair target";
+    let d = digest(data);
+    store
+        .import_blob(&mut Cursor::new(data), &d, data.len() as u64)
+        .unwrap();
+    let path = root.path().join("blobs").join(d.hex());
+    std::fs::remove_file(&path).unwrap();
+    std::fs::write(&path, b"corrupt bytes").unwrap();
+    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o400)).unwrap();
+    assert!(
+        store
+            .import_blob(&mut Cursor::new(b"wrong repair"), &d, data.len() as u64)
+            .is_err()
+    );
+    assert!(store.open_blob(&d).is_err());
+    assert_eq!(std::fs::read(&path).unwrap(), b"corrupt bytes");
+}
+
+#[test]
+fn unrecorded_digest_collision_is_preserved() {
+    let (root, mut store) = fixture();
+    let data = b"unrecorded target";
+    let d = digest(data);
+    let path = root.path().join("blobs").join(d.hex());
+    std::fs::write(&path, b"foreign corrupt bytes").unwrap();
+    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o400)).unwrap();
+    assert!(
+        store
+            .import_blob(&mut Cursor::new(data), &d, data.len() as u64)
+            .is_err()
+    );
+    assert_eq!(std::fs::read(&path).unwrap(), b"foreign corrupt bytes");
+}
+
+#[test]
+fn repair_reconciles_after_publish_effect_window() {
+    let (root, mut store) = fixture();
+    let data = b"recovery repair payload";
+    let d = digest(data);
+    store
+        .import_blob(&mut Cursor::new(data), &d, data.len() as u64)
+        .unwrap();
+    drop(store);
+
+    let final_path = root.path().join("blobs").join(d.hex());
+    std::fs::remove_file(&final_path).unwrap();
+    std::fs::write(&final_path, b"corrupt final").unwrap();
+    std::fs::set_permissions(&final_path, std::fs::Permissions::from_mode(0o400)).unwrap();
+
+    let id = uuid::Uuid::new_v4().to_string();
+    let temp = format!("{id}.part");
+    let temp_path = root.path().join("temp").join(&temp);
+    std::fs::write(&temp_path, data).unwrap();
+    std::fs::set_permissions(&temp_path, std::fs::Permissions::from_mode(0o400)).unwrap();
+    let dir =
+        cap_std::fs::Dir::open_ambient_dir(root.path(), cap_std::ambient_authority()).unwrap();
+    let db = State::open(&dir).unwrap();
+    db.put(
+        "imports",
+        &id,
+        &Imported {
+            temp,
+            digest: Some(d.clone()),
+            size: data.len() as u64,
+        },
+    )
+    .unwrap();
+    drop(db);
+
+    let recovered = Store::open(root.path(), Limits::default()).unwrap();
+    let mut output = Vec::new();
+    recovered
+        .open_blob(&d)
+        .unwrap()
+        .read_to_end(&mut output)
+        .unwrap();
+    assert_eq!(output, data);
+    drop(recovered);
+    let db = State::open(&dir).unwrap();
+    assert_eq!(db.count("imports").unwrap(), 0);
+    assert_eq!(
+        std::fs::read_dir(root.path().join("temp")).unwrap().count(),
+        0
+    );
+}
+
+#[test]
+fn repair_reconciles_after_publish_before_database_commit() {
+    let (root, mut store) = fixture();
+    let data = b"post rename recovery payload";
+    let d = digest(data);
+    store
+        .import_blob(&mut Cursor::new(data), &d, data.len() as u64)
+        .unwrap();
+    drop(store);
+
+    let final_path = root.path().join("blobs").join(d.hex());
+    std::fs::remove_file(&final_path).unwrap();
+    std::fs::write(&final_path, b"corrupt final").unwrap();
+    std::fs::set_permissions(&final_path, std::fs::Permissions::from_mode(0o400)).unwrap();
+    std::fs::remove_file(&final_path).unwrap();
+    std::fs::write(&final_path, data).unwrap();
+    std::fs::set_permissions(&final_path, std::fs::Permissions::from_mode(0o400)).unwrap();
+
+    let id = uuid::Uuid::new_v4().to_string();
+    let dir =
+        cap_std::fs::Dir::open_ambient_dir(root.path(), cap_std::ambient_authority()).unwrap();
+    let db = State::open(&dir).unwrap();
+    db.put(
+        "imports",
+        &id,
+        &Imported {
+            temp: format!("{id}.part"),
+            digest: Some(d.clone()),
+            size: data.len() as u64,
+        },
+    )
+    .unwrap();
+    drop(db);
+
+    let recovered = Store::open(root.path(), Limits::default()).unwrap();
+    let mut output = Vec::new();
+    recovered
+        .open_blob(&d)
+        .unwrap()
+        .read_to_end(&mut output)
+        .unwrap();
+    assert_eq!(output, data);
+    drop(recovered);
+    let db = State::open(&dir).unwrap();
+    assert_eq!(db.count("imports").unwrap(), 0);
+    assert_eq!(db.count("blobs").unwrap(), 1);
+}
+
+#[test]
+fn recovery_preserves_unrecorded_digest_collision() {
+    let (root, store) = fixture();
+    drop(store);
+    let data = b"unrecorded recovery target";
+    let d = digest(data);
+    let final_path = root.path().join("blobs").join(d.hex());
+    std::fs::write(&final_path, b"foreign corrupt bytes").unwrap();
+    std::fs::set_permissions(&final_path, std::fs::Permissions::from_mode(0o400)).unwrap();
+    let id = uuid::Uuid::new_v4().to_string();
+    let temp = format!("{id}.part");
+    std::fs::write(root.path().join("temp").join(&temp), data).unwrap();
+    std::fs::set_permissions(
+        root.path().join("temp").join(&temp),
+        std::fs::Permissions::from_mode(0o400),
+    )
+    .unwrap();
+    let dir =
+        cap_std::fs::Dir::open_ambient_dir(root.path(), cap_std::ambient_authority()).unwrap();
+    let db = State::open(&dir).unwrap();
+    db.put(
+        "imports",
+        &id,
+        &Imported {
+            temp: temp.clone(),
+            digest: Some(d.clone()),
+            size: data.len() as u64,
+        },
+    )
+    .unwrap();
+    drop(db);
+    assert!(Store::open(root.path(), Limits::default()).is_err());
+    assert_eq!(
+        std::fs::read(&final_path).unwrap(),
+        b"foreign corrupt bytes"
+    );
+    assert_eq!(
+        std::fs::read(root.path().join("temp").join(&temp)).unwrap(),
+        data
     );
 }
 
@@ -132,6 +341,21 @@ fn foreign_files_and_links_are_never_collected() {
     let external = tempfile::NamedTempFile::new().unwrap();
     std::fs::remove_file(root.path().join("blobs").join(d.hex())).unwrap();
     std::os::unix::fs::symlink(external.path(), root.path().join("blobs").join(d.hex())).unwrap();
+    assert!(
+        store
+            .import_blob(&mut Cursor::new(b"owned"), &d, 5)
+            .is_err()
+    );
+    assert!(external.path().exists());
+    assert!(
+        root.path()
+            .join("blobs")
+            .join(d.hex())
+            .symlink_metadata()
+            .unwrap()
+            .file_type()
+            .is_symlink()
+    );
     assert!(store.gc(10).is_err());
     assert!(external.path().exists());
     assert!(
@@ -153,7 +377,7 @@ fn quota_and_exclusive_store_owner() {
     let mut store = Store::open(
         root.path(),
         Limits {
-            max_store: 4,
+            max_store: 8,
             max_objects: 1,
             max_temp_bytes: 4,
             ..Limits::default()
@@ -168,9 +392,36 @@ fn quota_and_exclusive_store_owner() {
     let d = digest(b"full");
     store.import_blob(&mut Cursor::new(b"full"), &d, 4).unwrap();
     store.import_blob(&mut Cursor::new(b"full"), &d, 4).unwrap();
+    let full_path = root.path().join("blobs").join(d.hex());
+    std::fs::remove_file(&full_path).unwrap();
+    std::fs::write(&full_path, b"bad!").unwrap();
+    std::fs::set_permissions(&full_path, std::fs::Permissions::from_mode(0o400)).unwrap();
+    store.import_blob(&mut Cursor::new(b"full"), &d, 4).unwrap();
     assert!(store.import_blob(&mut Cursor::new(b"fake"), &d, 4).is_err());
     assert!(store.import_calculated(&mut Cursor::new(b""), 0).is_err());
     drop(store);
+    let mut constrained = Store::open(
+        root.path(),
+        Limits {
+            max_store: 4,
+            max_objects: 1,
+            ..Limits::default()
+        },
+    )
+    .unwrap();
+    std::fs::remove_file(&full_path).unwrap();
+    std::fs::write(&full_path, b"bad!").unwrap();
+    std::fs::set_permissions(&full_path, std::fs::Permissions::from_mode(0o400)).unwrap();
+    assert!(
+        constrained
+            .import_blob(&mut Cursor::new(b"full"), &d, 4)
+            .is_err()
+    );
+    assert_eq!(std::fs::read(&full_path).unwrap(), b"bad!");
+    drop(constrained);
+    std::fs::remove_file(&full_path).unwrap();
+    std::fs::write(&full_path, b"full").unwrap();
+    std::fs::set_permissions(&full_path, std::fs::Permissions::from_mode(0o400)).unwrap();
     let mut store = Store::open(
         root.path(),
         Limits {

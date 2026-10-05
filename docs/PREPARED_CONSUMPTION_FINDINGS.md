@@ -10,7 +10,7 @@ passes the verified root directory through the artifactd Unix socket with
 `SCM_RIGHTS`; it does not return an arbitrary filesystem path.
 
 `PREPARE` currently returns `PreparedArtifactId`, `PreparedDigest`, source
-`ManifestDigest`, `Platform`, size, and `format: artifactd-rootfs-v1`. The current
+`ManifestDigest`, `Platform`, size, and `format: artifactd-rootfs-v2`. The current
 `OPEN_PREPARED` response returns the prepared artifact ID and the directory FD;
 the consumer must obtain or carry the corresponding prepared facts from the
 prepare receipt and verify the FD before use.

@@ -1,0 +1,73 @@
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+warning: unused variable: `anchored`
+  --> src/api/runtime.rs:44:9
+   |
+44 |     let anchored = PathBuf::from(format!("/proc/self/fd/{}", dir.as_raw_fd())).join(name);
+   |         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_anchored`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `apollo-artifactd` (lib test) generated 1 warning (run `cargo fix --lib -p apollo-artifactd --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.73s
+     Running unittests src/lib.rs (target/debug/deps/apollo_artifactd-2814954cadcce2a6)
+
+running 1 test
+test api::runtime::tests::bind_stays_with_captured_runtime_directory_after_path_replacement ... FAILED
+
+failures:
+
+---- api::runtime::tests::bind_stays_with_captured_runtime_directory_after_path_replacement stdout ----
+
+thread 'api::runtime::tests::bind_stays_with_captured_runtime_directory_after_path_replacement' (220703) panicked at src/api/runtime.rs:112:18:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    api::runtime::tests::bind_stays_with_captured_runtime_directory_after_path_replacement
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`
+
+CONTROL absolute-path socket bind rejected at actual bind outcome
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.70s
+     Running unittests src/lib.rs (target/debug/deps/apollo_artifactd-2814954cadcce2a6)
+
+running 1 test
+test api::runtime::tests::bind_stays_with_captured_runtime_directory_after_path_replacement ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.14s
+  Executable tests/delegated_lease_peer.rs (target/debug/deps/delegated_lease_peer-6014570d871ef549)
+
+
+running 1 test
+
+thread 'delegated_claim_survives_restart_and_release_replay_cannot_rebind' (221357) panicked at tests/delegated_lease_peer.rs:170:5:
+operation unexpectedly succeeded
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test delegated_claim_survives_restart_and_release_replay_cannot_rebind ... FAILED
+
+failures:
+
+failures:
+    delegated_claim_survives_restart_and_release_replay_cannot_rebind
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.18s
+
+
+CONTROL claimed creator cancellation rejected at consumer claim boundary
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.05s
+  Executable tests/delegated_lease_peer.rs (target/debug/deps/delegated_lease_peer-6014570d871ef549)
+
+
+running 1 test
+test delegated_claim_survives_restart_and_release_replay_cannot_rebind ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.24s

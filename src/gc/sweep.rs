@@ -6,7 +6,8 @@ impl Store {
     pub fn gc(&mut self, max: u32) -> Result<u32> {
         ensure!((1..=4096).contains(&max), "invalid gc bound");
         self.reconcile(max)?;
-        if !self.gc_snapshot_ready()? {
+        let snapshot_ready = self.gc_snapshot_ready()?;
+        if !snapshot_ready {
             return Ok(0);
         }
         self.gc_prepared(max)?;

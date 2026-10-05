@@ -1,0 +1,94 @@
+Authenticated BuildKit fixture prerequisite evidence (x86_64)
+================================================================
+
+Host and scope
+--------------
+
+Host: tihan-apollo (remote hostname vps-6b11ee2e), Debian 13 (trixie),
+amd64.  All files below are under the isolated qualification checkout
+`/home/tihan/artifactd-legacy-integration-20261005`; no package was installed
+globally and no customer service was started.
+
+umoci
+-----
+
+Origin: official Open Containers umoci release endpoint
+`https://github.com/opencontainers/umoci/releases/download/v0.6.0/`.
+The release API selected tag v0.6.0.  `umoci.linux.amd64` was downloaded with
+the accompanying `umoci.sha256sum` and verified with `sha256sum -c` before it
+was installed at:
+
+`umoci-prefix/bin/umoci`
+
+Verification:
+
+    umoci version 0.6.0
+    image spec: 1.1.1
+    runtime spec: 1.2.1
+    go: go1.25.1
+    sha256 b51c267ec394499e42c6fde47f240b7b7dba57ea49df0b5acd304378b82a3b71
+
+The release asset has an official `.asc` signature available, but this host
+does not have the release signing key configured; the recorded acceptance
+criterion is the official release checksum, not an unverified signature claim.
+
+Reproduction commands (run as the qualification user) were:
+
+    cd /home/tihan/artifactd-legacy-integration-20261005/umoci-prefix/src
+    curl -fsSLO https://github.com/opencontainers/umoci/releases/download/v0.6.0/umoci.linux.amd64
+    curl -fsSLO https://github.com/opencontainers/umoci/releases/download/v0.6.0/umoci.sha256sum
+    grep 'umoci.linux.amd64$' umoci.sha256sum | sha256sum -c -
+
+For PostgreSQL the package-only extraction was:
+
+    mkdir -p /home/tihan/artifactd-legacy-integration-20261005/postgres-debs
+    cd /home/tihan/artifactd-legacy-integration-20261005/postgres-debs
+    apt-get download postgresql-17 postgresql-client-17 postgresql-common libpq5 libpq-dev
+    for f in *.deb; do dpkg-deb -x "$f" ../postgres-prefix; done
+
+PostgreSQL
+----------
+
+Debian package metadata selected PostgreSQL 17.11 (`17.11-0+deb13u1`).  The
+following packages were obtained with `apt-get download` (which does not
+install packages) and extracted with `dpkg-deb -x` into
+`postgres-prefix`:
+
+    postgresql-17
+    postgresql-client-17
+    postgresql-common
+    libpq5
+    libpq-dev
+
+Package SHA-256 values are in `postgres-prefix/package-sha256sums.txt`.
+The extracted server tools are:
+
+    postgres-prefix/usr/lib/postgresql/17/bin/initdb
+    postgres-prefix/usr/lib/postgresql/17/bin/pg_ctl
+    postgres-prefix/usr/lib/postgresql/17/bin/postgres
+    postgres-prefix/usr/lib/postgresql/17/bin/psql
+
+`initdb`, `pg_ctl`, and `psql` reported PostgreSQL 17.11.  A private
+qualification cluster was initialized under the checkout, started on Unix
+socket `pg-qualification/sock` and loopback port 55432, created and queried a
+probe table, then stopped and removed.  The observed result was
+`PRIVATE_POSTGRES=PASS`; no process remains.
+
+Fixture boundary
+----------------
+
+`verification/control-plane/authenticated_build_fixture.py` requires
+`APOLLO_VERIFY_SANDBOX_BIN`, `APOLLO_VERIFY_MSB_HOME`,
+`APOLLO_VERIFY_UMOCI_BIN`, and `APOLLO_VERIFY_SANDBOX_SHA256`, plus `/dev/kvm`.
+It also polls `docker exec <campaign>-pg psql` while the BuildKit worker runs.
+`persistent_hello.py` creates that database with `docker run` and uses the
+same `docker exec` contract.  This host has no Docker, Podman, containerd, or
+dockerd executable.  Therefore the extracted PostgreSQL server is a verified
+standalone database prerequisite, but it cannot satisfy the current fixture's
+container lifecycle contract without a separately authorized fixture adapter
+or an isolated container runtime.  No such adapter was invented here.
+
+Other x86 inputs already present in the checkout were independently hashed in
+the native qualification records: the patched MicroSandbox agentd, `msb`,
+libkrunfw, control-plane, BuildKit binaries, and Rust MicroSandbox backend.
+The arm64 MicroSandbox inputs remain a separate gate.

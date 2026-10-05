@@ -1,0 +1,15 @@
+host=apollo-node-01
+arch=aarch64
+f1dddcfffd6d93883d0cd5f4988aa713c23db77e286c3643c1ca07ffd06e0d53  src/gc/mod.rs
+ae79de22ebba4c77fbdd22c4fc2eb0a88ac8587d992cd25110f19a1d7df96c2c  src/gc/sweep.rs
+572048d0c4a90054bca093d7be8bfa16e4e9af6f687c5891f7952a553cf4f987  src/oci/mod.rs
+2cd1912f4a948c7585267f46992ecde47f026383c6e33175b4c9c4158293b914  tests/gc_incremental.rs
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.19s
+     Running tests/gc_incremental.rs (target/debug/deps/gc_incremental-8c7f00fcda29f63f)
+
+running 2 tests
+test pin_and_lease_invalidate_ready_and_partial_gc_snapshots ... ok
+test late_corrupt_pin_is_found_by_bounded_gc_not_startup ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.99s
+

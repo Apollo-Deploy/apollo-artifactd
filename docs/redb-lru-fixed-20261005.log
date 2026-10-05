@@ -1,0 +1,14 @@
+warning: profile package spec `librocksdb-sys` in profile `dev` did not match any packages
+   Compiling redb v4.3.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/vendor/redb)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.67s
+     Running unittests src/lib.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/redb-8c81fd74770a7cf8)
+
+running 5 tests
+test tree_store::page_store::lru_cache::test::replacing_a_value_keeps_its_queue_position ... ok
+test tree_store::page_store::lru_cache::test::second_chance_survives_one_eviction_pass ... ok
+test tree_store::page_store::lru_cache::test::reinsert_moves_key_to_the_back ... ok
+test tree_store::page_store::lru_cache::test::queue_stays_bounded_with_hot_key ... ok
+test tree_store::page_store::lru_cache::test::queue_stays_bounded_without_eviction ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 147 filtered out; finished in 0.16s
+

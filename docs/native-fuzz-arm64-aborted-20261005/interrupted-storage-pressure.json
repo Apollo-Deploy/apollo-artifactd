@@ -1,0 +1,28 @@
+{
+  "artifact_files": [],
+  "binary_sha256": "e84700a02f55c4ee431d540133244f3bd175ba4073241ce51e12e87b4b9e783c",
+  "log_bytes": 17368,
+  "log_sha256": "5649a55920aaf643b5249b601aa8cb6b6dc19b254ac73464fab538319187b362",
+  "partial_corpus": {
+    "bytes": 1870747,
+    "files": 11755,
+    "sha256_manifest": "2b002055a7b794cf9544e3433f78f7bd5f536bc9e499fe9afbaaa2c6308d5cd6"
+  },
+  "persistent_free_kib": 3356568,
+  "progress": {
+    "cpu_seconds": 478.9,
+    "elapsed_seconds": 480,
+    "fds": 5,
+    "log_bytes": 16881,
+    "persistent_free_kib": 3356584,
+    "rss_kib": 344832,
+    "target": "protocol_oci",
+    "tmpfs_free_kib": 6063368,
+    "vm_hwm_kib": 557232
+  },
+  "reason": "Stopped to preserve host storage after persistent filesystem free space fell by about 300 MiB/minute while task-owned disk files remained stable. This target did not reach its 30-minute limit and is not a qualification pass.",
+  "recorded_epoch": 1791195199.368981,
+  "status": "interrupted_incomplete",
+  "target": "protocol_oci",
+  "tmpfs_free_kib": 6062288
+}

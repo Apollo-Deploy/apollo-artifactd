@@ -1,5 +1,5 @@
 mod support;
-use apollo_artifactd::{Limits, Store, state::State};
+use apollo_artifactd::{Limits, Store, oci::facts, state::State};
 use std::{
     io::{Cursor, Read},
     os::unix::fs::PermissionsExt,
@@ -21,8 +21,8 @@ fn oci_preparation_verifies_diffid_and_whiteouts() {
     store.pin("test", &manifest).unwrap();
     let platform = platform("arm64");
     let id = store.prepare(&manifest, &platform).unwrap();
-    store.lease("rootfs", &manifest).unwrap();
-    let fd = store.open_prepared(&id, "rootfs").unwrap();
+    let lease = store.lease(&manifest).unwrap();
+    let fd = store.open_prepared(&id, lease.as_str()).unwrap();
     let dir = cap_std::fs::Dir::from_std_file(fd);
     assert!(!dir.try_exists("removed").unwrap());
     assert!(!dir.try_exists("dir/old").unwrap());
@@ -35,8 +35,52 @@ fn oci_preparation_verifies_diffid_and_whiteouts() {
     assert_eq!(id, store.prepare(&manifest, &platform).unwrap());
     assert_eq!(store.gc(100).unwrap(), 0);
     store.unpin("test").unwrap();
-    store.release("rootfs").unwrap();
+    store.release(lease.as_str()).unwrap();
     assert!(store.gc(100).unwrap() > 0);
+}
+
+#[test]
+fn admitted_oci_facts_include_verified_descriptor_receipt_data() {
+    let root = tempfile::tempdir().unwrap();
+    std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
+    let mut store = Store::open(root.path(), Limits::default()).unwrap();
+    let layer_bytes = layer(&[("file", b"payload")]);
+    let manifest_digest = image(
+        &mut store,
+        "amd64",
+        std::slice::from_ref(&layer_bytes),
+        false,
+    );
+    let resolved = store.resolve(&manifest_digest, &platform("amd64")).unwrap();
+    let value = facts(&manifest_digest, &resolved, &platform("amd64"));
+    let mut manifest_bytes = Vec::new();
+    store
+        .open_blob(&manifest_digest)
+        .unwrap()
+        .read_to_end(&mut manifest_bytes)
+        .unwrap();
+    let manifest: serde_json::Value = serde_json::from_slice(&manifest_bytes).unwrap();
+    assert_eq!(value["verified"], true);
+    assert_eq!(value["artifact_digest"], manifest_digest.to_string());
+    assert_eq!(value["manifest_digest"], manifest_digest.to_string());
+    assert_eq!(value["manifest_size"], manifest_bytes.len());
+    assert_eq!(
+        value["config"]["media_type"],
+        "application/vnd.oci.image.config.v1+json"
+    );
+    assert_eq!(value["config"]["digest"], manifest["config"]["digest"]);
+    assert_eq!(value["config"]["size"], manifest["config"]["size"]);
+    assert_eq!(value["layers"].as_array().unwrap().len(), 1);
+    assert_eq!(
+        value["layers"][0]["digest"],
+        manifest["layers"][0]["digest"]
+    );
+    assert_eq!(
+        value["layers"][0]["media_type"],
+        "application/vnd.oci.image.layer.v1.tar"
+    );
+    assert_eq!(value["layers"][0]["size"], layer_bytes.len());
+    assert_eq!(value["layer_digests"][0], manifest["layers"][0]["digest"]);
 }
 
 #[test]

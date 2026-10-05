@@ -1,0 +1,42 @@
+    Updating crates.io index
+     Locking 52 packages to latest Rust 1.90 compatible versions
+      Adding redb v2.6.0 (available: v2.6.4)
+ Downloading crates ...
+  Downloaded redb v2.6.0
+warning: profile package spec `librocksdb-sys` in profile `dev` did not match any packages
+   Compiling rand_core v0.10.1
+   Compiling getrandom v0.4.3
+   Compiling redb v2.6.0
+   Compiling redb v4.3.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/vendor/redb)
+   Compiling chacha20 v0.10.2
+   Compiling uuid v1.27.0
+   Compiling rand v0.10.3
+   Compiling tempfile v3.27.0
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.95s
+     Running unittests src/lib.rs (/Users/tihan-nico/Library/Caches/dev-build/rust-target/debug/deps/redb-8c81fd74770a7cf8)
+
+running 5 tests
+
+thread 'tree_store::page_store::lru_cache::test::reinsert_moves_key_to_the_back' (4278477) panicked at src/tree_store/page_store/lru_cache.rs:172:9:
+assertion `left == right` failed
+  left: [1, 2, 3]
+ right: [2, 3, 1]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test tree_store::page_store::lru_cache::test::second_chance_survives_one_eviction_pass ... ok
+test tree_store::page_store::lru_cache::test::replacing_a_value_keeps_its_queue_position ... ok
+test tree_store::page_store::lru_cache::test::reinsert_moves_key_to_the_back ... FAILED
+test tree_store::page_store::lru_cache::test::queue_stays_bounded_with_hot_key ... ok
+
+thread 'tree_store::page_store::lru_cache::test::queue_stays_bounded_without_eviction' (4278476) panicked at src/tree_store/page_store/lru_cache.rs:127:9:
+assertion failed: cache.lru_queue.len() <= 3 * keys
+test tree_store::page_store::lru_cache::test::queue_stays_bounded_without_eviction ... FAILED
+
+failures:
+
+failures:
+    tree_store::page_store::lru_cache::test::queue_stays_bounded_without_eviction
+    tree_store::page_store::lru_cache::test::reinsert_moves_key_to_the_back
+
+test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 measured; 147 filtered out; finished in 0.16s
+
+error: test failed, to rerun pass `--lib`

@@ -1,0 +1,47 @@
+   Compiling itoa v1.0.18
+   Compiling bitflags v2.13.2
+   Compiling memchr v2.8.3
+   Compiling linux-raw-sys v0.12.1
+   Compiling serde_core v1.0.229
+   Compiling rustix v1.1.5
+   Compiling serde v1.0.229
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.151
+   Compiling http v1.5.0
+   Compiling regex-syntax v0.8.11
+   Compiling thiserror v2.0.21
+   Compiling http-body v1.1.0
+   Compiling aho-corasick v1.1.5
+   Compiling konst_macro_rules v0.2.19
+   Compiling konst v0.2.20
+   Compiling regex-automata v0.4.18
+   Compiling derive_builder v0.20.2
+   Compiling const_format v0.2.36
+   Compiling strum v0.27.2
+   Compiling hyper v1.11.1
+   Compiling regex v1.13.1
+   Compiling hyper-util v0.1.21
+   Compiling serde_urlencoded v0.7.1
+   Compiling hyper-rustls v0.27.10
+   Compiling fs-set-times v0.20.3
+   Compiling tower-http v0.6.11
+   Compiling oci-spec v0.9.0
+   Compiling http-body-util v0.1.5
+   Compiling artifactd-protocol v0.1.0 (/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3/crates/artifactd-protocol)
+   Compiling rustix-linux-procfs v0.1.1
+   Compiling cap-primitives v4.0.3
+   Compiling chrono v0.4.45
+   Compiling reqwest v0.13.5
+   Compiling olpc-cjson v0.1.4
+   Compiling oci-spec v0.10.0
+   Compiling xattr v1.6.1
+   Compiling http-auth v0.1.10
+   Compiling oci-client v0.18.0 (/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3/vendor/oci-client)
+   Compiling tar v0.4.46 (/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3/vendor/tar)
+   Compiling cap-std v4.0.3
+   Compiling tempfile v3.27.0
+   Compiling rusty-fork v0.3.1
+   Compiling apollo-artifactd v0.1.0 (/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3)
+   Compiling proptest v1.11.0
+   Compiling artifactd-client-ffi v0.1.0 (/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3/crates/artifactd-client-ffi)
+    Finished `release` profile [optimized] target(s) in 3m 44s

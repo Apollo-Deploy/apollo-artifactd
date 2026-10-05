@@ -1,0 +1,17 @@
+
+running 1 test
+test kernel_peer_gid_binds_operation_owner_across_restart ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.18s
+
+
+running 1 test
+test kernel_peer_gid_binds_persistent_pin_and_lease_owners ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.37s
+
+
+running 1 test
+test delegated_claim_survives_restart_and_release_replay_cannot_rebind ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.39s

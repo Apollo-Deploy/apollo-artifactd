@@ -2,13 +2,14 @@
 mod layers;
 mod recovery;
 mod stream;
+mod symlink;
 mod tree;
 use crate::{Store, filesystem};
 use anyhow::{Result, ensure};
 use artifactd_protocol::{ArtifactDigest, Platform, PreparedArtifactId};
 use sha2::{Digest, Sha256};
 
-const FORMAT: &str = "artifactd-rootfs-v1";
+const FORMAT: &str = "artifactd-rootfs-v2";
 impl Store {
     pub fn prepare(
         &mut self,
@@ -130,10 +131,7 @@ impl Store {
             "prepared artifact is incomplete"
         );
         let manifest = record.manifest.to_string();
-        ensure!(
-            self.leased_for(lease, &manifest.parse()?, caller)?,
-            "prepared artifact requires a covering lease"
-        );
+        self.claim_lease_for(lease, &manifest.parse()?, caller)?;
         let dir = self.prepared.open_dir(id.as_str())?;
         let expected = record
             .tree_digest

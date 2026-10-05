@@ -1,0 +1,2 @@
+unlinkat(14, "verified-file", 0)        = 0 (DELAYED)
++++ killed by SIGKILL +++

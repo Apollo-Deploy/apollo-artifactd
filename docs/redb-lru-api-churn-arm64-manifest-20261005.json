@@ -1,0 +1,12 @@
+{
+  "source": "/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3",
+  "source_hash": "20df30b346439b40a8a93768705e265ccf85ee09d2adcdb572b0762c56ba3dfd",
+  "root": "/home/apollo-admin/artifactd-redb-lru-churn-20261005-s83lii0k",
+  "blob_operations": 100000,
+  "oci_lifecycles": 20000,
+  "binaries": {
+    "daemon": "f10f99a9d5d9c0d269a5a65e3e5d4a414c33c441f0a79f0d9852c43691df4f41",
+    "run": "9e934f9c7fb35b1472ca5ec43cb81ac62a085a998928298b06cae4c25a24fd62"
+  },
+  "launcher_pid": 464003
+}

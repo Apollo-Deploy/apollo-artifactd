@@ -1,0 +1,287 @@
+   Compiling apollo-artifactd v0.1.0 (/tmp/apollo-artifactd-current-20261005.kFPlri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.14s
+     Running unittests src/lib.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/apollo_artifactd-281a7086c1126a73)
+
+running 1 test
+test api::runtime::tests::bind_stays_with_captured_runtime_directory_after_path_replacement ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/cli.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/apollo_artifactctl-a8b250cd17c6e3ca)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/apollo_artifactd-f5e76495e388d7ec)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/admission_pin.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/admission_pin-0b60d345918ea39e)
+
+running 1 test
+test daemon_oci_admission_pin_survives_replay_and_controls_gc ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/api.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/api-2a49a9789992f480)
+
+running 1 test
+artifactd request rejected
+test daemon_fd_contract_idempotency_and_replay ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/api_intake.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/api_intake-fe28ea8def81bb07)
+
+running 1 test
+test silent_authorized_connections_do_not_delay_ready_requests ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/cas.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/cas-1d1fd1cf4eec0f46)
+
+running 14 tests
+test foreign_files_and_links_are_never_collected ... ok
+test legacy_sqlite_state_is_rejected_without_cleanup ... ok
+test invalid_inputs_never_publish ... ok
+test corrupt_recorded_blob_is_repaired_without_losing_pin_protection ... ok
+test recovery_preserves_unrecorded_digest_collision ... ok
+test cas_admission_durability_and_references ... ok
+test incremental_gc_progresses_past_pinned_prefix_after_restart ... ok
+test repair_reconciles_after_publish_before_database_commit ... ok
+test quota_and_exclusive_store_owner ... ok
+test unrecorded_digest_collision_is_preserved ... ok
+test wrong_repair_input_does_not_replace_corrupt_blob ... ok
+test repair_reconciles_after_publish_effect_window ... ok
+test calculated_identity_streams_deduplicates_and_rejects_wrong_size ... ok
+test stored_identity_matches_bytes ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.06s
+
+     Running tests/cas_repair.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/cas_repair-19afc21fd401d176)
+
+running 2 tests
+test oversized_corrupt_final_counts_toward_repair_peak_quota ... ok
+test missing_recorded_final_is_repaired_without_new_object ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/client_control.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/client_control-5bdc9cbb5b7c85db)
+
+running 4 tests
+test saturated_socket_backlog_returns_without_blocking_or_delivering_input ... ok
+test response_is_delivered_when_server_closes_immediately_after_send ... ok
+test cancellation_before_transmission_sends_no_request_or_fd ... ok
+test cancellation_after_transmission_preserves_exact_request_and_fd_delivery ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.00s
+
+     Running tests/client_identity.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/client_identity-624d5c1eca759c62)
+
+running 4 tests
+test privileged_cross_uid_cli_identity_boundary ... ignored, requires explicit root execution and nobody (65534) account
+test wrong_uid_rejects_before_request_or_descriptor_send ... ok
+test valid_uid_endpoint_receives_and_answers_public_request ... ok
+test wrong_uid_rejects_client_allocate_and_cli_autoallocation ... ok
+
+test result: ok. 3 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/delegated_lease_peer.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/delegated_lease_peer-83e74a8839c07c21)
+
+running 2 tests
+test delegated_claim_survives_restart_and_release_replay_cannot_rebind ... ignored, requires explicit root execution for isolated numeric UID/GID peers
+test holds_claimed_blob_fd_until_release ... ignored, child-process helper; invoked by the root-only delegated lease integration case
+
+test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/doctor.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/doctor-21a96970c8f9de9a)
+
+running 2 tests
+Error: database quarantined; restart and reconciliation required
+test daemon_doctor_corruption_quarantines_and_exits ... ok
+test doctor_fails_closed_after_committed_state_page_corruption ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests/gc_crash.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/gc_crash-10bd0bec7fee5929)
+
+running 1 test
+test sigkill_prepared_gc_recovers_partial_tree ... ignored, native SIGKILL prepared GC qualification
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/gc_incremental.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/gc_incremental-223db0c8a002907c)
+
+running 2 tests
+test pin_and_lease_invalidate_ready_and_partial_gc_snapshots ... ok
+test late_corrupt_pin_is_found_by_bounded_gc_not_startup ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.31s
+
+     Running tests/journal_api.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/journal_api-c5fd50c7aa9470db)
+
+running 1 test
+test allocated_mutations_replay_conflict_and_restart_with_bounded_journal ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 25.88s
+
+     Running tests/journal_churn.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/journal_churn-445648f344dcee7e)
+
+running 1 test
+test public_journal_churn_stays_bounded ... ignored, 100k native journal availability campaign
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/journal_crash.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/journal_crash-abcced6c5529f2bc)
+
+running 1 test
+test sigkill_import_preserves_intent_and_recovers_without_reexecution ... ignored, native SIGKILL recovery qualification
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/local_lease.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/local_lease-88722b153f2dd55b)
+
+running 2 tests
+test local_lease_issuer_never_reuses_id_after_release_and_restart ... ok
+test local_lease_issuer_rejects_partial_persisted_metadata ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/oci.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/oci-72fdc6598fc5fad0)
+
+running 9 tests
+test canonical_duplicate_layout_paths_are_rejected ... ok
+test malicious_layout_archive_never_unpacks ... ok
+test malformed_oci_archive_pax_is_rejected ... ok
+test admitted_oci_facts_include_verified_descriptor_receipt_data ... ok
+test multi_platform_and_descriptor_substitution ... ok
+test corrupt_reachability_cannot_authorize_gc ... ok
+test diffid_mismatch_and_symlink_escape_fail_preparation ... ok
+test valid_archive_admission_and_missing_terminator ... ok
+test oci_preparation_verifies_diffid_and_whiteouts ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+     Running tests/oci_gc.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/oci_gc-0b5019d8bfcdb9dc)
+
+running 1 test
+test gc_reimport_restores_admitted_manifest_reachability ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/operation_owner.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/operation_owner-3c048473dfaff6c3)
+
+running 2 tests
+test ownerless_persisted_operation_fails_closed_and_is_preserved ... ok
+test persisted_operation_owner_mismatch_blocks_effect_and_replay ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/operation_owner_peer.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/operation_owner_peer-5dab32f9fdd4b45d)
+
+running 2 tests
+test kernel_peer_gid_binds_operation_owner_across_restart ... ignored, requires explicit root execution for isolated numeric UID/GID peers
+test kernel_peer_gid_binds_persistent_pin_and_lease_owners ... ignored, requires explicit root execution for isolated numeric UID/GID peers
+
+test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/prepare_extensions.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/prepare_extensions-f97034a91f108adb)
+
+running 8 tests
+test prepare_bounds_decompressed_bytes_across_the_whole_image ... ok
+test prepare_preserves_pax_linkpath_dot_suffix ... ok
+test prepare_preserves_intermediate_symlink_resolution_for_relative_and_absolute_targets ... ok
+test prepare_normalization_keeps_root_type_and_traversal_guards ... ok
+test prepare_normalizes_current_directory_members_and_rejects_alias_collisions ... ok
+test prepare_standard_extensions_preserves_effective_paths_sizes_and_framing ... ok
+test prepare_rewrites_in_root_absolute_symlinks_and_rejects_escape ... ok
+test prepare_rejects_malformed_and_ambiguous_pax_metadata ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+     Running tests/protocol.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/protocol-6e19a00b6baaad4a)
+
+running 1 test
+test truncated_packets_and_excess_descriptors_are_rejected ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/recovery.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/recovery-53b38349e5b2a72e)
+
+running 8 tests
+test crash_import_worker ... ok
+test sigkill_during_calculated_import_discards_unresolved_intent ... ok
+test readonly_wrong_digest_stage_is_discarded_after_owner_verified_hash ... ok
+test sigkill_during_import_never_resolves_partial_content ... ok
+test publication_and_gc_intents_reconcile_idempotently ... ok
+test prepared_publication_reconciles_before_reuse ... ok
+test prepared_gc_intent_reconciles_with_or_without_tree_effect ... ok
+test prepared_recovery_cursor_reaches_late_intent_after_many_complete_records ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.55s
+
+     Running tests/reference_owner.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/reference_owner-a16965e3a06165be)
+
+running 1 test
+test ownerless_reference_fails_closed_during_gc_without_deleting_blob ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.63s
+
+     Running tests/registry.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/registry-d1e1687748cc63e9)
+
+running 3 tests
+test https_registry_push_pull_verifies_graph_and_retries ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+test push_rejects_unadmitted_manifest_before_credentials ... ok
+test pull_cache_rejects_mismatched_credential_authority ... ok
+
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+     Running tests/registry_api.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/registry_api-a3d99d5fa5e4473a)
+
+running 1 test
+test registry_api_fd_credentials_journal_and_prepared_facts ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/registry_crash.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/registry_crash-495740daa8cb8480)
+
+running 1 test
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/artifactd_client_ffi-2cfa47a96e34c946)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB/target/debug/deps/artifactd_protocol-9c138297a3e4d8af)
+
+running 2 tests
+test tests::mutation_classification_keeps_observations_and_allocation_read_only ... ok
+test tests::operation_tokens_are_canonical_and_round_trip ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests apollo_artifactd
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests artifactd_client_ffi
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests artifactd_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

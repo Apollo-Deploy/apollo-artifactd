@@ -1,5 +1,6 @@
 //! Streaming CAS with durable import intents and exclusive store ownership.
 mod import;
+mod leases;
 mod recovery;
 mod references;
 use crate::{filesystem, state};

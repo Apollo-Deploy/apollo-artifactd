@@ -1,0 +1,17 @@
+{"timestamp":"2026-10-05T03:38:26.705760Z","level":"WARN","fields":{"message":"no privileges could be revoked for \"enforce_legacy_effect_evidence_append_only_v048\""},"target":"sqlx::postgres::notice"}
+{"timestamp":"2026-10-05T03:38:26.706066Z","level":"WARN","fields":{"message":"no privileges could be revoked for \"enforce_legacy_effect_quarantine_transition_v048\""},"target":"sqlx::postgres::notice"}
+{"timestamp":"2026-10-05T03:38:26.706076Z","level":"WARN","fields":{"message":"no privileges could be revoked for \"effect_action_allows_safety_v1\""},"target":"sqlx::postgres::notice"}
+{"timestamp":"2026-10-05T03:38:26.706138Z","level":"WARN","fields":{"message":"no privileges could be revoked for \"record_legacy_external_effect_evidence_v048\""},"target":"sqlx::postgres::notice"}
+{"timestamp":"2026-10-05T03:38:26.706144Z","level":"WARN","fields":{"message":"no privileges could be revoked for \"resolve_legacy_external_effect_v048\""},"target":"sqlx::postgres::notice"}
+{"timestamp":"2026-10-05T03:38:26.706148Z","level":"WARN","fields":{"message":"no privileges could be revoked for \"legacy_external_effect_quarantine_ready_v048\""},"target":"sqlx::postgres::notice"}
+{"timestamp":"2026-10-05T03:38:26.706157Z","level":"WARN","fields":{"message":"no privileges could be revoked for \"guard_unresolved_legacy_external_effects_v048\""},"target":"sqlx::postgres::notice"}
+{"timestamp":"2026-10-05T03:38:27.083514Z","level":"WARN","fields":{"message":"no privileges could be revoked for \"postgres\""},"target":"sqlx::postgres::notice"}
+{"timestamp":"2026-10-05T03:38:27.083666Z","level":"WARN","fields":{"message":"no privileges could be revoked for \"postgres\""},"target":"sqlx::postgres::notice"}
+{"timestamp":"2026-10-05T03:38:27.083764Z","level":"WARN","fields":{"message":"no privileges were granted for \"postgres\""},"target":"sqlx::postgres::notice"}
+{"timestamp":"2026-10-05T03:38:28.253843Z","level":"WARN","fields":{"message":"role \"phase8_migrator_19474cc588bf\" has not been granted membership in role \"phase8_audit_19474cc588bf\" by role \"postgres\""},"target":"sqlx::postgres::notice"}
+status=applied migration_count=262 migration_head=V262__serialize_node_telemetry_publication.sql applied_now=262
+service_admission_function_revoke=PASS
+build_start_wrapper_revoke=PASS
+source_snapshot_upload status=PASS snapshot=src_0a310ebab3be4e52985d416dd5dca7a0 digest=sha256:f28b666593db6ce9c2c3b69e1574c5511cebd9001b8e4dbe036255d7f12eab68 bytes=17825894
+build_cancel_http_mvp=PASS build=build_1c98de5908b43e5fbbff3abe2766c686 operation=op_05311b59eb712a3c912b437757961089 replay=PASS source_lease=REVOKED before_dispatch=PASS
+source_to_build_admission_mvp=PASS snapshot_id=src_0a310ebab3be4e52985d416dd5dca7a0 digest=sha256:f28b666593db6ce9c2c3b69e1574c5511cebd9001b8e4dbe036255d7f12eab68 build_id=build_83c4ce2330e04aa526273141a2bb04ca bytes=17825894 replay=PASS

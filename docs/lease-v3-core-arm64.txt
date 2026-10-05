@@ -1,0 +1,41 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.07s
+     Running tests/api.rs (target/debug/deps/api-8ab6c5972546e2c4)
+
+running 1 test
+artifactd request rejected
+     Running tests/cas.rs (target/debug/deps/cas-f9a2ccb82cd310d5)
+test daemon_fd_contract_idempotency_and_replay ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+
+running 8 tests
+test legacy_sqlite_state_is_rejected_without_cleanup ... ok
+test foreign_files_and_links_are_never_collected ... ok
+test invalid_inputs_never_publish ... ok
+test quota_and_exclusive_store_owner ... ok
+test incremental_gc_progresses_past_pinned_prefix_after_restart ... ok
+test calculated_identity_streams_deduplicates_and_rejects_wrong_size ... ok
+test cas_admission_durability_and_references ... ok
+test stored_identity_matches_bytes ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.40s
+
+     Running tests/gc_incremental.rs (target/debug/deps/gc_incremental-03eddb2aaf1f4655)
+
+running 2 tests
+test pin_and_lease_invalidate_ready_and_partial_gc_snapshots ... ok
+test late_corrupt_pin_is_found_by_bounded_gc_not_startup ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.24s
+
+     Running tests/prepare_extensions.rs (target/debug/deps/prepare_extensions-1aae745770fe9b12)
+
+running 5 tests
+test prepare_bounds_decompressed_bytes_across_the_whole_image ... ok
+test prepare_normalizes_current_directory_members_and_rejects_alias_collisions ... ok
+test prepare_normalization_keeps_root_type_and_traversal_guards ... ok
+test prepare_standard_extensions_preserves_effective_paths_sizes_and_framing ... ok
+test prepare_rejects_malformed_and_ambiguous_pax_metadata ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s

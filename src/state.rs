@@ -3,6 +3,6 @@
 mod redb;
 
 pub use redb::{
-    Blob, CURRENT_SCHEMA, Garbage, Imported, Operation, PeerIdentity, Prepared, Reference, Root,
-    State, StateTx,
+    Blob, CURRENT_SCHEMA, Garbage, Imported, LeaseState, Operation, PeerIdentity, Prepared,
+    Reference, Root, State, StateTx,
 };

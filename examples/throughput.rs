@@ -79,8 +79,8 @@ fn main() -> Result<()> {
     let now = Instant::now();
     let prepared = store.prepare(&manifest, &platform)?;
     let prepare_seconds = now.elapsed().as_secs_f64();
-    store.lease("benchmark", &manifest)?;
-    let dir = cap_std::fs::Dir::from_std_file(store.open_prepared(&prepared, "benchmark")?);
+    let lease = store.lease(&manifest)?;
+    let dir = cap_std::fs::Dir::from_std_file(store.open_prepared(&prepared, lease.as_str())?);
     ensure!(
         dir.metadata("payload")?.len() == SIZE,
         "prepared size mismatch"

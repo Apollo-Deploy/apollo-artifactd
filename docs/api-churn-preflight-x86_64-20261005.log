@@ -1,0 +1,23 @@
+    Checking apollo-artifactd v0.1.0 (/home/tihan/artifactd-qualification-20261004)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.62s
+   Compiling rustix v1.1.5
+   Compiling rustix-linux-procfs v0.1.1
+   Compiling fs-set-times v0.20.3
+   Compiling xattr v1.6.1
+   Compiling artifactd-protocol v0.1.0 (/home/tihan/artifactd-qualification-20261004/crates/artifactd-protocol)
+   Compiling tempfile v3.27.0
+   Compiling cap-primitives v4.0.3
+   Compiling tar v0.4.46 (/home/tihan/artifactd-qualification-20261004/vendor/tar)
+   Compiling rusty-fork v0.3.1
+   Compiling proptest v1.11.0
+   Compiling cap-std v4.0.3
+   Compiling apollo-artifactd v0.1.0 (/home/tihan/artifactd-qualification-20261004)
+    Finished `release` profile [optimized] target(s) in 52.99s
+  File "<string>", line 3
+    with tempfile.TemporaryDirectory(prefix=artifactd-api-smoke-) as d:
+                                                                ^
+SyntaxError: invalid syntax
+{"blob_iteration":0,"resources":{"cpu_ticks":0,"fds":13,"pid":2304261,"state_bytes":94208,"status":["VmHWM:\t    6740 kB","VmRSS:\t    6740 kB","Threads:\t1"]}}
+{"oci_iteration":0,"resources":{"cpu_ticks":0,"fds":13,"pid":2304301,"state_bytes":139264,"status":["VmHWM:\t    6552 kB","VmRSS:\t    6552 kB","Threads:\t1"]}}
+{"baseline":{"cpu_ticks":0,"fds":13,"pid":2304261,"state_bytes":1056768,"status":["VmHWM:\t    6292 kB","VmRSS:\t    6292 kB","Threads:\t1"]},"blob_latency":{"p50_us":3880,"p95_us":5706,"p99_us":5706},"blob_operations":10,"bytes":{"blob":100,"oci_archives":38400},"cpu_ticks_after_restart":0,"cpu_ticks_cycles_after_restart":3,"cpu_ticks_segments":[3,0],"cpu_ticks_workload_before_first_restart":3,"elapsed_us":101592,"final_resources":{"cpu_ticks":0,"fds":13,"pid":2304302,"state_bytes":139264,"status":["VmHWM:\t    6608 kB","VmRSS:\t    6608 kB","Threads:\t1"]},"oci_latency":{"p50_us":8485,"p95_us":9949,"p99_us":9949},"oci_lifecycles":5,"operation_latency":{"gc":{"p50_us":813,"p95_us":2455,"p99_us":2455},"import_archive":{"p50_us":2113,"p95_us":2305,"p99_us":2305},"import_blob":{"p50_us":500,"p95_us":745,"p99_us":745},"prepare":{"p50_us":1345,"p95_us":1393,"p99_us":1393}},"post_restart_resources":{"cpu_ticks":0,"fds":13,"pid":2304302,"state_bytes":139264,"status":["VmHWM:\t    6596 kB","VmRSS:\t    6596 kB","Threads:\t1"]},"pre_first_restart_resources":{"cpu_ticks":3,"fds":13,"pid":2304261,"state_bytes":139264,"status":["VmHWM:\t    7112 kB","VmRSS:\t    7112 kB","Threads:\t1"]},"status":{"blobs":0,"bytes":0,"production_qualified":false,"schema":3},"throughput_bytes_per_sec":378966.84778329}
+{"final_inventory":{"blobs_entries":0,"prepared_entries":0,"store_entries":5,"tables":{"blobs":0,"edges":0,"gc":0,"gc_marks":0,"imports":0,"leases":0,"operations":112,"pins":0,"prepared":0,"registry":0,"roots":0},"temp_entries":0}}

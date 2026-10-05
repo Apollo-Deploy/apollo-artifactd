@@ -1,222 +1,53 @@
 #![cfg(target_os = "linux")]
 
-use artifactd_protocol::{Action, ArtifactDigest, Response};
-use rustix::{
-    fs::{self, AtFlags, CWD, Gid, Uid},
-    process::geteuid,
-};
-use std::{
-    os::unix::{fs::PermissionsExt, process::CommandExt},
-    path::{Path, PathBuf},
-    process::{Child, Command, Output, Stdio},
-};
+#[path = "common/peer.rs"]
+mod peer;
 
-const NOBODY: u32 = 65_534;
-const NOGROUP: u32 = 65_534;
+use artifactd_protocol::{Action, ArtifactDigest, LeaseId, PinId};
+use peer::{SERVICE_GID, SERVICE_UID, allocate_operation, chown, error, response, root_harness};
+use rustix::process::geteuid;
+use std::{os::unix::fs::PermissionsExt, process::Output};
 
-struct Daemon(Child);
-impl Drop for Daemon {
-    fn drop(&mut self) {
-        let _ = self.0.kill();
-        let _ = self.0.wait();
-    }
-}
+const FOREIGN_GID: u32 = SERVICE_GID - 1;
 
-fn chown(path: &Path, uid: u32, gid: u32) {
-    fs::chownat(
-        CWD,
-        path,
-        Some(Uid::from_raw(uid)),
-        Some(Gid::from_raw(gid)),
-        AtFlags::empty(),
-    )
-    .unwrap();
-}
-
-fn run_cli(
-    cli: &Path,
-    socket: &Path,
-    uid: u32,
-    gid: u32,
+fn assert_foreign_operation(
+    output: &Output,
+    harness: &peer::Harness,
+    operation: &str,
     action: &Action,
-    operation_id: Option<&str>,
-    input: Option<&Path>,
-) -> Output {
-    let action = serde_json::to_string(action).unwrap();
-    let mut command = Command::new(cli);
-    command.args([
-        "--socket",
-        socket.to_str().unwrap(),
-        "--server-uid",
-        &uid.to_string(),
-        "--action",
-        &action,
-    ]);
-    if let Some(operation_id) = operation_id {
-        command.args(["--operation-id", operation_id]);
-    }
-    if let Some(input) = input {
-        command.args(["--input", input.to_str().unwrap()]);
-    }
-    command.uid(uid).gid(gid).output().unwrap()
-}
-
-fn error(output: &Output) -> String {
-    serde_json::from_slice::<Response>(&output.stdout)
-        .unwrap()
-        .result
-        .unwrap_err()
-}
-
-fn spawn_daemon(binary: &Path, store: &Path, socket: &Path) -> Daemon {
-    let child = Command::new(binary)
-        .args([
-            "--store",
-            store.to_str().unwrap(),
-            "--socket",
-            socket.to_str().unwrap(),
-        ])
-        .uid(NOBODY)
-        .gid(NOGROUP)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .unwrap();
-    Daemon(child)
-}
-
-fn wait_ready(cli: &Path, socket: &Path) -> Output {
-    for _ in 0..100 {
-        let output = run_cli(
-            cli,
-            socket,
-            NOBODY,
-            NOGROUP,
-            &Action::Capabilities,
-            None,
-            None,
-        );
-        if output.status.success() {
-            return output;
-        }
-        std::thread::sleep(std::time::Duration::from_millis(10));
-    }
-    panic!("unprivileged daemon did not become ready");
-}
-
-fn response(output: &Output) -> Response {
-    assert!(
-        output.status.success(),
-        "{}",
-        String::from_utf8_lossy(&output.stderr)
-    );
-    serde_json::from_slice(&output.stdout).unwrap()
-}
-
-fn assert_foreign_reference(cli: &Path, socket: &Path, action: &Action) {
-    let output = run_cli(cli, socket, NOBODY, NOGROUP - 1, action, None, None);
-    assert!(!output.status.success());
-    assert!(error(&output).contains("reference owner mismatch"));
-}
-
-fn root_harness() -> (
-    tempfile::TempDir,
-    PathBuf,
-    PathBuf,
-    PathBuf,
-    PathBuf,
-    PathBuf,
 ) {
-    let root = tempfile::tempdir().unwrap();
-    std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o711)).unwrap();
-    let store = root.path().join("store");
-    let runtime = root.path().join("runtime");
-    std::fs::create_dir(&store).unwrap();
-    std::fs::create_dir(&runtime).unwrap();
-    for path in [&store, &runtime] {
-        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o700)).unwrap();
-        chown(path, NOBODY, NOGROUP);
-    }
-    let daemon_binary = root.path().join("apollo-artifactd");
-    let cli_binary = root.path().join("apollo-artifactctl");
-    std::fs::copy(env!("CARGO_BIN_EXE_apollo-artifactd"), &daemon_binary).unwrap();
-    std::fs::copy(env!("CARGO_BIN_EXE_apollo-artifactctl"), &cli_binary).unwrap();
-    for path in [&daemon_binary, &cli_binary] {
-        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).unwrap();
-    }
-    let socket = runtime.join("artifactd.sock");
-    (root, store, runtime, daemon_binary, cli_binary, socket)
+    assert!(!output.status.success());
+    assert!(error(output).contains("operation owner mismatch"));
+    let retry = harness.run_cli(SERVICE_UID, FOREIGN_GID, action, Some(operation), None);
+    assert!(!retry.status.success());
+    assert!(error(&retry).contains("operation owner mismatch"));
 }
 
 #[test]
 #[ignore = "requires explicit root execution for isolated numeric UID/GID peers"]
 fn kernel_peer_gid_binds_operation_owner_across_restart() {
     assert_eq!(geteuid().as_raw(), 0, "run this ignored case as root");
-    let (_root, store, _runtime, daemon_binary, cli_binary, socket) = root_harness();
-    let daemon = spawn_daemon(&daemon_binary, &store, &socket);
+    let harness = root_harness(&[(SERVICE_UID, FOREIGN_GID, "producer")]);
+    let daemon = harness.spawn_daemon();
 
-    let ready = wait_ready(&cli_binary, &socket);
+    let ready = harness.wait_ready();
     assert!(response(&ready).result.is_ok());
-    let allocated = response(&run_cli(
-        &cli_binary,
-        &socket,
-        NOBODY,
-        NOGROUP,
-        &Action::OperationAllocate,
-        None,
-        None,
-    ));
-    let token = allocated.result.unwrap()["operation_id"]
-        .as_str()
-        .unwrap()
-        .to_owned();
+    let token = allocate_operation(&harness, SERVICE_UID, SERVICE_GID);
     let action = Action::Unpin {
         id: "kernel-owner".to_owned().try_into().unwrap(),
     };
-    let assert_foreign_rejected = || {
-        let foreign = run_cli(
-            &cli_binary,
-            &socket,
-            NOBODY,
-            NOGROUP - 1,
-            &action,
-            Some(&token),
-            None,
-        );
-        assert!(!foreign.status.success());
-        let rejected: Response = serde_json::from_slice(&foreign.stdout).unwrap();
-        assert!(
-            rejected
-                .result
-                .unwrap_err()
-                .contains("operation owner mismatch")
-        );
-    };
-    assert_foreign_rejected();
-    let rightful = response(&run_cli(
-        &cli_binary,
-        &socket,
-        NOBODY,
-        NOGROUP,
-        &action,
-        Some(&token),
-        None,
-    ));
+    let foreign = harness.run_cli(SERVICE_UID, FOREIGN_GID, &action, Some(&token), None);
+    assert_foreign_operation(&foreign, &harness, &token, &action);
+    let rightful =
+        response(&harness.run_cli(SERVICE_UID, SERVICE_GID, &action, Some(&token), None));
     assert!(rightful.result.is_ok());
     drop(daemon);
 
-    let daemon = spawn_daemon(&daemon_binary, &store, &socket);
-    wait_ready(&cli_binary, &socket);
-    assert_foreign_rejected();
-    let replay = response(&run_cli(
-        &cli_binary,
-        &socket,
-        NOBODY,
-        NOGROUP,
-        &action,
-        Some(&token),
-        None,
-    ));
+    let daemon = harness.spawn_daemon();
+    harness.wait_ready();
+    let foreign = harness.run_cli(SERVICE_UID, FOREIGN_GID, &action, Some(&token), None);
+    assert_foreign_operation(&foreign, &harness, &token, &action);
+    let replay = response(&harness.run_cli(SERVICE_UID, SERVICE_GID, &action, Some(&token), None));
     assert!(replay.result.is_ok());
     drop(daemon);
 }
@@ -225,18 +56,16 @@ fn kernel_peer_gid_binds_operation_owner_across_restart() {
 #[ignore = "requires explicit root execution for isolated numeric UID/GID peers"]
 fn kernel_peer_gid_binds_persistent_pin_and_lease_owners() {
     assert_eq!(geteuid().as_raw(), 0, "run this ignored case as root");
-    let (root, store, _runtime, daemon_binary, cli_binary, socket) = root_harness();
-    let input = root.path().join("input");
+    let harness = root_harness(&[(SERVICE_UID, FOREIGN_GID, "producer")]);
+    let input = harness.root.path().join("input");
     std::fs::write(&input, b"reference-owner").unwrap();
     std::fs::set_permissions(&input, std::fs::Permissions::from_mode(0o644)).unwrap();
-    chown(&input, NOBODY, NOGROUP);
-    let daemon = spawn_daemon(&daemon_binary, &store, &socket);
-    wait_ready(&cli_binary, &socket);
-    let imported = response(&run_cli(
-        &cli_binary,
-        &socket,
-        NOBODY,
-        NOGROUP,
+    chown(&input, SERVICE_UID, SERVICE_GID);
+    let daemon = harness.spawn_daemon();
+    harness.wait_ready();
+    let imported = response(&harness.run_cli(
+        SERVICE_UID,
+        SERVICE_GID,
         &Action::ImportBlob {
             digest: None,
             size: b"reference-owner".len() as u64,
@@ -246,65 +75,86 @@ fn kernel_peer_gid_binds_persistent_pin_and_lease_owners() {
     ));
     let digest: ArtifactDigest =
         serde_json::from_value(imported.result.unwrap()["artifact_digest"].clone()).unwrap();
-    let pin: artifactd_protocol::PinId = "kernel-pin".to_owned().try_into().unwrap();
-    let lease: artifactd_protocol::LeaseId = "kernel-lease".to_owned().try_into().unwrap();
-    let owner = |action: &Action| {
-        response(&run_cli(
-            &cli_binary,
-            &socket,
-            NOBODY,
-            NOGROUP,
-            action,
-            None,
-            None,
-        ))
-        .result
-        .unwrap()
-    };
+    let pin: PinId = "kernel-pin".to_owned().try_into().unwrap();
     let pin_action = Action::Pin {
         id: pin.clone(),
         digest: digest.clone(),
     };
-    let lease_action = Action::LeaseCreate {
-        id: lease.clone(),
+    let create_operation = allocate_operation(&harness, SERVICE_UID, SERVICE_GID);
+    let create_action = Action::LeaseCreate {
         digest: digest.clone(),
+        grantee: None,
+    };
+    let created = response(&harness.run_cli(
+        SERVICE_UID,
+        SERVICE_GID,
+        &create_action,
+        Some(&create_operation),
+        None,
+    ));
+    let lease: LeaseId = created.result.unwrap()["lease_id"]
+        .as_str()
+        .unwrap()
+        .to_owned()
+        .try_into()
+        .unwrap();
+    let release_action = Action::LeaseRelease { id: lease.clone() };
+    let open_action = Action::OpenBlob {
+        digest: digest.clone(),
+        lease: lease.clone(),
+    };
+    let owner = |action: &Action| {
+        response(&harness.run_cli(SERVICE_UID, SERVICE_GID, action, None, None))
+            .result
+            .unwrap()
     };
     owner(&pin_action);
-    owner(&lease_action);
     let assert_refs_rejected = || {
         for action in [
             pin_action.clone(),
-            lease_action.clone(),
             Action::Unpin { id: pin.clone() },
-            Action::LeaseRelease { id: lease.clone() },
-            Action::OpenBlob {
-                digest: digest.clone(),
-                lease: lease.clone(),
-            },
+            release_action.clone(),
+            open_action.clone(),
         ] {
-            assert_foreign_reference(&cli_binary, &socket, &action);
+            let output = harness.run_cli(SERVICE_UID, FOREIGN_GID, &action, None, None);
+            assert!(!output.status.success());
+            let expected = match action {
+                Action::OpenBlob { .. } => "lease grantee mismatch",
+                Action::LeaseRelease { .. } => "lease release unauthorized",
+                _ => "reference owner mismatch",
+            };
+            assert_eq!(error(&output), expected);
         }
     };
     assert_refs_rejected();
     drop(daemon);
-    let daemon = spawn_daemon(&daemon_binary, &store, &socket);
-    wait_ready(&cli_binary, &socket);
+    let daemon = harness.spawn_daemon();
+    harness.wait_ready();
     assert_refs_rejected();
     owner(&Action::Gc { max_entries: 4096 });
-    // These reads/retries prove neither unauthorized removal nor GC lost the roots.
     owner(&Action::Verify {
         digest: digest.clone(),
     });
     owner(&pin_action);
-    owner(&lease_action);
+    let replayed_create = response(&harness.run_cli(
+        SERVICE_UID,
+        SERVICE_GID,
+        &create_action,
+        Some(&create_operation),
+        None,
+    ));
+    let replayed_lease = replayed_create.result.unwrap()["lease_id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    assert_eq!(replayed_lease, lease.as_str());
     owner(&Action::Unpin { id: pin });
-    owner(&Action::LeaseRelease { id: lease });
+    owner(&release_action);
     owner(&Action::Gc { max_entries: 4096 });
-    let verify = run_cli(
-        &cli_binary,
-        &socket,
-        NOBODY,
-        NOGROUP,
+
+    let verify = harness.run_cli(
+        SERVICE_UID,
+        SERVICE_GID,
         &Action::Verify { digest },
         None,
         None,

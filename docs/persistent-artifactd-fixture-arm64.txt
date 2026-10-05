@@ -1,0 +1,37 @@
+Apollo Artifactd persistent fixture qualification — arm64
+
+Host: apollo-node-01
+Architecture: aarch64/arm64
+Artifactd source checkout: 2fa93104d3a6b688a41140a9440581a5c5cb602b
+Qualification binaries:
+  apollo-artifactd  sha256:786febc77604c3159b8fe4e869ec84e4343707ad82fc52b2042f2fce6ea59f27
+  apollo-artifactctl sha256:5675cdf6e9fc2010da9ae9d7263b1277a08e0c0726ba3691cf7aa051385fc4e9
+Fixture source:
+  persistent_artifactd_fixture.py sha256:05a418732a99bff6ef9f455e6144a4668f398c683fc7dc26506873bfee05ad87
+
+Command:
+  sudo -n python3 /tmp/run-artifactd-qual.py apollo-node-01 /var/lib/apollo-verification/authority-workers-artifactd-qual-apollo-node-01
+
+Observed output:
+  STATUS_START=ok
+  IMPORT_FIRST={"version":3,"operation_id":"a90076f528334e79ac26f8c649d66e42_00000000000000000002","result":{"Ok":{"artifact_digest":"sha256:b310a21ee2efc07fd2dbf98d7bbcf87a0db5ac9dc31ebb60de95716aa8672fa8","size":43}}}
+  STATUS_RESTART=ok
+  INSPECT_RESTART={"version":3,"operation_id":"79eaa567-38ab-48a6-93a9-59a285202ca3","result":{"Ok":{"artifact_digest":"sha256:b310a21ee2efc07fd2dbf98d7bbcf87a0db5ac9dc31ebb60de95716aa8672fa8","size":43,"verified":true}}}
+  STOP=ok
+
+The transient qualification unit was inactive after the run. The fixture uses a hashed
+stable state directory so the Unix socket remains within Linux AF_UNIX path limits.
+
+Additional bounded controls on the same isolated campaign:
+  MISSING_STORE_REJECTED=established Artifactd state is missing or foreign
+  FOREIGN_UNIT_REJECTED=existing Artifactd unit is not owned by this campaign
+  FOREIGN_UNIT_STILL_ACTIVE=pid:<dummy transient PID>
+The foreign same-name transient `/bin/sleep` unit remained active with the same PID
+until the control stopped it; no foreign unit was stopped by the fixture.
+
+Stale foreign socket retry control (same helper object, isolated root):
+  STALE_FOREIGN_REJECTED=foreign Artifactd socket
+  STALE_FOREIGN_REMOVED=owned-test-socket
+  STALE_RETRY_STATUS=ok
+  FD_COUNTS=baseline:4,after_reject:4,after_start:7,after_close:4
+  CLEANUP=campaign-and-derived-state-removed

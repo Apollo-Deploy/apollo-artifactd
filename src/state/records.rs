@@ -13,6 +13,12 @@ pub struct Reference {
     /// Legacy references remain unowned and require explicit migration.
     #[serde(default)]
     pub owner: Option<PeerIdentity>,
+    /// Lease recipient; pins must leave this unset.
+    #[serde(default)]
+    pub grantee: Option<PeerIdentity>,
+    /// Lease lifecycle; pins must leave this unset.
+    #[serde(default)]
+    pub lease_state: Option<LeaseState>,
 }
 
 impl Reference {
@@ -32,6 +38,35 @@ impl Reference {
         );
         Ok(())
     }
+
+    pub fn validate_pin(&self) -> anyhow::Result<()> {
+        self.require_owner()?;
+        anyhow::ensure!(self.grantee.is_none(), "pin contains lease grantee");
+        anyhow::ensure!(self.lease_state.is_none(), "pin contains lease state");
+        Ok(())
+    }
+
+    pub fn validate_lease(&self) -> anyhow::Result<()> {
+        self.require_owner()?;
+        anyhow::ensure!(self.grantee.is_some(), "lease missing grantee");
+        anyhow::ensure!(self.lease_state.is_some(), "lease missing lifecycle state");
+        Ok(())
+    }
+
+    pub fn authorize_grantee(&self, caller: &PeerIdentity) -> anyhow::Result<()> {
+        self.validate_lease()?;
+        anyhow::ensure!(
+            self.grantee.as_ref() == Some(caller),
+            "lease grantee mismatch"
+        );
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+pub enum LeaseState {
+    Available,
+    Claimed,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]

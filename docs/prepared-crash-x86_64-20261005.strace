@@ -1,0 +1,2 @@
+renameat(7, "6c922610-3092-4083-bbcd-a9cb0baed7a5.staging", 7, "e9c03afbd1cce252951b800789a0a15cc6083a792aa543904220ee4a1c71a367") = 0 (DELAYED)
++++ killed by SIGKILL +++

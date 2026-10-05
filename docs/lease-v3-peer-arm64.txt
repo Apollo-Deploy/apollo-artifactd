@@ -1,0 +1,44 @@
+   Compiling darling_core v0.20.11
+   Compiling num-traits v0.2.19
+   Compiling chrono v0.4.45
+   Compiling darling_macro v0.20.11
+   Compiling darling v0.20.11
+   Compiling derive_builder_core v0.20.2
+   Compiling derive_builder_macro v0.20.2
+   Compiling derive_builder v0.20.2
+   Compiling oci-spec v0.10.0
+   Compiling oci-spec v0.9.0
+   Compiling oci-client v0.18.0 (/home/apollo-admin/artifactd-qualification-20261004/vendor/oci-client)
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.35s
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.85s
+     Running unittests src/lib.rs (target/debug/deps/apollo_artifactd-2814954cadcce2a6)
+
+running 1 test
+test api::runtime::tests::bind_stays_with_captured_runtime_directory_after_path_replacement ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.62s
+  Executable tests/delegated_lease_peer.rs (target/debug/deps/delegated_lease_peer-6014570d871ef549)
+  Executable tests/operation_owner_peer.rs (target/debug/deps/operation_owner_peer-51be2717e185776b)
+
+running 1 test
+test kernel_peer_gid_binds_operation_owner_across_restart ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.29s
+
+
+running 1 test
+test kernel_peer_gid_binds_persistent_pin_and_lease_owners ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.18s
+
+
+running 1 test
+test delegated_claim_survives_restart_and_release_replay_cannot_rebind ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.27s
+

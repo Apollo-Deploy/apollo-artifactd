@@ -1,0 +1,26 @@
+   Compiling apollo-artifactd v0.1.0 (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.10s
+     Running tests/registry_api.rs (target/debug/deps/registry_api-a3d99d5fa5e4473a)
+
+running 1 test
+test registry_api_fd_credentials_journal_and_prepared_facts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.16s
+
+     Running tests/registry_crash.rs (target/debug/deps/registry_crash-495740daa8cb8480)
+
+running 1 test
+
+thread 'sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob' (2401395) panicked at tests/registry_crash.rs:92:10:
+called `Result::unwrap()` on an `Err` value: No space left on device (os error 28)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob ... FAILED
+
+failures:
+
+failures:
+    sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 26.82s
+
+error: test failed, to rerun pass `--test registry_crash`

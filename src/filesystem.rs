@@ -120,6 +120,27 @@ pub fn owned_remove(dir: &Dir, name: &str) -> Result<()> {
     sync(dir)
 }
 
+/// Removes an immutable CAS object only when its stored ownership metadata
+/// still matches the durable object record. GC does not need to rehash bytes
+/// that are already unreachable; it must prove the file identity is safe to
+/// unlink and leave digest verification to reads and explicit VERIFY calls.
+pub fn owned_remove_blob(dir: &Dir, name: &str, expected_size: u64) -> Result<()> {
+    let fd = fs::openat(
+        dir,
+        name,
+        OFlags::RDONLY | OFlags::NOFOLLOW | OFlags::CLOEXEC | OFlags::NONBLOCK,
+        Mode::empty(),
+    )?;
+    private_fd(&fd, false)?;
+    let stat = fs::fstat(&fd)?;
+    ensure!(
+        stat.st_mode & 0o222 == 0 && u64::try_from(stat.st_size).ok() == Some(expected_size),
+        "GC target is writable or has a size mismatch"
+    );
+    fs::unlinkat(dir, name, fs::AtFlags::empty())?;
+    sync(dir)
+}
+
 pub fn readonly(file: &File) -> Result<()> {
     fs::fchmod(file, Mode::from_raw_mode(0o400))?;
     file.sync_all()?;

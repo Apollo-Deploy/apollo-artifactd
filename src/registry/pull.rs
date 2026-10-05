@@ -49,6 +49,9 @@ impl Registry {
         ensure!(platform.validate(), "unsupported platform");
         let image = reference(value, true)?;
         let root: ArtifactDigest = image.digest().expect("validated digest").parse()?;
+        // A cache hit skips the network, but supplied credentials must still
+        // be bound to the requested registry authority.
+        credentials.validate_for(&image)?;
         // A valid local graph is already the immutable requested result.
         if store.resolve(&root, platform).is_ok() {
             return store.admit_oci_with_pin(&root, platform, pin, caller);

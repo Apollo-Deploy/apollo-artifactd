@@ -1,0 +1,3 @@
+{"version":3,"operation_id":"a4bc5b2a-488d-4159-8f80-799547c20300","result":{"Ok":{"blobs":0,"bytes":0,"production_qualified":false,"schema":3}}}
+{"version":3,"operation_id":"40e43ebd35f24a24a9eef8e172365ebc_00000000000000671168","result":{"Ok":{"recovered":0}}}
+{"version":3,"operation_id":"40e43ebd35f24a24a9eef8e172365ebc_00000000000000671169","result":{"Ok":{"database":"open","database_integrity_checked":true,"database_integrity_clean":true,"database_repaired":false,"durability":"Immediate","engine":"redb","exclusive_owner":true,"inspection_scope":"operation_execution","live_graphs_verified":true,"operation_journal":{"interrupted":0,"pending_intents":1,"retained":4033,"retired_through":667136,"verified":true}}}}

@@ -1,0 +1,606 @@
+{
+  "host": "apollo-node-01-internet",
+  "daemon_sha256": "02cacdbc4a936c9f0238feedcba522df72ab2b7746210ec32166d7bbe4a282ab",
+  "source_input_map_sha256": "fccde001984e512bf21c7fe76a14a421137e37c6b5b732e754c65312ef91c265",
+  "input_count": 172,
+  "workload": "IMPORT_BLOB/PIN/UNPIN/GC; does not include leases or OPEN_BLOB",
+  "runs": {
+    "direct-current-default-10000": {
+      "root": "/home/apollo-admin/artifactd-rss-profile-20261005-arm64/direct-current-default-10000",
+      "script_sha256": "f20da4a18542da625bd2004c357e39ba149e880fd452e416f81731d49a9a85cd",
+      "samples": [
+        {
+          "iteration": 0,
+          "pid": 444864,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 632,
+            "Private_Dirty": 632,
+            "Pss": 2473,
+            "Pss_Anon": 632,
+            "Pss_File": 1841,
+            "Rss": 5336
+          },
+          "state_bytes": 1056768,
+          "time": 1791186673.1802678
+        },
+        {
+          "iteration": 1000,
+          "pid": 444864,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 3920,
+            "Private_Dirty": 3920,
+            "Pss": 5857,
+            "Pss_Anon": 3920,
+            "Pss_File": 1937,
+            "Rss": 8816
+          },
+          "state_bytes": 2433024,
+          "time": 1791186710.4715605
+        },
+        {
+          "iteration": 2000,
+          "pid": 444864,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 3952,
+            "Private_Dirty": 3952,
+            "Pss": 7460,
+            "Pss_Anon": 3952,
+            "Pss_File": 3508,
+            "Rss": 8912
+          },
+          "state_bytes": 2433024,
+          "time": 1791186740.2876813
+        },
+        {
+          "iteration": 3000,
+          "pid": 444864,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 3952,
+            "Private_Dirty": 3952,
+            "Pss": 5761,
+            "Pss_Anon": 3952,
+            "Pss_File": 1809,
+            "Rss": 8912
+          },
+          "state_bytes": 2433024,
+          "time": 1791186771.3875425
+        },
+        {
+          "iteration": 4000,
+          "pid": 444864,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 4120,
+            "Private_Dirty": 4120,
+            "Pss": 5895,
+            "Pss_Anon": 4120,
+            "Pss_File": 1775,
+            "Rss": 9080
+          },
+          "state_bytes": 2433024,
+          "time": 1791186809.5703545
+        },
+        {
+          "iteration": 5000,
+          "pid": 444864,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 4204,
+            "Private_Dirty": 4204,
+            "Pss": 5981,
+            "Pss_Anon": 4204,
+            "Pss_File": 1777,
+            "Rss": 9164
+          },
+          "state_bytes": 2433024,
+          "time": 1791186847.3609493
+        },
+        {
+          "iteration": 6000,
+          "pid": 444864,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 4504,
+            "Private_Dirty": 4504,
+            "Pss": 6281,
+            "Pss_Anon": 4504,
+            "Pss_File": 1777,
+            "Rss": 9464
+          },
+          "state_bytes": 2433024,
+          "time": 1791186885.5238554
+        },
+        {
+          "iteration": 7000,
+          "pid": 444864,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 4816,
+            "Private_Dirty": 4816,
+            "Pss": 6593,
+            "Pss_Anon": 4816,
+            "Pss_File": 1777,
+            "Rss": 9776
+          },
+          "state_bytes": 2433024,
+          "time": 1791186924.6686227
+        },
+        {
+          "iteration": 8000,
+          "pid": 444864,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 5164,
+            "Private_Dirty": 5164,
+            "Pss": 6941,
+            "Pss_Anon": 5164,
+            "Pss_File": 1777,
+            "Rss": 10124
+          },
+          "state_bytes": 2433024,
+          "time": 1791186963.3683496
+        },
+        {
+          "iteration": 9000,
+          "pid": 444864,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 5588,
+            "Private_Dirty": 5588,
+            "Pss": 7365,
+            "Pss_Anon": 5588,
+            "Pss_File": 1777,
+            "Rss": 10548
+          },
+          "state_bytes": 2433024,
+          "time": 1791187002.0682342
+        },
+        {
+          "iteration": 10000,
+          "pid": 444864,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 5896,
+            "Private_Dirty": 5896,
+            "Pss": 7673,
+            "Pss_Anon": 5896,
+            "Pss_File": 1777,
+            "Rss": 10856
+          },
+          "state_bytes": 2433024,
+          "time": 1791187042.3652015
+        },
+        {
+          "iteration": 10000,
+          "pid": 444864,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 5896,
+            "Private_Dirty": 5896,
+            "Pss": 7673,
+            "Pss_Anon": 5896,
+            "Pss_File": 1777,
+            "Rss": 10856
+          },
+          "state_bytes": 2433024,
+          "time": 1791187042.3653505
+        }
+      ]
+    },
+    "direct-current-trim-10000": {
+      "root": "/home/apollo-admin/artifactd-rss-profile-20261005-arm64/direct-current-trim-10000",
+      "script_sha256": "3f16ca833c7090cbe4fd51be72ad8fd8215001f83ef92536b0e08cf1f9e71abf",
+      "samples": [
+        {
+          "iteration": 0,
+          "pid": 445051,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 632,
+            "Private_Dirty": 632,
+            "Pss": 2281,
+            "Pss_Anon": 632,
+            "Pss_File": 1649,
+            "Rss": 5336
+          },
+          "state_bytes": 1056768,
+          "time": 1791186758.46749
+        },
+        {
+          "iteration": 1000,
+          "pid": 445051,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 3136,
+            "Private_Dirty": 3136,
+            "Pss": 4881,
+            "Pss_Anon": 3136,
+            "Pss_File": 1745,
+            "Rss": 8032
+          },
+          "state_bytes": 2433024,
+          "time": 1791186795.818132
+        },
+        {
+          "iteration": 2000,
+          "pid": 445051,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 3168,
+            "Private_Dirty": 3168,
+            "Pss": 4945,
+            "Pss_Anon": 3168,
+            "Pss_File": 1777,
+            "Rss": 8128
+          },
+          "state_bytes": 2433024,
+          "time": 1791186834.386318
+        },
+        {
+          "iteration": 3000,
+          "pid": 445051,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 3168,
+            "Private_Dirty": 3168,
+            "Pss": 4945,
+            "Pss_Anon": 3168,
+            "Pss_File": 1777,
+            "Rss": 8128
+          },
+          "state_bytes": 2433024,
+          "time": 1791186872.6602454
+        },
+        {
+          "iteration": 4000,
+          "pid": 445051,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 3428,
+            "Private_Dirty": 3428,
+            "Pss": 5205,
+            "Pss_Anon": 3428,
+            "Pss_File": 1777,
+            "Rss": 8388
+          },
+          "state_bytes": 2433024,
+          "time": 1791186911.8491943
+        },
+        {
+          "iteration": 5000,
+          "pid": 445051,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 3776,
+            "Private_Dirty": 3776,
+            "Pss": 5553,
+            "Pss_Anon": 3776,
+            "Pss_File": 1777,
+            "Rss": 8736
+          },
+          "state_bytes": 2433024,
+          "time": 1791186950.1160932
+        },
+        {
+          "iteration": 6000,
+          "pid": 445051,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 4216,
+            "Private_Dirty": 4216,
+            "Pss": 5993,
+            "Pss_Anon": 4216,
+            "Pss_File": 1777,
+            "Rss": 9176
+          },
+          "state_bytes": 2433024,
+          "time": 1791186988.9876184
+        },
+        {
+          "iteration": 7000,
+          "pid": 445051,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 4628,
+            "Private_Dirty": 4628,
+            "Pss": 6405,
+            "Pss_Anon": 4628,
+            "Pss_File": 1777,
+            "Rss": 9588
+          },
+          "state_bytes": 2433024,
+          "time": 1791187029.0273006
+        },
+        {
+          "iteration": 8000,
+          "pid": 445051,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 5040,
+            "Private_Dirty": 5040,
+            "Pss": 8551,
+            "Pss_Anon": 5040,
+            "Pss_File": 3511,
+            "Rss": 10000
+          },
+          "state_bytes": 2433024,
+          "time": 1791187062.751836
+        },
+        {
+          "iteration": 9000,
+          "pid": 445051,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 5412,
+            "Private_Dirty": 5412,
+            "Pss": 8923,
+            "Pss_Anon": 5412,
+            "Pss_File": 3511,
+            "Rss": 10372
+          },
+          "state_bytes": 2433024,
+          "time": 1791187091.533111
+        },
+        {
+          "iteration": 10000,
+          "pid": 445051,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 5776,
+            "Private_Dirty": 5776,
+            "Pss": 9285,
+            "Pss_Anon": 5776,
+            "Pss_File": 3509,
+            "Rss": 10736
+          },
+          "state_bytes": 2433024,
+          "time": 1791187119.468331
+        },
+        {
+          "iteration": 10000,
+          "pid": 445051,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 5776,
+            "Private_Dirty": 5776,
+            "Pss": 9285,
+            "Pss_Anon": 5776,
+            "Pss_File": 3509,
+            "Rss": 10736
+          },
+          "state_bytes": 2433024,
+          "time": 1791187119.4684403
+        }
+      ],
+      "launcher_tail": [
+        "{\"iteration\": 10000, \"pid\": 445051, \"smaps_kib\": {\"AnonHugePages\": 0, \"Anonymous\": 5776, \"Private_Dirty\": 5776, \"Pss\": 9285, \"Pss_Anon\": 5776, \"Pss_File\": 3509, \"Rss\": 10736}, \"state_bytes\": 2433024, \"time\": 1791187119.4684403}",
+        "PROFILE_WORKLOAD_PASS",
+        "DAEMON_EXIT -15"
+      ]
+    },
+    "massif-current-10000": {
+      "root": "/home/apollo-admin/artifactd-rss-profile-20261005-arm64/massif-current-10000",
+      "script_sha256": "e374c4b8ba0c2b8d1ce2dd88be6118238dbd4888e1172aae25d3f195a4b78912",
+      "samples": [
+        {
+          "iteration": 0,
+          "pid": 444266,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 26596,
+            "Private_Dirty": 26600,
+            "Pss": 31863,
+            "Pss_Anon": 26596,
+            "Pss_File": 5267,
+            "Rss": 33308
+          },
+          "state_bytes": 1056768,
+          "time": 1791186254.6019332
+        },
+        {
+          "iteration": 1000,
+          "pid": 444266,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 32408,
+            "Private_Dirty": 32408,
+            "Pss": 37739,
+            "Pss_Anon": 32408,
+            "Pss_File": 5331,
+            "Rss": 39184
+          },
+          "state_bytes": 2433024,
+          "time": 1791186292.5264554
+        },
+        {
+          "iteration": 2000,
+          "pid": 444266,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 32708,
+            "Private_Dirty": 32708,
+            "Pss": 38103,
+            "Pss_Anon": 32708,
+            "Pss_File": 5395,
+            "Rss": 39548
+          },
+          "state_bytes": 2433024,
+          "time": 1791186338.4893808
+        },
+        {
+          "iteration": 3000,
+          "pid": 444266,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 32764,
+            "Private_Dirty": 32764,
+            "Pss": 38159,
+            "Pss_Anon": 32764,
+            "Pss_File": 5395,
+            "Rss": 39604
+          },
+          "state_bytes": 2433024,
+          "time": 1791186383.5832798
+        },
+        {
+          "iteration": 4000,
+          "pid": 444266,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 32924,
+            "Private_Dirty": 32924,
+            "Pss": 38319,
+            "Pss_Anon": 32924,
+            "Pss_File": 5395,
+            "Rss": 39764
+          },
+          "state_bytes": 2433024,
+          "time": 1791186429.6243374
+        },
+        {
+          "iteration": 5000,
+          "pid": 444266,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 33032,
+            "Private_Dirty": 33032,
+            "Pss": 38427,
+            "Pss_Anon": 33032,
+            "Pss_File": 5395,
+            "Rss": 39872
+          },
+          "state_bytes": 2433024,
+          "time": 1791186475.6535726
+        },
+        {
+          "iteration": 6000,
+          "pid": 444266,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 33288,
+            "Private_Dirty": 33288,
+            "Pss": 38683,
+            "Pss_Anon": 33288,
+            "Pss_File": 5395,
+            "Rss": 40128
+          },
+          "state_bytes": 2433024,
+          "time": 1791186521.9209352
+        },
+        {
+          "iteration": 7000,
+          "pid": 444266,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 33572,
+            "Private_Dirty": 33572,
+            "Pss": 38967,
+            "Pss_Anon": 33572,
+            "Pss_File": 5395,
+            "Rss": 40412
+          },
+          "state_bytes": 2433024,
+          "time": 1791186568.839111
+        },
+        {
+          "iteration": 8000,
+          "pid": 444266,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 33948,
+            "Private_Dirty": 33948,
+            "Pss": 39343,
+            "Pss_Anon": 33948,
+            "Pss_File": 5395,
+            "Rss": 40788
+          },
+          "state_bytes": 2433024,
+          "time": 1791186615.3402584
+        },
+        {
+          "iteration": 9000,
+          "pid": 444266,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 34392,
+            "Private_Dirty": 34392,
+            "Pss": 39787,
+            "Pss_Anon": 34392,
+            "Pss_File": 5395,
+            "Rss": 41232
+          },
+          "state_bytes": 2433024,
+          "time": 1791186660.9495661
+        },
+        {
+          "iteration": 10000,
+          "pid": 444266,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 34664,
+            "Private_Dirty": 34664,
+            "Pss": 38527,
+            "Pss_Anon": 34664,
+            "Pss_File": 3863,
+            "Rss": 41504
+          },
+          "state_bytes": 2433024,
+          "time": 1791186715.2286277
+        },
+        {
+          "iteration": 10000,
+          "pid": 444266,
+          "smaps_kib": {
+            "AnonHugePages": 0,
+            "Anonymous": 34664,
+            "Private_Dirty": 34664,
+            "Pss": 38527,
+            "Pss_Anon": 34664,
+            "Pss_File": 3863,
+            "Rss": 41504
+          },
+          "state_bytes": 2433024,
+          "time": 1791186715.2288558
+        }
+      ],
+      "launcher_tail": [
+        "{\"iteration\": 10000, \"pid\": 444266, \"smaps_kib\": {\"AnonHugePages\": 0, \"Anonymous\": 34664, \"Private_Dirty\": 34664, \"Pss\": 38527, \"Pss_Anon\": 34664, \"Pss_File\": 3863, \"Rss\": 41504}, \"state_bytes\": 2433024, \"time\": 1791186715.2288558}",
+        "PROFILE_WORKLOAD_PASS",
+        "DAEMON_EXIT -15"
+      ],
+      "massif": {
+        "path": "/home/apollo-admin/artifactd-rss-profile-20261005-arm64/massif-current-10000/massif.444266",
+        "sha256": "a778972a083b6744a28f2c2b1d3a3369826fb1111b93353c5102bbd598702998",
+        "snapshot_count": 162,
+        "first": {
+          "snapshot": 0,
+          "time": 0,
+          "mem_heap_B": 0,
+          "mem_heap_extra_B": 0,
+          "mem_stacks_B": 0,
+          "heap_tree": "empty"
+        },
+        "peak": {
+          "snapshot": 160,
+          "time": 116428801152,
+          "mem_heap_B": 5617153,
+          "mem_heap_extra_B": 10303,
+          "mem_stacks_B": 0,
+          "heap_tree": "peak"
+        },
+        "last": {
+          "snapshot": 161,
+          "time": 116909182496,
+          "mem_heap_B": 4841630,
+          "mem_heap_extra_B": 13938,
+          "mem_stacks_B": 0,
+          "heap_tree": "empty"
+        }
+      }
+    }
+  }
+}

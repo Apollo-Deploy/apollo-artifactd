@@ -1,0 +1,142 @@
+{
+  "host": "apollo-node-01-internet",
+  "root": "/home/apollo-admin/artifactd-api-current-20261005-b3y_d42z",
+  "receipts": {
+    "manifest.json": {
+      "path": "docs/api-churn-current-arm64-complete-20261005.json",
+      "sha256": "065750c4016f0f750be49f1fb4cdf1f15b6a2f5bd61627f81864256af5bfc683",
+      "bytes": 405
+    },
+    "run.log": {
+      "path": "docs/api-churn-current-arm64-complete-20261005.log",
+      "sha256": "a2823d791da676e03b197f027e9306dbd7f782e4cf7fc6d507f72d80eeb6c5ef",
+      "bytes": 4965
+    },
+    "exit": {
+      "path": "docs/api-churn-current-arm64-complete-20261005.exit",
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "bytes": 1
+    }
+  },
+  "terminal_exit": 0,
+  "summary": {
+    "baseline": {
+      "cpu_ticks": 0,
+      "fds": 13,
+      "pid": 441935,
+      "state_bytes": 1056768,
+      "status": [
+        "VmHWM:\t    5336 kB",
+        "VmRSS:\t    5336 kB",
+        "Threads:\t1"
+      ]
+    },
+    "blob_latency": {
+      "p50_us": 20102,
+      "p95_us": 41857,
+      "p99_us": 446148
+    },
+    "blob_operations": 100000,
+    "bytes": {
+      "blob": 1388890,
+      "oci_archives": 153600000
+    },
+    "cpu_ticks_after_restart": 0,
+    "cpu_ticks_cycles_after_restart": 18277,
+    "cpu_ticks_segments": [
+      53255,
+      0
+    ],
+    "cpu_ticks_workload_before_first_restart": 53255,
+    "elapsed_us": 4447365991,
+    "final_resources": {
+      "cpu_ticks": 0,
+      "fds": 13,
+      "pid": 455676,
+      "state_bytes": 3538944,
+      "status": [
+        "VmHWM:\t    7668 kB",
+        "VmRSS:\t    7668 kB",
+        "Threads:\t1"
+      ]
+    },
+    "oci_latency": {
+      "p50_us": 37793,
+      "p95_us": 83661,
+      "p99_us": 767853
+    },
+    "oci_lifecycles": 20000,
+    "operation_latency": {
+      "gc": {
+        "p50_us": 4423,
+        "p95_us": 15331,
+        "p99_us": 112368
+      },
+      "import_archive": {
+        "p50_us": 12824,
+        "p95_us": 22080,
+        "p99_us": 215994
+      },
+      "import_blob": {
+        "p50_us": 4069,
+        "p95_us": 11185,
+        "p99_us": 71751
+      },
+      "prepare": {
+        "p50_us": 4845,
+        "p95_us": 9442,
+        "p99_us": 103485
+      }
+    },
+    "post_restart_resources": {
+      "cpu_ticks": 0,
+      "fds": 13,
+      "pid": 455676,
+      "state_bytes": 3538944,
+      "status": [
+        "VmHWM:\t    7612 kB",
+        "VmRSS:\t    7612 kB",
+        "Threads:\t1"
+      ]
+    },
+    "pre_first_restart_resources": {
+      "cpu_ticks": 53255,
+      "fds": 13,
+      "pid": 441935,
+      "state_bytes": 3538944,
+      "status": [
+        "VmHWM:\t   85884 kB",
+        "VmRSS:\t   85884 kB",
+        "Threads:\t1"
+      ]
+    },
+    "status": {
+      "blobs": 0,
+      "bytes": 0,
+      "production_qualified": false,
+      "schema": 3
+    },
+    "throughput_bytes_per_sec": 34849.59194130781
+  },
+  "final_inventory": {
+    "blobs_entries": 0,
+    "prepared_entries": 0,
+    "store_entries": 5,
+    "tables": {
+      "blobs": 0,
+      "edges": 0,
+      "gc": 0,
+      "gc_marks": 0,
+      "imports": 0,
+      "leases": 0,
+      "operations": 4066,
+      "pins": 0,
+      "prepared": 0,
+      "registry": 0,
+      "roots": 0
+    },
+    "temp_entries": 0
+  },
+  "resource_bound_pass": false,
+  "memory_gate": "RSS grows before restart"
+}

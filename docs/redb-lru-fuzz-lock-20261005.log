@@ -1,0 +1,4 @@
+     Locking 1 package to latest Rust 1.93.1 compatible version
+      Adding redb v4.3.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/vendor/redb)
+    Removing redb v4.3.0
+note: pass `--verbose` to see 1 unchanged dependencies behind latest

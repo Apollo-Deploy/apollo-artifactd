@@ -31,20 +31,46 @@ impl Client {
         request: &Request,
         input: Option<&File>,
     ) -> Result<(Response, Option<OwnedFd>)> {
+        self.call_with_control(request, input, || Ok(()))
+    }
+
+    /// Sends a request while periodically giving the caller a cancellation and
+    /// deadline hook. If the hook fails after transmission, the operation token
+    /// remains caller-owned because the server may still commit the operation.
+    pub fn call_with_control<F>(
+        &self,
+        request: &Request,
+        input: Option<&File>,
+        mut control: F,
+    ) -> Result<(Response, Option<OwnedFd>)>
+    where
+        F: FnMut() -> Result<()>,
+    {
+        control()?;
         let socket = net::socket_with(
             AddressFamily::UNIX,
             SocketType::SEQPACKET,
-            SocketFlags::CLOEXEC,
+            SocketFlags::CLOEXEC | SocketFlags::NONBLOCK,
             None,
         )?;
-        net::connect(&socket, &SocketAddrUnix::new(&self.path)?)?;
+        match net::connect(&socket, &SocketAddrUnix::new(&self.path)?) {
+            Ok(()) => {}
+            Err(error) if error == rustix::io::Errno::INPROGRESS => {
+                wire::wait_for_control(&socket, true, 30, &mut control)?;
+                match net::sockopt::socket_error(&socket)? {
+                    Ok(()) => {}
+                    Err(error) => return Err(error.into()),
+                }
+            }
+            Err(error) => return Err(error.into()),
+        }
         if net::sockopt::socket_peercred(&socket)?.uid.as_raw() != self.server_uid {
             return Err(Error::other("unexpected artifactd owner"));
         }
         let fd = input
             .map(|f| f.try_clone().map(OwnedFd::from))
             .transpose()?;
-        wire::wait(&socket, true)?;
+        wire::wait_for_control(&socket, true, 30, &mut control)?;
         wire::send(
             &socket,
             &serde_json::to_vec(request).map_err(Error::other)?,
@@ -52,7 +78,7 @@ impl Client {
         )?;
         // Streaming imports, registry transfers and rootfs verification can outlast
         // packet delivery. Preserve the token on timeout so callers can retry it.
-        wire::wait_for(&socket, false, 600)?;
+        wire::wait_for_control(&socket, false, 600, &mut control)?;
         let (bytes, fd) = wire::receive(&socket)?;
         let response: Response = serde_json::from_slice(&bytes).map_err(Error::other)?;
         if response.version != VERSION || response.operation_id != request.operation_id {
@@ -62,12 +88,19 @@ impl Client {
     }
 
     pub fn allocate(&self) -> Result<OperationId> {
+        self.allocate_with_control(|| Ok(()))
+    }
+
+    pub fn allocate_with_control<F>(&self, mut control: F) -> Result<OperationId>
+    where
+        F: FnMut() -> Result<()>,
+    {
         let request = Request {
             version: VERSION,
             operation_id: "allocation".to_string().try_into().map_err(Error::other)?,
             action: Action::OperationAllocate,
         };
-        let (response, _) = self.call(&request, None)?;
+        let (response, _) = self.call_with_control(&request, None, &mut control)?;
         let value = response.result.map_err(Error::other)?;
         let token: OperationId = value
             .get("operation_id")

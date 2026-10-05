@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+     Running tests/registry_api.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/registry_api-030f9e2967a44a48)
+
+running 1 test
+test registry_api_fd_credentials_journal_and_prepared_facts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.24s
+

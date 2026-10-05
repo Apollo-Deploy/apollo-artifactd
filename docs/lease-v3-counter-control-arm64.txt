@@ -1,0 +1,43 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.76s
+     Running tests/local_lease.rs (target/debug/deps/local_lease-5ff9b0e6fc016271)
+
+running 2 tests
+test local_lease_issuer_never_reuses_id_after_release_and_restart ... ok
+test local_lease_issuer_rejects_partial_persisted_metadata ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.50s
+     Running tests/local_lease.rs (target/debug/deps/local_lease-5ff9b0e6fc016271)
+
+running 1 test
+test local_lease_issuer_rejects_partial_persisted_metadata ... FAILED
+
+failures:
+
+---- local_lease_issuer_rejects_partial_persisted_metadata stdout ----
+
+thread 'local_lease_issuer_rejects_partial_persisted_metadata' (212641) panicked at tests/local_lease.rs:63:44:
+called `Result::unwrap_err()` on an `Ok` value: LeaseId("local_lease_01a447cd3fb345f48aecd957a18cf096_00000000000000000001")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    local_lease_issuer_rejects_partial_persisted_metadata
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.07s
+
+error: test failed, to rerun pass `--test local_lease`
+
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.24s
+     Running tests/local_lease.rs (target/debug/deps/local_lease-5ff9b0e6fc016271)
+
+running 2 tests
+test local_lease_issuer_never_reuses_id_after_release_and_restart ... ok
+test local_lease_issuer_rejects_partial_persisted_metadata ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+
+LOCAL_LEASE_COUNTER_CONTROL_PASSED_SOURCE_RESTORED

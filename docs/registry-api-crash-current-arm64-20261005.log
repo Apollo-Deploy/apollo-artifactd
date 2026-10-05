@@ -1,0 +1,28 @@
+   Compiling apollo-artifactd v0.1.0 (/home/apollo-admin/artifactd-cas-repair-20261005.GPrTLa)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.10s
+     Running tests/registry_api.rs (target/debug/deps/registry_api-cdfd73e3a37e41b3)
+
+running 1 test
+test registry_api_fd_credentials_journal_and_prepared_facts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.09s
+
+     Running tests/registry_crash.rs (target/debug/deps/registry_crash-e399ad46f1e823e0)
+
+running 1 test
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob has been running for over 60 seconds
+Error: published content is writable
+
+thread 'sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob' (347294) panicked at tests/support/daemon.rs:33:13:
+daemon exited before ready
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob ... FAILED
+
+failures:
+
+failures:
+    sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 84.66s
+
+error: test failed, to rerun pass `--test registry_crash`

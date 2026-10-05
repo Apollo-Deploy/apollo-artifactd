@@ -24,6 +24,10 @@ impl Store {
                 recovered += 1;
                 continue;
             };
+            let recorded_blob = self
+                .db
+                .get::<crate::state::Blob>("blobs", digest.as_str())?
+                .is_some_and(|blob| blob.size == record.size);
             if let Ok(meta) = self.temp.symlink_metadata(&record.temp) {
                 if meta.nlink() == 2 {
                     let final_meta = self.blobs.symlink_metadata(digest.hex())?;
@@ -32,13 +36,55 @@ impl Store {
                             && meta.ino() == final_meta.ino()
                             && meta.is_file()
                             && meta.uid() == rustix::process::geteuid().as_raw()
+                            && meta.mode() & 0o222 == 0
                             && meta.mode() & 0o277 == 0,
                         "unproven publication ownership"
                     );
                     self.temp.remove_file(&record.temp)?;
                     filesystem::sync(&self.temp)?;
-                } else {
+                } else if meta.mode() & 0o222 != 0 || meta.len() != record.size {
+                    // A stage which is still writable, or whose durable size
+                    // is not the recorded size, cannot be a completed
+                    // publication.  Remove it only through the descriptor
+                    // relative ownership checks in owned_remove; this keeps
+                    // foreign, linked, and symlink entries fail-closed.
                     filesystem::owned_remove(&self.temp, &record.temp)?;
+                    self.db.remove("imports", &id)?;
+                    recovered += 1;
+                    continue;
+                } else {
+                    // The stage is private and readonly, so it may be the
+                    // completed chmod step immediately before the import
+                    // intent was advanced.  Hash it while those ownership
+                    // checks are live; only a successful hash mismatch grants
+                    // authority to discard it.  Open/hash failures remain
+                    // fail-closed and never become cleanup authorization.
+                    let mut staged = filesystem::read(&self.temp, &record.temp)?;
+                    let (actual, staged_size) = super::hash(&mut staged, record.size)?;
+                    if actual != digest || staged_size != record.size {
+                        filesystem::owned_remove(&self.temp, &record.temp)?;
+                        self.db.remove("imports", &id)?;
+                        recovered += 1;
+                        continue;
+                    }
+                    if self.blobs.symlink_metadata(digest.hex()).is_ok() {
+                        if self.verify_file(&digest, record.size).is_ok() {
+                            filesystem::owned_remove(&self.temp, &record.temp)?;
+                        } else {
+                            ensure!(
+                                recorded_blob,
+                                "unrecorded digest collision refuses recovery replacement"
+                            );
+                            let _existing = filesystem::read(&self.blobs, digest.hex())?;
+                            self.temp.rename(&record.temp, &self.blobs, digest.hex())?;
+                            filesystem::sync(&self.temp)?;
+                            filesystem::sync(&self.blobs)?;
+                        }
+                    } else {
+                        self.temp.rename(&record.temp, &self.blobs, digest.hex())?;
+                        filesystem::sync(&self.temp)?;
+                        filesystem::sync(&self.blobs)?;
+                    }
                 }
             }
             if self.blobs.symlink_metadata(digest.hex()).is_ok() {
@@ -74,8 +120,7 @@ impl Store {
             );
             match self.blobs.symlink_metadata(digest.hex()) {
                 Ok(_) => {
-                    self.verify_file(&digest, garbage.size)?;
-                    filesystem::owned_remove(&self.blobs, digest.hex())?;
+                    filesystem::owned_remove_blob(&self.blobs, digest.hex(), garbage.size)?;
                 }
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
                     filesystem::sync(&self.blobs)?

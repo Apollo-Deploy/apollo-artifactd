@@ -65,6 +65,40 @@ fn publication_and_gc_intents_reconcile_idempotently() {
 }
 
 #[test]
+fn readonly_wrong_digest_stage_is_discarded_after_owner_verified_hash() {
+    let root = root();
+    drop(Store::open(root.path(), Limits::default()).unwrap());
+    let expected = digest(b"expected bytes");
+    let actual = b"wrong payload!";
+    let id = uuid::Uuid::new_v4().to_string();
+    let temp = format!("{id}.part");
+    let temp_path = root.path().join("temp").join(&temp);
+    std::fs::write(&temp_path, actual).unwrap();
+    std::fs::set_permissions(&temp_path, std::fs::Permissions::from_mode(0o400)).unwrap();
+    let dir =
+        cap_std::fs::Dir::open_ambient_dir(root.path(), cap_std::ambient_authority()).unwrap();
+    let db = State::open(&dir).unwrap();
+    db.put(
+        "imports",
+        &id,
+        &Imported {
+            temp: temp.clone(),
+            digest: Some(expected.clone()),
+            size: actual.len() as u64,
+        },
+    )
+    .unwrap();
+    drop(db);
+
+    let store = Store::open(root.path(), Limits::default()).unwrap();
+    assert!(!root.path().join("blobs").join(expected.hex()).exists());
+    assert!(!temp_path.exists());
+    drop(store);
+    let db = State::open(&dir).unwrap();
+    assert_eq!(db.count("imports").unwrap(), 0);
+}
+
+#[test]
 fn prepared_publication_reconciles_before_reuse() {
     let root = root();
     let mut store = Store::open(root.path(), Limits::default()).unwrap();
@@ -95,11 +129,25 @@ fn prepared_publication_reconciles_before_reuse() {
 
 #[test]
 fn prepared_gc_intent_reconciles_with_or_without_tree_effect() {
-    for tree_effect_completed in [false, true] {
+    for (tree_effect_completed, root_count) in [(false, 0), (true, 0), (false, 70), (true, 70)] {
         let root = root();
         let mut store = Store::open(root.path(), Limits::default()).unwrap();
         let manifest = image(&mut store, "amd64", &[], false);
         let prepared = store.prepare(&manifest, &platform("amd64")).unwrap();
+        let retained = b"pinned during prepared GC recovery";
+        let retained_digest = digest(retained);
+        store
+            .import_blob(
+                &mut Cursor::new(retained),
+                &retained_digest,
+                retained.len() as u64,
+            )
+            .unwrap();
+        for index in 0..root_count {
+            store
+                .pin(&format!("recovery-pin-{index:03}"), &retained_digest)
+                .unwrap();
+        }
         drop(store);
 
         let dir =
@@ -116,7 +164,16 @@ fn prepared_gc_intent_reconciles_with_or_without_tree_effect() {
         }
         drop(db);
 
-        let reopened = Store::open(root.path(), Limits::default()).unwrap();
+        let mut reopened = Store::open(root.path(), Limits::default()).unwrap();
+        // Reopening discards stale GC marks. With more than 64 live roots,
+        // recovery needs repeated bounded calls before deletion is proven safe.
+        for _ in 0..128 {
+            reopened.reconcile(1).unwrap();
+            let mut file = reopened.open_blob(&retained_digest).unwrap();
+            let mut bytes = Vec::new();
+            file.read_to_end(&mut bytes).unwrap();
+            assert_eq!(bytes, retained);
+        }
         assert!(reopened.open_blob(&manifest).is_ok());
         assert!(
             !root

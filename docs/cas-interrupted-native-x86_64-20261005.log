@@ -1,0 +1,55 @@
+{"private_tmpdir": "/home/tihan/artifactd-interrupted-inputs-20261005-5c0do7ex", "host": "tihan-apollo"}
+   Compiling apollo-artifactd v0.1.0 (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.07s
+     Running tests/registry_crash.rs (target/debug/deps/registry_crash-495740daa8cb8480)
+
+running 1 test
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob has been running for over 60 seconds
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 284.74s
+
+   Compiling apollo-artifactd v0.1.0 (/home/tihan/artifactd-cas-repair-20261005.Fb6fUB)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.05s
+     Running tests/cas.rs (target/debug/deps/cas-1d1fd1cf4eec0f46)
+
+running 14 tests
+test foreign_files_and_links_are_never_collected ... ok
+test invalid_inputs_never_publish ... ok
+test corrupt_recorded_blob_is_repaired_without_losing_pin_protection ... ok
+test legacy_sqlite_state_is_rejected_without_cleanup ... ok
+test incremental_gc_progresses_past_pinned_prefix_after_restart ... ok
+test calculated_identity_streams_deduplicates_and_rejects_wrong_size ... ok
+test recovery_preserves_unrecorded_digest_collision ... ok
+test cas_admission_durability_and_references ... ok
+test unrecorded_digest_collision_is_preserved ... ok
+test quota_and_exclusive_store_owner ... ok
+test wrong_repair_input_does_not_replace_corrupt_blob ... ok
+test repair_reconciles_after_publish_before_database_commit ... ok
+test repair_reconciles_after_publish_effect_window ... ok
+test stored_identity_matches_bytes ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 24.66s
+
+     Running tests/cas_repair.rs (target/debug/deps/cas_repair-19afc21fd401d176)
+
+running 2 tests
+test oversized_corrupt_final_counts_toward_repair_peak_quota ... ok
+test missing_recorded_final_is_repaired_without_new_object ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/recovery.rs (target/debug/deps/recovery-53b38349e5b2a72e)
+
+running 8 tests
+test crash_import_worker ... ok
+test sigkill_during_calculated_import_discards_unresolved_intent ... ok
+test readonly_wrong_digest_stage_is_discarded_after_owner_verified_hash ... ok
+test publication_and_gc_intents_reconcile_idempotently ... ok
+test sigkill_during_import_never_resolves_partial_content ... ok
+test prepared_publication_reconciles_before_reuse ... ok
+test prepared_gc_intent_reconciles_with_or_without_tree_effect ... ok
+test prepared_recovery_cursor_reaches_late_intent_after_many_complete_records ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.86s
+

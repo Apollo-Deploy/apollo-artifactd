@@ -1,4 +1,5 @@
 //! Request-scoped credentials arrive through a private descriptor, never API JSON.
+use crate::state::PeerIdentity;
 use anyhow::{Result, ensure};
 use oci_client::{Reference, secrets::RegistryAuth};
 use serde::Deserialize;
@@ -30,13 +31,18 @@ impl Drop for Credentials {
 }
 impl Credentials {
     pub fn read(file: Option<File>) -> Result<Self> {
+        let caller = PeerIdentity::current();
+        Self::read_for(file, &caller)
+    }
+
+    pub(crate) fn read_for(file: Option<File>, caller: &PeerIdentity) -> Result<Self> {
         let Some(file) = file else {
             return Ok(Self::default());
         };
         let stat = rustix::fs::fstat(&file)?;
         ensure!(
             rustix::fs::FileType::from_raw_mode(stat.st_mode) == rustix::fs::FileType::RegularFile
-                && stat.st_uid == rustix::process::geteuid().as_raw()
+                && stat.st_uid == caller.uid
                 && stat.st_mode & 0o077 == 0
                 && stat.st_nlink == 1
                 && (0..=65536).contains(&stat.st_size),
@@ -48,7 +54,7 @@ impl Credentials {
         // Never include parse errors: malformed JSON can quote secret bytes.
         serde_json::from_slice(&bytes).map_err(|_| anyhow::anyhow!("invalid credential provider"))
     }
-    pub(crate) fn auth(&self, reference: &Reference) -> Result<RegistryAuth> {
+    pub(crate) fn validate_for(&self, reference: &Reference) -> Result<()> {
         let supplied =
             !self.username.is_empty() || !self.password.is_empty() || !self.token.is_empty();
         ensure!(
@@ -63,6 +69,12 @@ impl Credentials {
             self.auth_authorities.len() <= 16,
             "too many credential authorities"
         );
+        Ok(())
+    }
+    pub(crate) fn auth(&self, reference: &Reference) -> Result<RegistryAuth> {
+        self.validate_for(reference)?;
+        let supplied =
+            !self.username.is_empty() || !self.password.is_empty() || !self.token.is_empty();
         if !self.token.is_empty() {
             Ok(RegistryAuth::Bearer(self.token.clone()))
         } else if supplied {

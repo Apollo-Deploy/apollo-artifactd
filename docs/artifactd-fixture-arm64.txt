@@ -1,0 +1,47 @@
+Artifactd verification fixture qualification — 2026-10-05
+========================================================
+
+Host: apollo-node-01, Linux aarch64, Python 3.12.3.
+The lifecycle used the existing target/release apollo-artifactd and
+apollo-artifactctl binaries from
+/home/apollo-admin/artifactd-qualification-20261004/target/release. The
+fixture copied these into root-owned temporary staging and then into its
+private state directory before execution. A separate read-only SHA-256 query
+of those source paths observed daemon
+786febc77604c3159b8fe4e869ec84e4343707ad82fc52b2042f2fce6ea59f27 and client
+5675cdf6e9fc2010da9ae9d7263b1277a08e0c0726ba3691cf7aa051385fc4e9. These
+hashes were collected after the retained lifecycle run; the retained run did
+not emit hashes for its staged copies.
+
+Fixture helper SHA-256: f307f161673ff8614536e414c1dfd523b78fe1dde2850afa1065fd3381e104b5.
+
+Retained lifecycle result:
+- An isolated Artifactd started with a private store and policy; service UID
+  and GID were both 424242. The daemon process UID and GID checks each showed
+  real, effective, saved, and filesystem IDs equal to 424242.
+- Authenticated STATUS succeeded during startup.
+- A root producer imported a blob; Artifactd returned
+  sha256:afb70d55bc71e832409d6366015a3b30b4d3ac25287cedc2a500a6b59948132d.
+- A STATUS request from unlisted UID 424243, using GID 424242 so it could
+  traverse the group-accessible socket path, exited nonzero. The detailed
+  stderr message was not captured in the retained output.
+- stage_tool staged /usr/bin/true as a root-owned 0755 file; it was not run.
+- The retained output asserted daemon_reaped=true and state_removed=true.
+
+Bounded fixture log check on this host:
+- A child wrote 8,388,608 bytes to stdout and exited 0. With the configured
+  1,048,576-byte retention limit, the log contained exactly 1,048,576 bytes;
+  the reader drained the remaining pipe data so the child completed.
+- Negative control: an isolated fixture object's in-memory retention limit
+  was raised to 8,388,608 bytes before attaching the same child. The log
+  retained 8,388,608 bytes, exceeding the 1 MiB assertion as expected.
+
+The same scratch check on the local macOS host (Python 3.13.7) also retained
+exactly 1,048,576 bytes from an 8,388,608-byte child output with exit status 0;
+the in-memory 8 MiB negative control retained all 8,388,608 bytes.
+
+An additional output-collection attempt later repeated the lifecycle
+assertions, then raised FileNotFoundError while hashing fixture.daemon after
+fixture.close() had removed the state directory. This was a post-cleanup
+reporting error; it did not invalidate the earlier retained lifecycle result.
+No production Artifactd service or store was changed.

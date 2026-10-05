@@ -1,0 +1,9 @@
+{
+  "host": "tihan-apollo",
+  "checkout": "/home/tihan/artifactd-cas-repair-20261005.Fb6fUB",
+  "hashes": {
+    "src/cas/recovery.rs": "cdaa050be9dce368525f92b33c8ddc91185fcfcb9c82a8c1e91ea67bbb2ff648",
+    "tests/recovery.rs": "4ea8e70c1ed630e51351f6b29226ad041b9bdc6d7466630b52d1c364edc29e53",
+    "src/cas/import.rs": "91b6362ac4e00c4d2073e17cc3965ab9cc9372d6df3391f5d7a353540934b7eb"
+  }
+}

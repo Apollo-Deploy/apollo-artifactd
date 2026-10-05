@@ -82,21 +82,24 @@ fn daemon_fd_contract_idempotency_and_replay() {
     assert_eq!(result["size"], 5);
     let conflict = request_id(import.operation_id.clone(), Action::Gc { max_entries: 1 });
     assert!(call(&socket, &conflict, None).unwrap().0.result.is_err());
-    let lease: artifactd_protocol::LeaseId = "consumer".to_owned().try_into().unwrap();
-    assert!(
-        call(
-            &socket,
-            &mutation(Action::LeaseCreate {
-                id: lease.clone(),
-                digest: d.clone()
-            }),
-            None
-        )
+    let lease_result = call(
+        &socket,
+        &mutation(Action::LeaseCreate {
+            digest: d.clone(),
+            grantee: None,
+        }),
+        None,
+    )
+    .unwrap()
+    .0
+    .result
+    .unwrap();
+    let lease: artifactd_protocol::LeaseId = lease_result["lease_id"]
+        .as_str()
         .unwrap()
-        .0
-        .result
-        .is_ok()
-    );
+        .to_owned()
+        .try_into()
+        .unwrap();
     let open = request(
         "open",
         Action::OpenBlob {

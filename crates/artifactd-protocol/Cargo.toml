@@ -2,8 +2,8 @@
 name = "artifactd-protocol"
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.93"
-license = "Apache-2.0"
+rust-version = "1.88"
+license = "MIT"
 description = "Generic versioned artifact daemon contract"
 
 [dependencies]

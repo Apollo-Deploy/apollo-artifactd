@@ -1,0 +1,497 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.26
+   Compiling libc v0.2.190
+   Compiling syn v3.0.6
+   Compiling jobserver v0.1.35
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.14
+   Compiling cc v1.6.0
+   Compiling itoa v1.0.18
+   Compiling synstructure v0.14.0
+   Compiling syn v2.0.119
+   Compiling pkg-config v0.3.34
+   Compiling bitflags v2.13.2
+   Compiling zerofrom-derive v0.1.8
+   Compiling cfg-if v1.0.5
+   Compiling rustix v1.1.5
+   Compiling serde_core v1.0.229
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling linux-raw-sys v0.12.1
+   Compiling memchr v2.8.3
+   Compiling stable_deref_trait v1.2.1
+   Compiling yoke v0.8.3
+   Compiling once_cell v1.21.4
+   Compiling serde v1.0.229
+   Compiling zerovec-derive v0.11.6
+   Compiling serde_derive v1.0.229
+   Compiling fnv v1.0.7
+   Compiling strsim v0.11.1
+   Compiling zmij v1.0.23
+   Compiling zerovec v0.11.8
+   Compiling displaydoc v0.2.7
+   Compiling cmake v0.1.58
+   Compiling fs_extra v1.3.0
+   Compiling pin-project-lite v0.2.17
+   Compiling serde_json v1.0.151
+   Compiling bytes v1.12.1
+   Compiling dunce v1.0.5
+   Compiling aws-lc-sys v0.45.0
+   Compiling futures-core v0.3.34
+   Compiling ident_case v1.0.1
+   Compiling darling_core v0.20.11
+   Compiling thiserror v2.0.21
+   Compiling typenum v1.20.1
+   Compiling darling_macro v0.20.11
+   Compiling tinystr v0.8.4
+   Compiling thiserror-impl v2.0.21
+   Compiling tokio-macros v2.7.2
+   Compiling mio v1.2.4
+   Compiling socket2 v0.6.5
+   Compiling litemap v0.8.3
+   Compiling smallvec v1.16.2
+   Compiling zeroize v1.9.0
+   Compiling aws-lc-rs v1.18.1
+   Compiling writeable v0.6.4
+   Compiling icu_locale_core v2.3.0
+   Compiling tokio v1.53.2
+   Compiling darling v0.20.11
+   Compiling zerotrie v0.2.5
+   Compiling potential_utf v0.1.6
+   Compiling icu_normalizer_data v2.3.0
+   Compiling heck v0.5.0
+   Compiling utf8_iter v1.0.4
+   Compiling regex-syntax v0.8.11
+   Compiling icu_properties_data v2.3.0
+   Compiling icu_collections v2.3.0
+   Compiling icu_provider v2.3.1
+   Compiling derive_builder_core v0.20.2
+   Compiling rustls-pki-types v1.15.1
+   Compiling http v1.5.0
+   Compiling aho-corasick v1.1.5
+   Compiling unicode-xid v0.2.6
+   Compiling konst_macro_rules v0.2.19
+   Compiling percent-encoding v2.3.2
+   Compiling konst v0.2.20
+   Compiling const_format_proc_macros v0.2.34
+   Compiling regex-automata v0.4.18
+   Compiling http-body v1.1.0
+   Compiling derive_builder_macro v0.20.2
+   Compiling futures-macro v0.3.34
+   Compiling rustls v0.23.45
+   Compiling slab v0.4.12
+   Compiling httparse v1.10.1
+   Compiling version_check v0.9.5
+   Compiling futures-task v0.3.34
+   Compiling untrusted v0.9.0
+   Compiling futures-util v0.3.34
+   Compiling generic-array v0.14.7
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling derive_builder v0.20.2
+   Compiling regex v1.13.1
+   Compiling const_format v0.2.36
+   Compiling strum_macros v0.27.2
+   Compiling getset v0.1.7
+   Compiling log v0.4.34
+   Compiling ipnet v2.12.2
+   Compiling subtle v2.6.1
+   Compiling try-lock v0.2.5
+   Compiling getrandom v0.4.3
+   Compiling tower-service v0.3.3
+   Compiling autocfg v1.5.1
+   Compiling strum v0.27.2
+   Compiling num-traits v0.2.19
+   Compiling want v0.3.1
+   Compiling idna_adapter v1.2.2
+   Compiling form_urlencoded v1.2.2
+   Compiling hybrid-array v0.4.15
+   Compiling futures-channel v0.3.34
+   Compiling tracing-core v0.1.36
+   Compiling tracing-attributes v0.1.31
+   Compiling zstd-sys v2.1.0+zstd.1.5.7
+   Compiling atomic-waker v1.1.2
+   Compiling io-lifetimes v2.0.4
+   Compiling io-lifetimes v3.0.1
+   Compiling hyper v1.11.1
+   Compiling tracing v0.1.44
+   Compiling idna v1.1.0
+   Compiling artifactd-protocol v0.1.0 (/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3/crates/artifactd-protocol)
+   Compiling sync_wrapper v1.0.2
+   Compiling base64 v0.23.1
+   Compiling getrandom v0.3.4
+   Compiling tower-layer v0.3.3
+   Compiling utf8parse v0.2.2
+   Compiling openssl-probe v0.2.1
+   Compiling io-extras v0.19.0
+   Compiling rustls-native-certs v0.8.4
+   Compiling anstyle-parse v1.0.0
+   Compiling tower v0.5.3
+   Compiling hyper-util v0.1.21
+   Compiling url v2.5.8
+   Compiling crypto-common v0.2.2
+   Compiling block-buffer v0.12.1
+   Compiling oci-spec v0.9.0
+   Compiling const-oid v0.10.2
+   Compiling futures-sink v0.3.34
+   Compiling ryu v1.0.23
+   Compiling cap-primitives v4.0.3
+   Compiling zstd-safe v7.3.0
+   Compiling tinyvec v1.13.3
+   Compiling colorchoice v1.0.5
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling anstyle v1.0.14
+   Compiling crc32fast v1.5.2
+   Compiling anstyle-query v1.1.5
+   Compiling anstream v1.0.0
+   Compiling unicode-normalization v0.1.25
+   Compiling serde_urlencoded v0.7.1
+   Compiling tokio-util v0.7.19
+   Compiling digest v0.11.3
+   Compiling fs-set-times v0.20.3
+   Compiling tower-http v0.6.11
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling http-body-util v0.1.5
+   Compiling rustix-linux-procfs v0.1.1
+   Compiling cpufeatures v0.3.1
+   Compiling ambient-authority v0.0.2
+   Compiling zerocopy v0.8.59
+   Compiling adler2 v2.0.1
+   Compiling clap_lex v1.1.1
+   Compiling anyhow v1.0.104
+   Compiling iana-time-zone v0.1.65
+   Compiling cap-std v4.0.3
+   Compiling maybe-owned v0.3.4
+   Compiling simd-adler32 v0.3.10
+   Compiling redb v4.3.0 (/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3/vendor/redb)
+   Compiling miniz_oxide v0.9.1
+   Compiling chrono v0.4.45
+   Compiling clap_builder v4.6.7
+   Compiling sha2 v0.11.0
+   Compiling digest v0.10.7
+   Compiling rand_core v0.9.5
+   Compiling olpc-cjson v0.1.4
+   Compiling oci-spec v0.10.0
+   Compiling clap_derive v4.6.7
+   Compiling xattr v1.6.1
+   Compiling http-auth v0.1.10
+   Compiling filetime v0.2.29
+   Compiling cpufeatures v0.2.17
+   Compiling unicase v2.9.0
+   Compiling hex v0.4.3
+   Compiling base64 v0.22.1
+   Compiling sha2 v0.10.9
+   Compiling tar v0.4.46 (/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3/vendor/tar)
+   Compiling clap v4.6.7
+   Compiling flate2 v1.1.10
+   Compiling zstd v0.13.3
+   Compiling uuid v1.27.0
+   Compiling fastrand v2.5.0
+   Compiling tempfile v3.27.0
+   Compiling ppv-lite86 v0.2.21
+   Compiling wait-timeout v0.2.1
+   Compiling bit-vec v0.8.0
+   Compiling quick-error v1.2.3
+   Compiling rusty-fork v0.3.1
+   Compiling bit-set v0.8.0
+   Compiling rand_chacha v0.9.0
+   Compiling rand v0.9.5
+   Compiling rand_xorshift v0.4.0
+   Compiling unarray v0.1.4
+   Compiling proptest v1.11.0
+   Compiling artifactd-client-ffi v0.1.0 (/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3/crates/artifactd-client-ffi)
+   Compiling rustls-webpki v0.103.15
+   Compiling tokio-rustls v0.26.6
+   Compiling hyper-rustls v0.27.10
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling reqwest v0.13.5
+   Compiling oci-client v0.18.0 (/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3/vendor/oci-client)
+   Compiling apollo-artifactd v0.1.0 (/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 17s
+     Running unittests src/lib.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/apollo_artifactd-76bb1e38d7231138)
+
+running 1 test
+test api::runtime::tests::bind_stays_with_captured_runtime_directory_after_path_replacement ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/cli.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/apollo_artifactctl-8fbbbd0ca8df6db5)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/apollo_artifactd-f8806c2436f0969a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/admission_pin.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/admission_pin-138ea709ee51d75a)
+
+running 1 test
+test daemon_oci_admission_pin_survives_replay_and_controls_gc ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s
+
+     Running tests/api.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/api-2c1e1192a07cc618)
+
+running 1 test
+artifactd request rejected
+test daemon_fd_contract_idempotency_and_replay ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/api_intake.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/api_intake-e99c50d6186017f3)
+
+running 1 test
+test silent_authorized_connections_do_not_delay_ready_requests ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/cas.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/cas-ccc793187c9ad4d1)
+
+running 14 tests
+test legacy_sqlite_state_is_rejected_without_cleanup ... ok
+test invalid_inputs_never_publish ... ok
+test foreign_files_and_links_are_never_collected ... ok
+test corrupt_recorded_blob_is_repaired_without_losing_pin_protection ... ok
+test recovery_preserves_unrecorded_digest_collision ... ok
+test quota_and_exclusive_store_owner ... ok
+test incremental_gc_progresses_past_pinned_prefix_after_restart ... ok
+test calculated_identity_streams_deduplicates_and_rejects_wrong_size ... ok
+test unrecorded_digest_collision_is_preserved ... ok
+test cas_admission_durability_and_references ... ok
+test repair_reconciles_after_publish_before_database_commit ... ok
+test repair_reconciles_after_publish_effect_window ... ok
+test wrong_repair_input_does_not_replace_corrupt_blob ... ok
+test stored_identity_matches_bytes ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 14.48s
+
+     Running tests/cas_repair.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/cas_repair-3f0926fe482cdce8)
+
+running 2 tests
+test oversized_corrupt_final_counts_toward_repair_peak_quota ... ok
+test missing_recorded_final_is_repaired_without_new_object ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/client_control.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/client_control-3f5ea78bb18c4643)
+
+running 4 tests
+test response_is_delivered_when_server_closes_immediately_after_send ... ok
+test saturated_socket_backlog_returns_without_blocking_or_delivering_input ... ok
+test cancellation_before_transmission_sends_no_request_or_fd ... ok
+test cancellation_after_transmission_preserves_exact_request_and_fd_delivery ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.00s
+
+     Running tests/client_identity.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/client_identity-2cfef1a2af7d29c3)
+
+running 4 tests
+test privileged_cross_uid_cli_identity_boundary ... ignored, requires explicit root execution and nobody (65534) account
+test wrong_uid_rejects_before_request_or_descriptor_send ... ok
+test valid_uid_endpoint_receives_and_answers_public_request ... ok
+test wrong_uid_rejects_client_allocate_and_cli_autoallocation ... ok
+
+test result: ok. 3 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/delegated_lease_peer.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/delegated_lease_peer-6925834a00923434)
+
+running 2 tests
+test delegated_claim_survives_restart_and_release_replay_cannot_rebind ... ignored, requires explicit root execution for isolated numeric UID/GID peers
+test holds_claimed_blob_fd_until_release ... ignored, child-process helper; invoked by the root-only delegated lease integration case
+
+test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/doctor.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/doctor-bc1262d6fc9d28c9)
+
+running 2 tests
+Error: database quarantined; restart and reconciliation required
+test daemon_doctor_corruption_quarantines_and_exits ... ok
+test doctor_fails_closed_after_committed_state_page_corruption ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/gc_crash.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/gc_crash-3b861bc7cbacdab7)
+
+running 1 test
+test sigkill_prepared_gc_recovers_partial_tree ... ignored, native SIGKILL prepared GC qualification
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/gc_incremental.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/gc_incremental-077714dab5927b70)
+
+running 2 tests
+test pin_and_lease_invalidate_ready_and_partial_gc_snapshots ... ok
+test late_corrupt_pin_is_found_by_bounded_gc_not_startup ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.68s
+
+     Running tests/journal_api.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/journal_api-c39ea2c5872088d6)
+
+running 1 test
+test allocated_mutations_replay_conflict_and_restart_with_bounded_journal ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 17.43s
+
+     Running tests/journal_churn.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/journal_churn-4babfe3eccf9d7a2)
+
+running 1 test
+test public_journal_churn_stays_bounded ... ignored, 100k native journal availability campaign
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/journal_crash.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/journal_crash-d1129c8d8afc01ca)
+
+running 1 test
+test sigkill_import_preserves_intent_and_recovers_without_reexecution ... ignored, native SIGKILL recovery qualification
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/local_lease.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/local_lease-63b2f4ba88b059d8)
+
+running 2 tests
+test local_lease_issuer_never_reuses_id_after_release_and_restart ... ok
+test local_lease_issuer_rejects_partial_persisted_metadata ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/oci.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/oci-8a3a523c8983e234)
+
+running 9 tests
+test malicious_layout_archive_never_unpacks ... ok
+test canonical_duplicate_layout_paths_are_rejected ... ok
+test malformed_oci_archive_pax_is_rejected ... ok
+test admitted_oci_facts_include_verified_descriptor_receipt_data ... ok
+test multi_platform_and_descriptor_substitution ... ok
+test corrupt_reachability_cannot_authorize_gc ... ok
+test diffid_mismatch_and_symlink_escape_fail_preparation ... ok
+test oci_preparation_verifies_diffid_and_whiteouts ... ok
+test valid_archive_admission_and_missing_terminator ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests/oci_gc.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/oci_gc-b6caa521bbc19d86)
+
+running 1 test
+test gc_reimport_restores_admitted_manifest_reachability ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/operation_owner.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/operation_owner-d080fba1506e6ab7)
+
+running 2 tests
+test ownerless_persisted_operation_fails_closed_and_is_preserved ... ok
+test persisted_operation_owner_mismatch_blocks_effect_and_replay ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/operation_owner_peer.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/operation_owner_peer-abe92d7b659ea806)
+
+running 2 tests
+test kernel_peer_gid_binds_operation_owner_across_restart ... ignored, requires explicit root execution for isolated numeric UID/GID peers
+test kernel_peer_gid_binds_persistent_pin_and_lease_owners ... ignored, requires explicit root execution for isolated numeric UID/GID peers
+
+test result: ok. 0 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/prepare_extensions.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/prepare_extensions-5649fe60842e371f)
+
+running 8 tests
+test prepare_bounds_decompressed_bytes_across_the_whole_image ... ok
+test prepare_preserves_pax_linkpath_dot_suffix ... ok
+test prepare_preserves_intermediate_symlink_resolution_for_relative_and_absolute_targets ... ok
+test prepare_normalizes_current_directory_members_and_rejects_alias_collisions ... ok
+test prepare_normalization_keeps_root_type_and_traversal_guards ... ok
+test prepare_standard_extensions_preserves_effective_paths_sizes_and_framing ... ok
+test prepare_rewrites_in_root_absolute_symlinks_and_rejects_escape ... ok
+test prepare_rejects_malformed_and_ambiguous_pax_metadata ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+     Running tests/protocol.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/protocol-be6f7bf7250628dc)
+
+running 1 test
+test truncated_packets_and_excess_descriptors_are_rejected ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/recovery.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/recovery-035bbaa82e0257ef)
+
+running 8 tests
+test crash_import_worker ... ok
+test sigkill_during_calculated_import_discards_unresolved_intent ... ok
+test sigkill_during_import_never_resolves_partial_content ... ok
+test readonly_wrong_digest_stage_is_discarded_after_owner_verified_hash ... ok
+test publication_and_gc_intents_reconcile_idempotently ... ok
+test prepared_publication_reconciles_before_reuse ... ok
+test prepared_gc_intent_reconciles_with_or_without_tree_effect ... ok
+test prepared_recovery_cursor_reaches_late_intent_after_many_complete_records ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.48s
+
+     Running tests/reference_owner.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/reference_owner-f2504bfb48aa4b45)
+
+running 1 test
+test ownerless_reference_fails_closed_during_gc_without_deleting_blob ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.47s
+
+     Running tests/registry.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/registry-a263a95ff2b7ff25)
+
+running 3 tests
+test https_registry_push_pull_verifies_graph_and_retries ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+test push_rejects_unadmitted_manifest_before_credentials ... ok
+test pull_cache_rejects_mismatched_credential_authority ... ok
+
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/registry_api.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/registry_api-030f9e2967a44a48)
+
+running 1 test
+test registry_api_fd_credentials_journal_and_prepared_facts ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/registry_crash.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/registry_crash-0259c6e15504e7b8)
+
+running 1 test
+test sigkill_registry_pull_retains_uncertain_operation_without_publishing_partial_blob ... ignored, requires isolated authenticated HTTPS registry and private credential provider
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/artifactd_client_ffi-1a7c71e804037675)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/home/apollo-admin/artifactd-rss-profile-20261005-arm64/target-rss/debug/deps/artifactd_protocol-46aa68a1fc8ef06a)
+
+running 2 tests
+test tests::mutation_classification_keeps_observations_and_allocation_read_only ... ok
+test tests::operation_tokens_are_canonical_and_round_trip ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests apollo_artifactd
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests artifactd_client_ffi
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests artifactd_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

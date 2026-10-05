@@ -1,0 +1,6 @@
+{"command": ["/home/apollo-admin/.cargo/bin/cargo", "clippy", "--locked", "-p", "apollo-buildkit-publisher", "--lib", "--", "-D", "warnings"]}
+    Checking apollo-buildkit-publisher v0.1.0 (/home/apollo-admin/artifactd-config-lease-20261005-n58deurw/APIs/apollo-deployment-api/crates/apollo-buildkit-publisher)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.19s
+{"command": ["python3", "/home/apollo-admin/artifactd-config-lease-20261005-n58deurw/smoke.py", "/home/apollo-admin/artifactd-cas-repair-20261005.GPrTLa/target/debug/apollo-artifactd", "/home/apollo-admin/artifactd-config-lease-20261005-n58deurw/APIs/apollo-deployment-api/target/debug/artifactd-publisher-qualification"]}
+PASS verified config FD; cancellation cleanup; caller SIGKILL; daemon restart; lease protects graph; repeated recovery releases GC retention
+qualification fixture: /home/apollo-admin/artifactd-config-lease-_v4fp8tf

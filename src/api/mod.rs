@@ -1,28 +1,32 @@
 mod dispatch;
+mod intake;
 mod journal;
 mod journal_recovery;
+mod policy;
+mod runtime;
 use crate::{Limits, Store, filesystem};
 use anyhow::{Result, ensure};
 use artifactd_protocol::{Request, Response, VERSION, wire};
 use cap_std::fs::MetadataExt;
 use rustix::{
     fd::OwnedFd,
-    net::{self, AddressFamily, SocketAddrUnix, SocketFlags, SocketType},
+    net::{self, AddressFamily, SocketFlags, SocketType},
     process::geteuid,
 };
-use std::{os::unix::fs::PermissionsExt, path::Path};
+use std::path::Path;
 
-pub fn serve(store: &Path, path: &Path) -> Result<()> {
+pub fn serve(store: &Path, path: &Path, policy_path: Option<&Path>) -> Result<()> {
     ensure!(
         geteuid().as_raw() != 0,
         "run artifactd as an unprivileged dedicated user"
     );
+    let policy = policy::Policy::load(policy_path)?;
     let mut store = Store::open(store, Limits::default())?;
     journal_recovery::audit(&store, true)?;
     let parent = path
         .parent()
         .ok_or_else(|| anyhow::anyhow!("missing socket parent"))?;
-    let dir = filesystem::private_root(parent)?;
+    let dir = runtime::open(parent, policy.socket_gid())?;
     let _socket_lock = filesystem::lock(&dir)?;
     let name = path
         .file_name()
@@ -35,7 +39,8 @@ pub fn serve(store: &Path, path: &Path) -> Result<()> {
             ensure!(
                 meta.file_type().is_socket()
                     && meta.uid() == geteuid().as_raw()
-                    && meta.mode() & 0o077 == 0,
+                    && meta.gid() == policy.socket_gid().unwrap_or(meta.gid())
+                    && meta.mode() & 0o777 == runtime::socket_mode(policy.socket_gid()),
                 "foreign socket entry"
             );
             dir.remove_file(name)?;
@@ -46,24 +51,17 @@ pub fn serve(store: &Path, path: &Path) -> Result<()> {
     let listener = net::socket_with(
         AddressFamily::UNIX,
         SocketType::SEQPACKET,
-        SocketFlags::CLOEXEC,
+        SocketFlags::CLOEXEC | SocketFlags::NONBLOCK,
         None,
     )?;
-    net::bind(&listener, &SocketAddrUnix::new(path)?)?;
-    std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o600))?;
+    runtime::bind_socket(&dir, path, &listener)?;
+    runtime::finalize_socket(&dir, name, policy.socket_gid())?;
     net::listen(&listener, 32)?;
     filesystem::sync(&dir)?;
+    let mut intake = intake::Intake::new();
     loop {
-        let socket = net::accept_with(&listener, SocketFlags::CLOEXEC)?;
-        let peer = net::sockopt::socket_peercred(&socket)?;
-        if peer.uid != geteuid() {
-            continue;
-        }
-        let caller = crate::state::PeerIdentity {
-            uid: peer.uid.as_raw(),
-            gid: peer.gid.as_raw(),
-        };
-        if let Err(_error) = handle(&mut store, &socket, &caller) {
+        let (socket, caller) = intake.next(&listener, &policy)?;
+        if let Err(_error) = handle(&mut store, &socket, &caller, &policy) {
             // Do not log customer input, credentials or registry diagnostics.
             eprintln!("artifactd request rejected");
         }
@@ -74,12 +72,20 @@ pub fn serve(store: &Path, path: &Path) -> Result<()> {
     }
 }
 
-fn handle(store: &mut Store, socket: &OwnedFd, caller: &crate::state::PeerIdentity) -> Result<()> {
+fn handle(
+    store: &mut Store,
+    socket: &OwnedFd,
+    caller: &crate::state::PeerIdentity,
+    policy: &policy::Policy,
+) -> Result<()> {
     wire::wait(socket, false)?;
     let (bytes, fd) = wire::receive(socket)?;
     let request: Request = serde_json::from_slice(&bytes)?;
     ensure!(request.version == VERSION, "unsupported API version");
-    let (result, output) = dispatch::execute(store, &request, fd, caller);
+    let (result, output) = match policy.authorize_request(&request, caller) {
+        Ok(()) => dispatch::execute(store, &request, fd, caller, policy),
+        Err(error) => (Err(error.to_string()), None),
+    };
     let response = Response {
         version: VERSION,
         operation_id: request.operation_id,

@@ -1,6 +1,9 @@
 mod support;
 use apollo_artifactd::{Limits, Store};
-use std::{io::Read, os::unix::fs::PermissionsExt};
+use std::{
+    io::{Cursor, Read},
+    os::unix::fs::PermissionsExt,
+};
 use support::{image, layer, platform};
 
 fn extended_layer(kind: &str) -> (Vec<u8>, String, Vec<u8>) {
@@ -64,9 +67,10 @@ fn prepare_standard_extensions_preserves_effective_paths_sizes_and_framing() {
                 continue;
             }
         };
-        store.lease("extensions", &manifest).unwrap();
-        let directory =
-            cap_std::fs::Dir::from_std_file(store.open_prepared(&prepared, "extensions").unwrap());
+        let lease = store.lease(&manifest).unwrap();
+        let directory = cap_std::fs::Dir::from_std_file(
+            store.open_prepared(&prepared, lease.as_str()).unwrap(),
+        );
         let mut actual = Vec::new();
         directory
             .open(path)
@@ -210,9 +214,9 @@ fn prepare_normalizes_current_directory_members_and_rejects_alias_collisions() {
             );
         } else {
             let prepared = store.prepare(&manifest, &platform("amd64")).unwrap();
-            store.lease("dot-path", &manifest).unwrap();
+            let lease = store.lease(&manifest).unwrap();
             let directory = cap_std::fs::Dir::from_std_file(
-                store.open_prepared(&prepared, "dot-path").unwrap(),
+                store.open_prepared(&prepared, lease.as_str()).unwrap(),
             );
             assert_eq!(directory.read("dir/file").unwrap(), b"payload");
             assert_eq!(directory.read_dir(".").unwrap().count(), 1);
@@ -255,4 +259,155 @@ fn prepare_normalization_keeps_root_type_and_traversal_guards() {
             );
         }
     }
+}
+
+#[test]
+fn prepare_rewrites_in_root_absolute_symlinks_and_rejects_escape() {
+    for (target, expected) in [
+        ("/bin/busybox", "busybox"),
+        ("../lib/ld-musl", "../lib/ld-musl"),
+        ("a/../b", "a/../b"),
+        ("/a/../b", "../a/../b"),
+    ] {
+        let root = tempfile::tempdir().unwrap();
+        std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
+        let mut store = Store::open(root.path(), Limits::default()).unwrap();
+        let mut archive = tar::Builder::new(Vec::new());
+        let mut directory = tar::Header::new_gnu();
+        directory.set_entry_type(tar::EntryType::Directory);
+        directory.set_size(0);
+        directory.set_mode(0o755);
+        directory.set_cksum();
+        archive
+            .append_data(&mut directory, "bin", Cursor::new([]))
+            .unwrap();
+        let mut link = tar::Header::new_gnu();
+        link.set_entry_type(tar::EntryType::Symlink);
+        link.set_size(0);
+        link.set_link_name(target).unwrap();
+        link.set_cksum();
+        archive
+            .append_data(&mut link, "bin/sh", Cursor::new([]))
+            .unwrap();
+        let manifest = image(&mut store, "amd64", &[archive.into_inner().unwrap()], false);
+        let prepared = store.prepare(&manifest, &platform("amd64")).unwrap();
+        let lease = store.lease(&manifest).unwrap();
+        let directory = cap_std::fs::Dir::from_std_file(
+            store.open_prepared(&prepared, lease.as_str()).unwrap(),
+        );
+        assert_eq!(
+            directory.read_link("bin/sh").unwrap().to_str().unwrap(),
+            expected
+        );
+    }
+
+    let root = tempfile::tempdir().unwrap();
+    std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
+    let mut store = Store::open(root.path(), Limits::default()).unwrap();
+    let mut archive = tar::Builder::new(Vec::new());
+    let mut link = tar::Header::new_gnu();
+    link.set_entry_type(tar::EntryType::Symlink);
+    link.set_size(0);
+    link.set_link_name("../../etc/passwd").unwrap();
+    link.set_cksum();
+    archive
+        .append_data(&mut link, "bin/sh", Cursor::new([]))
+        .unwrap();
+    let manifest = image(&mut store, "amd64", &[archive.into_inner().unwrap()], false);
+    let error = store.prepare(&manifest, &platform("amd64")).unwrap_err();
+    assert!(error.to_string().contains("symlink escape"), "{error:#}");
+}
+
+#[test]
+fn prepare_preserves_intermediate_symlink_resolution_for_relative_and_absolute_targets() {
+    let root = tempfile::tempdir().unwrap();
+    std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
+    let mut store = Store::open(root.path(), Limits::default()).unwrap();
+    let mut archive = tar::Builder::new(Vec::new());
+    for path in ["bin", "dir", "dir/sub"] {
+        let mut header = tar::Header::new_gnu();
+        header.set_entry_type(tar::EntryType::Directory);
+        header.set_size(0);
+        header.set_mode(0o755);
+        header.set_cksum();
+        archive
+            .append_data(&mut header, path, Cursor::new([]))
+            .unwrap();
+    }
+    for (path, contents) in [
+        ("b", b"normalized".as_slice()),
+        ("dir/b", b"literal".as_slice()),
+    ] {
+        let mut header = tar::Header::new_gnu();
+        header.set_size(contents.len() as u64);
+        header.set_mode(0o644);
+        header.set_cksum();
+        archive
+            .append_data(&mut header, path, Cursor::new(contents))
+            .unwrap();
+    }
+    for (path, target) in [
+        ("a", "dir/sub"),
+        ("bin/relative", "../a/../b"),
+        ("bin/absolute", "/a/../b"),
+    ] {
+        let mut header = tar::Header::new_gnu();
+        header.set_entry_type(tar::EntryType::Symlink);
+        header.set_size(0);
+        header.set_link_name(target).unwrap();
+        header.set_cksum();
+        archive
+            .append_data(&mut header, path, Cursor::new([]))
+            .unwrap();
+    }
+    let manifest = image(&mut store, "amd64", &[archive.into_inner().unwrap()], false);
+    let prepared = store.prepare(&manifest, &platform("amd64")).unwrap();
+    let lease = store.lease(&manifest).unwrap();
+    let directory =
+        cap_std::fs::Dir::from_std_file(store.open_prepared(&prepared, lease.as_str()).unwrap());
+    for path in ["bin/relative", "bin/absolute"] {
+        let mut resolved = Vec::new();
+        directory
+            .open(path)
+            .unwrap()
+            .read_to_end(&mut resolved)
+            .unwrap();
+        assert_eq!(resolved, b"literal", "{path} was lexically normalized");
+    }
+}
+
+#[test]
+fn prepare_preserves_pax_linkpath_dot_suffix() {
+    let root = tempfile::tempdir().unwrap();
+    std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
+    let mut store = Store::open(root.path(), Limits::default()).unwrap();
+    let mut archive = tar::Builder::new(Vec::new());
+    let mut directory = tar::Header::new_gnu();
+    directory.set_entry_type(tar::EntryType::Directory);
+    directory.set_size(0);
+    directory.set_mode(0o755);
+    directory.set_cksum();
+    archive
+        .append_data(&mut directory, "bin", Cursor::new([]))
+        .unwrap();
+    archive
+        .append_pax_extensions([("linkpath", b"/bin/busybox/.".as_slice())])
+        .unwrap();
+    let mut link = tar::Header::new_gnu();
+    link.set_entry_type(tar::EntryType::Symlink);
+    link.set_size(0);
+    link.set_link_name("fallback").unwrap();
+    link.set_cksum();
+    archive
+        .append_data(&mut link, "bin/dot", Cursor::new([]))
+        .unwrap();
+    let manifest = image(&mut store, "amd64", &[archive.into_inner().unwrap()], false);
+    let prepared = store.prepare(&manifest, &platform("amd64")).unwrap();
+    let lease = store.lease(&manifest).unwrap();
+    let directory =
+        cap_std::fs::Dir::from_std_file(store.open_prepared(&prepared, lease.as_str()).unwrap());
+    assert_eq!(
+        directory.read_link("bin/dot").unwrap().to_str().unwrap(),
+        "../bin/busybox/."
+    );
 }

@@ -19,6 +19,72 @@ fn store() -> (tempfile::TempDir, Store) {
     (root, store)
 }
 
+fn mismatched_credentials() -> Credentials {
+    let mut private_provider = tempfile::NamedTempFile::new().unwrap();
+    serde_json::to_writer(
+        private_provider.as_file_mut(),
+        &serde_json::json!({
+            "registry":"elsewhere.invalid",
+            "username":"user",
+            "password":"sentinel"
+        }),
+    )
+    .unwrap();
+    Credentials::read(Some(File::open(private_provider.path()).unwrap())).unwrap()
+}
+
+#[test]
+fn push_rejects_unadmitted_manifest_before_credentials() {
+    let (_root, mut source) = store();
+    let config = serde_json::to_vec(&serde_json::json!({
+        "architecture":"amd64", "os":"linux", "rootfs":{"type":"layers","diff_ids":[]}
+    }))
+    .unwrap();
+    let config_digest = import(&mut source, &config);
+    let invalid_manifest = serde_json::to_vec(&serde_json::json!({
+        "schemaVersion":1,
+        "mediaType":MANIFEST,
+        "config":{
+            "mediaType":"application/vnd.oci.image.config.v1+json",
+            "digest":config_digest,
+            "size":config.len()
+        },
+        "layers":[]
+    }))
+    .unwrap();
+    let unadmitted = import(&mut source, &invalid_manifest);
+    let error = Registry::new()
+        .unwrap()
+        .push(
+            &source,
+            &unadmitted,
+            "registry.invalid/repo:tag",
+            mismatched_credentials(),
+        )
+        .unwrap_err();
+    assert_eq!(error.to_string(), "push requires admitted OCI root");
+    assert_eq!(source.status().unwrap()["blobs"], 2);
+}
+
+#[test]
+fn pull_cache_rejects_mismatched_credential_authority() {
+    let (_root, mut source) = store();
+    let manifest = image(&mut source, "amd64", &[], false);
+    let before = source.status().unwrap();
+    let reference = format!("registry.invalid/repo@{manifest}");
+    let error = Registry::new()
+        .unwrap()
+        .pull(
+            &mut source,
+            &reference,
+            &platform("amd64"),
+            mismatched_credentials(),
+        )
+        .unwrap_err();
+    assert_eq!(error.to_string(), "credential authority mismatch");
+    assert_eq!(source.status().unwrap(), before);
+}
+
 #[test]
 #[ignore = "requires isolated authenticated HTTPS registry and private credential provider"]
 fn https_registry_push_pull_verifies_graph_and_retries() {
@@ -60,8 +126,8 @@ fn https_registry_push_pull_verifies_graph_and_retries() {
         .unwrap();
     assert_eq!(target.status().unwrap(), before);
     let prepared = target.prepare(&manifest, &platform("amd64")).unwrap();
-    target.lease("registry-rootfs", &manifest).unwrap();
-    let fd = target.open_prepared(&prepared, "registry-rootfs").unwrap();
+    let lease = target.lease(&manifest).unwrap();
+    let fd = target.open_prepared(&prepared, lease.as_str()).unwrap();
     assert_eq!(
         cap_std::fs::Dir::from_std_file(fd).read("content").unwrap(),
         vec![0x5a; 262144]

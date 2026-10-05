@@ -18,7 +18,7 @@ impl Store {
             cycle.epoch == self.reference_epoch()?,
             "prepared GC snapshot is stale"
         );
-        let nodes = self.verified_graph_nodes(&record.manifest)?;
+        let nodes = self.gc_reachable_nodes(&record.manifest)?;
         self.db.transaction(|tx| {
             for node in nodes {
                 let mut mark = tx

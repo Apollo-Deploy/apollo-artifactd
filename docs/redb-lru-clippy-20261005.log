@@ -1,0 +1,5 @@
+    Checking artifactd-protocol v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/crates/artifactd-protocol)
+    Checking redb v4.3.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/vendor/redb)
+    Checking artifactd-client-ffi v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd/crates/artifactd-client-ffi)
+    Checking apollo-artifactd v0.1.0 (/Users/tihan-nico/Developer/Apollo-Deploy/Open-Source/apollo-artifactd)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.49s

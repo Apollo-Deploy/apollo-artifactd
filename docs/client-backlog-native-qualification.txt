@@ -1,0 +1,33 @@
+Native Linux Unix SEQPACKET backlog qualification, 2026-10-05
+Hosts: tihan-apollo (x86_64), apollo-node-01 (arm64)
+Checkout: ~/artifactd-qualification-20261004
+Scope: protocol client, real saturated kernel socket; no daemon operation/crash claim.
+
+Current source SHA-256 (verified identical locally and on both hosts):
+f7ec7a56f86c4d01b513dcecd88f16186db50e1d80365f618ee23857ce8b107e tests/client_control.rs
+492b0303fe4ed40d1be1bdf604548b523961a9ed14a8df3fbb4f77bfa75a79b3 crates/artifactd-protocol/src/client.rs
+bb66b6948705d5c6eb89f5fa75cd932bb44448cebdfa784705655cc22d77c471 crates/artifactd-protocol/src/wire.rs
+
+Commands: cargo test --locked --test client_control
+(x86 cargo /usr/bin/cargo; ARM ~/.cargo/bin/cargo)
+Both observed:
+running 4 tests
+saturated_socket_backlog_returns_without_blocking_or_delivering_input ... ok
+response_is_delivered_when_server_closes_immediately_after_send ... ok
+cancellation_after_transmission_preserves_exact_request_and_fd_delivery ... ok
+cancellation_before_transmission_sends_no_request_or_fd ... ok
+4 passed; 0 failed; 0 ignored
+
+Independent ARM negative control:
+Only remove SocketFlags::NONBLOCK from protocol Client connection socket.
+Run the saturated_socket_backlog case. Observed intended failure:
+saturated connect blocked: 2.010874136s
+0 passed; 1 failed; 3 filtered out
+The fixture releases its listener after two seconds even for a blocking regression.
+Protocol bytes were restored in finally, the four-test suite passed afterward,
+and restored source hashes matched root and x86. No negative-control change remains.
+
+Authoring gate: protects bounded connection under a saturated kernel backlog.
+Prior response-wait cancellation coverage cannot reach this pre-transmission failure.
+Regression is blocking connect; no production flag, seam, or callback-count assertion.
+Full service operation cancellation/replay remains unqualified by this check.

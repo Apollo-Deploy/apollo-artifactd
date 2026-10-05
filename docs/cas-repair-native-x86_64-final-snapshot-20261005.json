@@ -1,0 +1,11 @@
+{
+  "host": "tihan-apollo",
+  "checkout": "/home/tihan/artifactd-cas-repair-20261005.Fb6fUB",
+  "command": "cargo test --locked --test cas_repair && cargo test --locked --test cas",
+  "hashes": {
+    "src/cas/import.rs": "7b5dd9a798dd343cce1e249a080cbfb4df1e2208cfe6c9c6a8870717eed9c5e6",
+    "src/cas/recovery.rs": "76c0e71b4b93972c942ab82aeb8179d56bae62886b3daaa61052c17199228292",
+    "tests/cas.rs": "f96705929ca7f7e3f7b676781b56214165e40f6aa77bf829d7b12cdbf264c057",
+    "tests/cas_repair.rs": "f2527e1c95fcf40493a48a1f36c8fb8818e5e13e09cfbe8e165ee3e97f42b6f2"
+  }
+}

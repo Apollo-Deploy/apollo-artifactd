@@ -1,5 +1,5 @@
 //! Graph admission and optional durable protection publish in one transaction.
-use super::{facts, platform_of, select};
+use super::{facts, graph::select, platform_of};
 use crate::Store;
 use anyhow::{Result, ensure};
 use artifactd_protocol::{ArtifactDigest, Platform};
@@ -43,6 +43,7 @@ impl Store {
             if let Some(id) = pin {
                 let existing = tx.get::<crate::state::Reference>("pins", id)?;
                 if let Some(reference) = existing.as_ref() {
+                    reference.validate_pin()?;
                     reference.authorize(caller)?;
                 }
                 ensure!(
@@ -101,6 +102,8 @@ impl Store {
                     &crate::state::Reference {
                         digest: digest.clone(),
                         owner: Some(caller.clone()),
+                        grantee: None,
+                        lease_state: None,
                     },
                 )?;
             }

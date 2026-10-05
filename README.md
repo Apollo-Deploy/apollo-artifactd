@@ -1,66 +1,98 @@
 # apollo-artifactd
 
-**APOLLO_ARTIFACTD_PRODUCTION_PARTIAL.** This is an independently buildable Rust artifact service and its own protocol crate. It is not qualified for the requested complete production cutover. Authenticated HTTPS registry transfers are implemented and have native integration evidence; existing Apollo callers still use the old implementation, and independent reviewers block release. See [qualification](docs/QUALIFICATION.md) and [migration map](docs/MIGRATION.md).
+`apollo-artifactd` is a standalone Rust service for storing, verifying, transferring, and preparing OCI artifacts on Linux. It provides a local Unix-domain socket API and two binaries:
 
-The package implements streaming SHA-256 CAS, transactional redb intents, OCI indexes/manifests/configs/layers, local archive admission, graph pins and leases, ownership checked collection, verified layer preparation and descriptor passing. It never runs customer workloads or invokes shells. It has no Zig code and no dependencies on Apollo sibling packages.
+- `apollo-artifactd` runs the service.
+- `apollo-artifactctl` is a command-line client for the versioned API.
 
-## Build and run
+The service owns artifact bytes and metadata. It does not run workloads, invoke shells, or depend on another Apollo package. Artifact digests use canonical `sha256:<hex>` identities; registry tags are mutable references, not artifact identities.
 
-Use native Linux x86_64 or aarch64, Rust 1.93 or newer, a C compiler/linker and standard build utilities for zstd and the TLS cryptography backend. No external database, Zig compiler or sibling checkout is required. Rust dependency versions are recorded in Cargo.lock. macOS supports library tests, but the binaries require Linux SO_PEERCRED and SOCK_SEQPACKET.
+## Capabilities
+
+- Stream blobs into a content-addressed store, hashing and checking declared size before atomically publishing content.
+- Admit OCI layouts and archives, verify descriptor digest, size, media type, and graph relationships, and resolve platform-specific manifests.
+- Pull digest-pinned images from OCI registries over HTTPS and push verified blobs before manifests and optional tags.
+- Retain reachable content with pins and leases, and incrementally collect unreferenced owned content.
+- Prepare immutable root filesystems by applying verified layers in order, checking DiffIDs, handling whiteouts, and rejecting unsafe archive entries.
+- Recover durable operations after restart using a transactional embedded database.
+- Pass file descriptors over the local API for imports and reads; enforce peer identity with Linux `SO_PEERCRED`.
+
+Supported OCI platforms include `linux/amd64` and `linux/arm64`. The generic protocol is in [`crates/artifactd-protocol`](crates/artifactd-protocol); a Rust/C client library is in [`crates/artifactd-client-ffi`](crates/artifactd-client-ffi).
+
+## Requirements
+
+- Linux x86_64 or aarch64 for the daemon and local API.
+- Rust 1.93 or newer.
+- A C toolchain and standard build tools for native compression and TLS dependencies.
+
+The repository includes `Cargo.lock` and the small, license-preserving vendored dependency patches it builds from. It needs no Zig compiler, sibling Apollo checkout, external database, or shell-based import bridge.
+
+## Build
 
 ```sh
 cargo build --locked --release --bins
-cargo test --locked --workspace --all-targets
-mkdir -m 700 /absolute/private/artifact-store /absolute/private/artifact-runtime
-target/release/apollo-artifactd \
-  --store /absolute/private/artifact-store \
-  --socket /absolute/private/artifact-runtime/artifactd.sock
 ```
 
-Run as an unprivileged dedicated user. The root and socket parent must already exist, be owned by that user and be private. An exclusive store lock prevents two daemons owning the same state. The included systemd unit is a qualification example, not an installed service. Its address-family policy permits the local Unix API and outbound registry HTTPS connections.
+The outputs are `target/release/apollo-artifactd` and `target/release/apollo-artifactctl`.
+
+## Run locally
+
+Create private directories owned by the dedicated service user, then start the daemon:
 
 ```sh
-target/release/apollo-artifactctl \
-  --socket /absolute/private/artifact-runtime/artifactd.sock \
-  --action '{"operation":"CAPABILITIES"}'
-target/release/apollo-artifactctl \
-  --socket /absolute/private/artifact-runtime/artifactd.sock \
-  --input /absolute/path/to/blob \
-  --action '{"operation":"IMPORT_BLOB","digest":"sha256:<64 lowercase hex>","size":123}'
+install -d -m 0700 /var/lib/apollo-artifactd /run/apollo-artifactd
+apollo-artifactd \
+  --store /var/lib/apollo-artifactd \
+  --socket /run/apollo-artifactd/artifactd.sock
 ```
 
-For a trusted local producer, omit `digest` from `IMPORT_BLOB`; artifactd calculates and returns SHA-256 while streaming, still enforcing the declared size and quotas. The resolved digest is committed to the import intent before publication.
+The daemon requires an existing private store and socket parent. It holds an exclusive store lock, and by default accepts requests from its effective UID/GID. An optional policy file can grant configured producer, consumer, and administrator roles to other local identities. See [`deploy/apollo-artifactd.service`](deploy/apollo-artifactd.service) for a systemd example.
 
-`IMPORT_OCI`, `IMPORT_OCI_ARCHIVE` and `PULL` accept an optional generic `pin` string. When supplied, verified graph admission and the pin commit in one transaction, and the receipt returns `pin_id`. A conflicting existing pin fails without replacing it. Producers must retain the pin until their artifact lifecycle authorizes `UNPIN`; an import without a pin remains eligible for GC.
+Query service capabilities:
 
-The CLI opens local input and sends its FD. Paths do not cross the daemon API. For OPEN_BLOB/OPEN_PREPARED, use `artifactd_protocol::client::call` on Linux: it returns an owned descriptor that the caller retains. The CLI reports and closes returned descriptors on exit. The client package needs no daemon implementation or Apollo business types.
+```sh
+apollo-artifactctl \
+  --socket /run/apollo-artifactd/artifactd.sock \
+  --action '{"operation":"CAPABILITIES"}'
+```
+
+For blob import, the CLI opens the input file and passes its descriptor to the daemon. Filesystem paths are not part of the service request:
+
+```sh
+apollo-artifactctl \
+  --socket /run/apollo-artifactd/artifactd.sock \
+  --input /path/to/blob \
+  --action '{"operation":"IMPORT_BLOB","size":123}'
+```
+
+The service streams and hashes the input and returns the resulting digest. To enforce a producer-supplied identity, include `"digest":"sha256:<64 lowercase hex>"` in the request; a mismatch fails before publication. Consult `apollo-artifactctl --help` and the protocol crate for the complete request and response contract.
 
 ## Registry transfers
 
-The caller supplies an OCI repository reference. PUSH uploads verified CAS config/layers, then manifests/indexes, then an optional tag. PULL requires a digest-pinned reference such as `registry.example.com/team/image@sha256:<64 lowercase hex>` and verifies remote content before OCI admission. No production registry destination is hardcoded.
+The caller supplies the registry and repository. Pulls use digest-pinned references, for example `registry.example.com/team/image@sha256:<digest>`. The service verifies remote content and OCI relationships before admitting it. Push uploads verified config and layer blobs first, then manifests or indexes, and can update a tag afterward.
 
-PUSH/PULL accept an optional protected credential-provider FD. The CLI opens it with `--input`; credentials themselves must never appear in command arguments. The JSON provider supports `registry` (exact host:port), either `username`/`password` or `token`, optional `ca_pem`, and optional `auth_authorities` (exact trusted bearer-realm host:port values). Use a regular file owned by the service UID, one hard link, no group/other permissions, and at most 64 KiB. Provider content is not persisted in Artifact state. Anonymous access uses no FD. Private provider files must be provisioned outside the store and socket runtime directory.
+There is no built-in registry destination. Credentials are provided through a protected file descriptor, not command-line arguments, logs, or persistent artifact state. Anonymous registry access needs no credential provider. Network and credential-provider policy is enforced by the daemon.
 
-## Protocol and ownership
+## Ownership and lifecycle
 
-One version-2 JSON packet per Unix SOCK_SEQPACKET connection, at most 64 KiB and one SCM_RIGHTS FD. Digests are canonical lowercase `sha256:` identities. Import descriptors must be bounded regular files. OPEN requires a live lease owned by the kernel peer UID/GID. Pins and leases cannot be adopted or removed by another peer, including same-digest retries. See [reference ownership qualification](docs/REFERENCE_OWNERSHIP.md). Replayed reads recheck current integrity and liveness.
+Pins and leases protect an artifact and its reachable OCI graph from collection. Keep the returned generic IDs in the caller's durable lifecycle state and release them when the artifact is no longer needed. `OPEN_BLOB` and `OPEN_PREPARED` return descriptors only when the caller has an applicable lease. Garbage collection is bounded and uses persisted progress so it can resume after interruption.
 
-Packet delivery waits are bounded to 30 seconds. The client allows up to 600 seconds for an operation response, so verified streaming transfers can complete. A response timeout leaves the operation outcome unknown; retry the same allocated token rather than automatically creating a new mutation.
+Prepared artifacts are identified by the source manifest digest, canonical platform, and preparation format version. The service validates layers before publishing a prepared rootfs and rejects traversal, escaping links, hard links, devices, malformed archives, and entries exceeding configured limits.
 
-Mutations use daemon-issued `OperationId` tokens from `OPERATION_ALLOCATE`; the CLI allocates automatically unless `--operation-id` supplies a token for a retry. The durable journal retains up to 4096 reservations/results. Under allocation pressure, it retires the oldest terminal results and unused reservations in batches, advancing a durable retirement floor. A retired token returns `operation expired` and never repeats an effect. Within the retained window, both success and failure replay their original result; a different request with the same token is rejected. Allocation binds the token to the kernel peer UID/GID; execution and replay require that same identity. Ownerless legacy journal entries require explicit migration and cannot be adopted by a caller. See [operation ownership qualification](docs/OPERATION_OWNERSHIP.md).
+## Configuration and operations
 
-Startup audits the bounded journal before accepting clients. Interrupted intents become terminal failures reporting an uncertain outcome: inspect the artifact/reference or remote registry before attempting a new operation. The daemon does not repeat unknown effects after restart. `DOCTOR` is journaled maintenance: it performs redb page integrity checking and logical graph verification. Repair or check failure quarantines the state and stops the daemon; same-token replay returns a historical inspection receipt. See [Doctor integrity policy](docs/DOCTOR_INTEGRITY.md). Existing nonempty version-1 journals are preserved and rejected pending a qualified migration; no protocol fallback exists. See [operation journal qualification](docs/OPERATION_JOURNAL.md) for native daemon churn and crash evidence and remaining release gates.
+The daemon exposes `STATUS`, `DOCTOR`, `RECONCILE`, and `CAPABILITIES` through the local API. Limits and access policy are supplied at daemon startup. Registry URLs and credentials are caller-provided; no Apollo control-plane or secrets service is required.
 
-The daemon admits peers matching its effective UID. The protocol client authenticates the server using SO_PEERCRED before sending a request or FD. `artifactd_protocol::client::Client::new(socket, server_uid)` and CLI `--server-uid` select the trusted service UID; convenience functions and the CLI default trust the caller UID. This client setting does not grant daemon access. See [client identity qualification](docs/CLIENT_IDENTITY.md). The daemon currently assumes cooperating processes under the dedicated service UID. A read-only FD and filesystem mode do not prevent that UID from changing inode permissions. Hostile same-UID isolation and cross-UID consumers are not qualified. redb uses the capability-opened private FD directly. Legacy state.sqlite stores are rejected without modification; state migration and corruption qualification remain open.
+The service is designed to run unprivileged under a dedicated OS account with exclusive ownership of its private store. Linux descriptor-relative filesystem operations anchor storage access to the configured directories. Review the systemd example and host-specific deployment policy before enabling cross-UID access.
 
-Default bounds: 4 GiB blob, 16 GiB store, 4 MiB OCI metadata, 128 graph descriptors, 100,000 rootfs entries, depth 128, and 4096 deletion records per GC call. The daemon processes requests serially; bounded storage does not guarantee responsive concurrent clients. GC verifies at most 64 root records per mark call using durable cursors and reference epochs; deletion waits for a complete unchanged protection snapshot. Per-root graph reads remain bounded by graph and byte limits. See [incremental GC evidence](docs/GC_INCREMENTAL.md).
+## Development
 
-Prepared identity includes the manifest digest, canonical platform and preparation version. Output hashes include content, paths, relative symlinks and execute bits; ownership is the dedicated daemon user and timestamps are not identity. Absolute links, hardlinks, devices, special entries, GNU/PAX extension headers and unsupported descriptor features are rejected. These restrictions are explicitly incomplete portability versus the requested OCI/rootfs behavior.
+```sh
+cargo check --locked --workspace --all-targets
+```
 
-## Qualification tooling
+Fuzz targets live in the separate `fuzz/` Cargo workspace and require `cargo-fuzz`. The service and protocol are modular Rust crates; vendored dependency changes and their provenance are documented beside the vendored sources.
 
-`examples/churn.rs` performs 100,000 blob import/pin/unpin/GC cycles followed by 20,000 OCI cycles. Its OCI fixture has no layers; it does not represent all image workloads or daemon operation-journal churn. `examples/throughput.rs` measures streaming import and verified preparation using a 256 MiB uncompressed layer. `scripts/measure-idle.py` measures an isolated daemon. Each needs a new administrator-provisioned private store; it never touches existing services.
+## License
 
-The separate fuzz workspace uses cargo-fuzz/libFuzzer for protocol/OCI parsing, archive admission/preparation and corrupt recovery records. Short sanitizer runs are smoke evidence, not completed fuzz qualification. Registry response fuzz coverage remains missing.
-
-Dependency evidence, CycloneDX SBOM, native logs and review reports are in `docs/`. The existing Zig artifact package and importer remain because this replacement has not passed its cutover gate. No production deployment was performed.
+The Apollo Artifactd workspace is licensed under the MIT License. Vendored dependencies retain their upstream licenses and notices; see `vendor/` and `licenses/`.

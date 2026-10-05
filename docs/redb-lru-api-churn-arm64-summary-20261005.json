@@ -1,0 +1,127 @@
+{
+  "host": "apollo-node-01-internet",
+  "source_hash": "20df30b346439b40a8a93768705e265ccf85ee09d2adcdb572b0762c56ba3dfd",
+  "daemon_sha256": "f10f99a9d5d9c0d269a5a65e3e5d4a414c33c441f0a79f0d9852c43691df4f41",
+  "runner_sha256": "9e934f9c7fb35b1472ca5ec43cb81ac62a085a998928298b06cae4c25a24fd62",
+  "launcher_pid": 464003,
+  "exit": 0,
+  "run_log_sha256": "ebb9d1262c9d82d47249f04f47def7ee46e00dad5ceb3b7d6cab881bc0f91926",
+  "final": {
+    "baseline": {
+      "cpu_ticks": 0,
+      "fds": 13,
+      "pid": 464005,
+      "state_bytes": 1056768,
+      "status": [
+        "VmHWM:\t    5404 kB",
+        "VmRSS:\t    5404 kB",
+        "Threads:\t1"
+      ]
+    },
+    "blob_latency": {
+      "p50_us": 18735,
+      "p95_us": 47568,
+      "p99_us": 296066
+    },
+    "blob_operations": 100000,
+    "bytes": {
+      "blob": 1388890,
+      "oci_archives": 153600000
+    },
+    "cpu_ticks_after_restart": 0,
+    "cpu_ticks_cycles_after_restart": 18494,
+    "cpu_ticks_segments": [
+      54451,
+      0
+    ],
+    "cpu_ticks_workload_before_first_restart": 54451,
+    "elapsed_us": 4140489027,
+    "final_resources": {
+      "cpu_ticks": 0,
+      "fds": 13,
+      "pid": 512581,
+      "state_bytes": 3538944,
+      "status": [
+        "VmHWM:\t    7796 kB",
+        "VmRSS:\t    7796 kB",
+        "Threads:\t1"
+      ]
+    },
+    "oci_latency": {
+      "p50_us": 36980,
+      "p95_us": 108811,
+      "p99_us": 740926
+    },
+    "oci_lifecycles": 20000,
+    "operation_latency": {
+      "gc": {
+        "p50_us": 4202,
+        "p95_us": 16254,
+        "p99_us": 96570
+      },
+      "import_archive": {
+        "p50_us": 12007,
+        "p95_us": 23191,
+        "p99_us": 153270
+      },
+      "import_blob": {
+        "p50_us": 3454,
+        "p95_us": 9769,
+        "p99_us": 40416
+      },
+      "prepare": {
+        "p50_us": 4839,
+        "p95_us": 9175,
+        "p99_us": 86953
+      }
+    },
+    "post_restart_resources": {
+      "cpu_ticks": 0,
+      "fds": 13,
+      "pid": 512581,
+      "state_bytes": 3538944,
+      "status": [
+        "VmHWM:\t    7740 kB",
+        "VmRSS:\t    7740 kB",
+        "Threads:\t1"
+      ]
+    },
+    "pre_first_restart_resources": {
+      "cpu_ticks": 54451,
+      "fds": 13,
+      "pid": 464005,
+      "state_bytes": 3538944,
+      "status": [
+        "VmHWM:\t    9404 kB",
+        "VmRSS:\t    9404 kB",
+        "Threads:\t1"
+      ]
+    },
+    "status": {
+      "blobs": 0,
+      "bytes": 0,
+      "production_qualified": false,
+      "schema": 3
+    },
+    "throughput_bytes_per_sec": 37432.508331581674
+  },
+  "inventory": {
+    "blobs_entries": 0,
+    "prepared_entries": 0,
+    "store_entries": 5,
+    "tables": {
+      "blobs": 0,
+      "edges": 0,
+      "gc": 0,
+      "gc_marks": 0,
+      "imports": 0,
+      "leases": 0,
+      "operations": 4066,
+      "pins": 0,
+      "prepared": 0,
+      "registry": 0,
+      "roots": 0
+    },
+    "temp_entries": 0
+  }
+}

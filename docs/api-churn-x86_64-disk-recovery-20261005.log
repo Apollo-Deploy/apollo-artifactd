@@ -1,0 +1,4 @@
+{"version":3,"operation_id":"982053c9-0493-4742-a1cf-dc7e2eed9917","result":{"Ok":{"blobs":0,"bytes":0,"production_qualified":false,"schema":3}}}
+{"version":3,"operation_id":"b228d1389fec4df3b449d64e7147275d_00000000000000264756","result":{"Ok":{"recovered":0}}}
+{"version":3,"operation_id":"4c45bf84-9ffa-48fb-830b-c526754a16d8","result":{"Ok":{"blobs":0,"bytes":0,"production_qualified":false,"schema":3}}}
+{"version":3,"operation_id":"b228d1389fec4df3b449d64e7147275d_00000000000000264757","result":{"Ok":{"database":"open","database_integrity_checked":true,"database_integrity_clean":true,"database_repaired":false,"durability":"Immediate","engine":"redb","exclusive_owner":true,"inspection_scope":"operation_execution","live_graphs_verified":true,"operation_journal":{"interrupted":0,"pending_intents":1,"retained":4085,"retired_through":260672,"verified":true}}}}

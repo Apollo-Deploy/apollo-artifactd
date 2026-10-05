@@ -1,0 +1,9 @@
+   Compiling apollo-artifactd v0.1.0 (/home/tihan/artifactd-qualification-20261004)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.35s
+     Running tests/local_lease.rs (target/debug/deps/local_lease-7049d64551a74180)
+
+running 2 tests
+test local_lease_issuer_never_reuses_id_after_release_and_restart ... ok
+test local_lease_issuer_rejects_partial_persisted_metadata ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s

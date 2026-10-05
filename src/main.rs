@@ -5,12 +5,14 @@ struct Args {
     store: std::path::PathBuf,
     #[arg(long)]
     socket: std::path::PathBuf,
+    #[arg(long)]
+    policy: Option<std::path::PathBuf>,
 }
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     #[cfg(target_os = "linux")]
     {
-        apollo_artifactd::api::serve(&args.store, &args.socket)
+        apollo_artifactd::api::serve(&args.store, &args.socket, args.policy.as_deref())
     }
     #[cfg(not(target_os = "linux"))]
     {

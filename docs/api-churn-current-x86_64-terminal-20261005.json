@@ -1,0 +1,142 @@
+{
+  "host": "tihan-apollo",
+  "root": "/home/tihan/artifactd-api-current-20261005-56l_0rhk",
+  "receipts": {
+    "manifest.json": {
+      "path": "docs/api-churn-current-x86_64-complete-20261005.json",
+      "sha256": "a725d5ef23a15ac8d61a7f4dd0015bd1d3f01d6963bb7438870fb2fcbc9e53b1",
+      "bytes": 399
+    },
+    "run.log": {
+      "path": "docs/api-churn-current-x86_64-complete-20261005.log",
+      "sha256": "869c7bb5e2a6263c9ff718cf83fbdae1724afcc95fcc3c81cdb708d6bf39df1f",
+      "bytes": 4985
+    },
+    "exit": {
+      "path": "docs/api-churn-current-x86_64-complete-20261005.exit",
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "bytes": 1
+    }
+  },
+  "terminal_exit": 0,
+  "summary": {
+    "baseline": {
+      "cpu_ticks": 0,
+      "fds": 13,
+      "pid": 2673457,
+      "state_bytes": 1056768,
+      "status": [
+        "VmHWM:\t    6328 kB",
+        "VmRSS:\t    6328 kB",
+        "Threads:\t1"
+      ]
+    },
+    "blob_latency": {
+      "p50_us": 21932,
+      "p95_us": 37441,
+      "p99_us": 43904
+    },
+    "blob_operations": 100000,
+    "bytes": {
+      "blob": 1388890,
+      "oci_archives": 153600000
+    },
+    "cpu_ticks_after_restart": 0,
+    "cpu_ticks_cycles_after_restart": 34791,
+    "cpu_ticks_segments": [
+      91979,
+      2
+    ],
+    "cpu_ticks_workload_before_first_restart": 91979,
+    "elapsed_us": 3416955770,
+    "final_resources": {
+      "cpu_ticks": 2,
+      "fds": 13,
+      "pid": 2686221,
+      "state_bytes": 3538944,
+      "status": [
+        "VmHWM:\t    8652 kB",
+        "VmRSS:\t    8652 kB",
+        "Threads:\t1"
+      ]
+    },
+    "oci_latency": {
+      "p50_us": 47347,
+      "p95_us": 67681,
+      "p99_us": 77687
+    },
+    "oci_lifecycles": 20000,
+    "operation_latency": {
+      "gc": {
+        "p50_us": 5513,
+        "p95_us": 17618,
+        "p99_us": 33660
+      },
+      "import_archive": {
+        "p50_us": 14376,
+        "p95_us": 19095,
+        "p99_us": 22680
+      },
+      "import_blob": {
+        "p50_us": 4026,
+        "p95_us": 5427,
+        "p99_us": 6772
+      },
+      "prepare": {
+        "p50_us": 6366,
+        "p95_us": 8496,
+        "p99_us": 10694
+      }
+    },
+    "post_restart_resources": {
+      "cpu_ticks": 2,
+      "fds": 13,
+      "pid": 2686221,
+      "state_bytes": 3538944,
+      "status": [
+        "VmHWM:\t    8600 kB",
+        "VmRSS:\t    8600 kB",
+        "Threads:\t1"
+      ]
+    },
+    "pre_first_restart_resources": {
+      "cpu_ticks": 91979,
+      "fds": 15,
+      "pid": 2673457,
+      "state_bytes": 3538944,
+      "status": [
+        "VmHWM:\t   85828 kB",
+        "VmRSS:\t   85828 kB",
+        "Threads:\t1"
+      ]
+    },
+    "status": {
+      "blobs": 0,
+      "bytes": 0,
+      "production_qualified": false,
+      "schema": 3
+    },
+    "throughput_bytes_per_sec": 45358.76389175503
+  },
+  "final_inventory": {
+    "blobs_entries": 0,
+    "prepared_entries": 0,
+    "store_entries": 5,
+    "tables": {
+      "blobs": 0,
+      "edges": 0,
+      "gc": 0,
+      "gc_marks": 0,
+      "imports": 0,
+      "leases": 0,
+      "operations": 4066,
+      "pins": 0,
+      "prepared": 0,
+      "registry": 0,
+      "roots": 0
+    },
+    "temp_entries": 0
+  },
+  "resource_bound_pass": false,
+  "memory_gate": "RSS continues growing before restart"
+}

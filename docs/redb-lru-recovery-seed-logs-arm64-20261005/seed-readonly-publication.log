@@ -1,0 +1,11 @@
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2138429139
+INFO: Loaded 1 modules   (694820 inline 8-bit counters): 694820 [0xc6a1a8a78c60, 0xc6a1a8b22684), 
+INFO: Loaded 1 PC tables (694820 PCs): 694820 [0xc6a1a8b22688,0xc6a1a95bc8c8), 
+/home/apollo-admin/artifactd-native-fuzz-20261005-hxzd8un9/focused-recovery-20261005/approved-bin/recovery: Running 1 inputs 1 time(s) each.
+Running: /tmp/apollo-artifactd-redb-lru-20261005.a3iVB3/fuzz/corpus/recovery/seed-readonly-publication
+Executed /tmp/apollo-artifactd-redb-lru-20261005.a3iVB3/fuzz/corpus/recovery/seed-readonly-publication in 74 ms
+***
+*** NOTE: fuzzing was not performed, you have only
+***       executed the target code on a fixed set of inputs.
+***

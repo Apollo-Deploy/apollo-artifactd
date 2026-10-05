@@ -1,0 +1,9 @@
+   Compiling apollo-artifactd v0.1.0 (/tmp/apollo-artifactd-current-20261005.IsaymM)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.20s
+     Running tests/registry_api.rs (/home/apollo-admin/artifactd-cas-repair-20261005.GPrTLa/target/debug/deps/registry_api-92e913b902872d35)
+
+running 1 test
+test registry_api_fd_credentials_journal_and_prepared_facts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.88s
+

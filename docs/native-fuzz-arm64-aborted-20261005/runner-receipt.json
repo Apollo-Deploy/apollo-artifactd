@@ -1,0 +1,17 @@
+{
+  "abort_reason": "Stopped to preserve host storage after persistent filesystem free space fell by about 300 MiB/minute while task-owned disk files remained stable. This target did not reach its 30-minute limit and is not a qualification pass.",
+  "aborted_target": "protocol_oci",
+  "arch": "aarch64",
+  "complete": false,
+  "machine": "apollo-node-01-internet",
+  "per_target_max_seconds": 1800,
+  "persistent_campaign_root": "/home/apollo-admin/artifactd-native-fuzz-20261005-hxzd8un9/campaigns/arm64-redb-lru-tmpfs-20261005",
+  "persistent_disk_guard_free_kib": 2621440,
+  "persistent_free_kib_at_abort": 3356568,
+  "rss_limit_mb": 1024,
+  "source_root": "/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3",
+  "targets": [],
+  "testcase_timeout_seconds": 10,
+  "tmpfs_guard_free_kib": 1572864,
+  "volatile_corpus_root": "/dev/shm/apollo-artifactd-fuzz-20261005"
+}

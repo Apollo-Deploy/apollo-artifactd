@@ -1,0 +1,5 @@
+     Removed 67 files, 118.6MiB total
+   Compiling apollo-transports v0.1.0 (/home/tihan/artifactd-legacy-integration-20261005/APIs/apollo-deployment-api/crates/apollo-transports)
+    Checking apollo-postgres v0.1.0 (/home/tihan/artifactd-legacy-integration-20261005/APIs/apollo-deployment-api/crates/apollo-postgres)
+    Checking apollo-control-plane v0.1.0 (/home/tihan/artifactd-legacy-integration-20261005/APIs/apollo-deployment-api/crates/apollo-control-plane)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 12.48s

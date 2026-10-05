@@ -11,8 +11,9 @@ pub(super) fn execute(
     request: &Request,
     fd: Option<OwnedFd>,
     caller: &PeerIdentity,
+    policy: &super::policy::Policy,
 ) -> (Result<Value, String>, Option<OwnedFd>) {
-    match recorded(store, request, fd, caller) {
+    match recorded(store, request, fd, caller, policy) {
         Ok((value, fd)) => (Ok(value), fd),
         Err(e) => (Err(e.to_string()), None),
     }
@@ -22,6 +23,7 @@ fn recorded(
     request: &Request,
     fd: Option<OwnedFd>,
     caller: &PeerIdentity,
+    policy: &super::policy::Policy,
 ) -> Result<(Value, Option<OwnedFd>)> {
     let input_required = matches!(
         request.action,
@@ -59,7 +61,14 @@ fn recorded(
     }
     // Observations must reflect current integrity and liveness, including replay.
     if !request.action.is_mutation() {
-        return dispatch(store, &request.action, input, caller);
+        return dispatch(
+            store,
+            &request.action,
+            input,
+            caller,
+            policy,
+            &request.operation_id,
+        );
     }
     let payload = serde_json::to_string(&request.action)?;
     if let Some(result) =
@@ -67,7 +76,14 @@ fn recorded(
     {
         return result.map(|v| (v, None)).map_err(anyhow::Error::msg);
     }
-    let outcome = dispatch(store, &request.action, input, caller);
+    let outcome = dispatch(
+        store,
+        &request.action,
+        input,
+        caller,
+        policy,
+        &request.operation_id,
+    );
     let saved: Result<&Value, String> = outcome.as_ref().map(|(v, _)| v).map_err(|e| e.to_string());
     // A page check can repair roots or fail partway through. Its owning
     // state is quarantined: never overwrite the uncertain journal afterward.
@@ -90,6 +106,8 @@ fn dispatch(
     action: &Action,
     input: Option<std::fs::File>,
     caller: &PeerIdentity,
+    policy: &super::policy::Policy,
+    operation_id: &artifactd_protocol::OperationId,
 ) -> Result<(Value, Option<OwnedFd>)> {
     let mut fd = None;
     let value = match action {
@@ -135,8 +153,13 @@ fn dispatch(
             store.unpin_for(id.as_str(), caller)?;
             json!({"pin_id":id})
         }
-        Action::LeaseCreate { id, digest } => {
-            store.lease_for(id.as_str(), digest, caller)?;
+        Action::LeaseCreate { digest, grantee } => {
+            let requested = grantee.as_ref().map(|peer| PeerIdentity {
+                uid: peer.uid,
+                gid: peer.gid,
+            });
+            let grantee = policy.resolve_grantee(caller, requested.as_ref())?;
+            let id = store.lease_for(operation_id, digest, caller, &grantee)?;
             json!({"lease_id":id})
         }
         Action::LeaseRelease { id } => {
@@ -156,11 +179,11 @@ fn dispatch(
                 format!("sha256:{tree_digest}").parse()?;
             json!({"prepared_artifact_id":id,"prepared_digest":prepared_digest,
                 "manifest_digest":prepared.manifest,"platform":prepared.platform,"size":prepared.size,
-                "format":"artifactd-rootfs-v1"})
+                "format":"artifactd-rootfs-v2"})
         }
         Action::OpenBlob { digest, lease } => {
             ensure!(
-                store.leased_for(lease.as_str(), digest, caller)?,
+                store.claim_lease_for(lease.as_str(), digest, caller)?,
                 "blob requires covering lease"
             );
             fd = Some(store.open_blob(digest)?.into());
@@ -195,7 +218,7 @@ fn dispatch(
             let registry = REGISTRY
                 .as_ref()
                 .map_err(|_| anyhow::anyhow!("registry runtime unavailable"))?;
-            let credentials = crate::registry::Credentials::read(input)?;
+            let credentials = crate::registry::Credentials::read_for(input, caller)?;
             registry.pull_with_pin(
                 store,
                 reference,
@@ -213,7 +236,7 @@ fn dispatch(
                 store,
                 digest,
                 reference,
-                crate::registry::Credentials::read(input)?,
+                crate::registry::Credentials::read_for(input, caller)?,
             )?
         }
     };

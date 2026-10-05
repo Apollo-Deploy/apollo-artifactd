@@ -1,0 +1,57 @@
+{
+  "receipt": {
+    "host": "apollo-node-01-internet",
+    "root": "/home/apollo-admin/artifactd-redb-lru-registry-20261005-mp1fo60d",
+    "source": "/tmp/apollo-artifactd-redb-lru-20261005.a3iVB3",
+    "results": [
+      {
+        "target": "registry",
+        "command": [
+          "/home/apollo-admin/.cargo/bin/cargo",
+          "test",
+          "--locked",
+          "--test",
+          "registry",
+          "https_registry_push_pull_verifies_graph_and_retries",
+          "--",
+          "--ignored",
+          "--exact",
+          "--nocapture"
+        ],
+        "exit": 0,
+        "log": "/home/apollo-admin/artifactd-redb-lru-registry-20261005-mp1fo60d/registry.log"
+      },
+      {
+        "target": "registry_api",
+        "command": [
+          "/home/apollo-admin/.cargo/bin/cargo",
+          "test",
+          "--locked",
+          "--test",
+          "registry_api",
+          "registry_api_fd_credentials_journal_and_prepared_facts",
+          "--",
+          "--ignored",
+          "--exact",
+          "--nocapture"
+        ],
+        "exit": 0,
+        "log": "/home/apollo-admin/artifactd-redb-lru-registry-20261005-mp1fo60d/registry_api.log"
+      }
+    ]
+  },
+  "logs": {
+    "registry": {
+      "original_sha256": "ced2be5edf7e6ba0ffb7827735a3a2e10648a11b6a3db13f63eb325ba10406bf",
+      "credential_matches": 0,
+      "retained_log": "redb-lru-native-arm64-registry-20261005.log",
+      "retained_sha256": "ced2be5edf7e6ba0ffb7827735a3a2e10648a11b6a3db13f63eb325ba10406bf"
+    },
+    "registry_api": {
+      "original_sha256": "b3e2463ddb9afb46b3c49a11587456eeb426ac8c1123cb307a391de3527e4fc3",
+      "credential_matches": 0,
+      "retained_log": "redb-lru-native-arm64-registry-api-20261005.log",
+      "retained_sha256": "b3e2463ddb9afb46b3c49a11587456eeb426ac8c1123cb307a391de3527e4fc3"
+    }
+  }
+}

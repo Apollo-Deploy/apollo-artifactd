@@ -33,7 +33,7 @@ def component(package):
     }
     if package["license"]:
         result["licenses"] = [{"expression": package["license"].replace("/", " OR ")}]
-    if package["name"] in {"oci-client", "tar"} and package["source"] is None:
+    if package["name"] in {"oci-client", "tar", "redb"} and package["source"] is None:
         result["properties"] = [{
             "name": "artifactd:vendored-fork",
             "value": f'vendor/{package["name"]}/ARTIFACTD_PATCH.md',

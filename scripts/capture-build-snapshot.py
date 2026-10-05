@@ -24,6 +24,8 @@ patterns = [
     "vendor/oci-client/ARTIFACTD_PATCH.md", "deploy/*", "licenses/*",
     "vendor/tar/src/**/*.rs", "vendor/tar/Cargo.toml", "vendor/tar/LICENSE-*",
     "vendor/tar/ARTIFACTD_PATCH.md", "examples/**/*.rs",
+    "vendor/redb/src/**/*.rs", "vendor/redb/Cargo.toml", "vendor/redb/build.rs",
+    "vendor/redb/LICENSE-*", "vendor/redb/ARTIFACTD_PATCH.md",
 ]
 sources = sorted({p for pattern in patterns for p in root.glob(pattern)
                   if p.is_file() and not any(part.startswith("._") for part in p.parts)})
